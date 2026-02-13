@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,7 +11,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
-    "typecheck": "tsc --noEmit"
+    "db:push:prod": "dotenv -e .env.production.local -- drizzle-kit push",
+    "typecheck": "tsc --noEmit",
+    "vercel-env": "node scripts/setup-vercel-env.mjs"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.33.0",
