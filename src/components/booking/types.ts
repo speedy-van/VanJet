@@ -51,6 +51,7 @@ export interface BookingFormData {
   distanceKm?: number;
   durationMinutes?: number;
   bookingId?: string;
+  trackingToken?: string;
 }
 
 export const TIME_WINDOWS = [

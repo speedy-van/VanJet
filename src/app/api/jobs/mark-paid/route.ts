@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { jobs, bookings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { generateTrackingToken } from "@/lib/tracking/token";
 
 interface MarkPaidBody {
   jobId: string;
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // ── Create booking record ─────────────────────────────────
     const finalPrice = job.estimatedPrice ?? "0";
+    const trackingToken = generateTrackingToken();
 
     const [booking] = await db
       .insert(bookings)
@@ -57,11 +59,14 @@ export async function POST(req: NextRequest) {
         stripePaymentIntentId: body.paymentIntentId,
         paymentStatus: "paid",
         status: "confirmed",
+        trackingToken,
+        trackingEnabled: true,
       })
       .returning();
 
     return NextResponse.json({
       bookingId: booking.id,
+      trackingToken: booking.trackingToken,
       status: "paid",
     });
   } catch (err) {

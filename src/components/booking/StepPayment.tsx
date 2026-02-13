@@ -203,6 +203,9 @@ function PaymentForm({
         if (markRes.ok) {
           const data = await markRes.json();
           form.setValue("bookingId", data.bookingId);
+          if (data.trackingToken) {
+            form.setValue("trackingToken", data.trackingToken);
+          }
         }
 
         onNext();

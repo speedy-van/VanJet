@@ -10,6 +10,7 @@ interface StepSuccessProps {
 
 export function StepSuccess({ form }: StepSuccessProps) {
   const jobId = form.watch("jobId");
+  const trackingToken = form.watch("trackingToken");
 
   return (
     <Box
@@ -62,6 +63,23 @@ export function StepSuccess({ form }: StepSuccessProps) {
         <Text fontSize="14px" color="#6B7280">
           A confirmation email has been sent to your email address.
         </Text>
+
+        {trackingToken && (
+          <Link href={`/track/${trackingToken}`}>
+            <Button
+              bg="#059669"
+              color="white"
+              size="lg"
+              fontWeight="700"
+              borderRadius="8px"
+              h="48px"
+              w="full"
+              _hover={{ bg: "#047857" }}
+            >
+              Live Tracking
+            </Button>
+          </Link>
+        )}
 
         <Link href="/">
           <Button

@@ -9,6 +9,7 @@ import {
   numeric,
   boolean,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 // ── Timestamps helper ───────────────────────────────────────────
@@ -168,9 +169,15 @@ export const bookings = pgTable(
     priceBreakdown: text("price_breakdown"), // JSON string of PricingBreakdown
     repricedAt: timestamp("repriced_at", { withTimezone: true }),
     repricedBy: varchar("repriced_by", { length: 255 }),
+    // Live tracking
+    trackingToken: text("tracking_token").unique(),
+    trackingEnabled: boolean("tracking_enabled").notNull().default(true),
     ...timestamps,
   },
-  (table) => [index("bookings_job_id_idx").on(table.jobId)]
+  (table) => [
+    index("bookings_job_id_idx").on(table.jobId),
+    uniqueIndex("bookings_tracking_token_idx").on(table.trackingToken),
+  ]
 );
 
 // ── Admin Audit Logs ────────────────────────────────────────────
@@ -190,6 +197,33 @@ export const adminAuditLogs = pgTable(
     note: text("note"),
   },
   (table) => [index("audit_logs_booking_id_idx").on(table.bookingId)]
+);
+
+// ── Booking Tracking Events ─────────────────────────────────────
+export const bookingTrackingEvents = pgTable(
+  "booking_tracking_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "cascade" }),
+    driverId: uuid("driver_id").references(() => driverProfiles.id),
+    lat: numeric("lat", { precision: 10, scale: 7 }).notNull(),
+    lng: numeric("lng", { precision: 10, scale: 7 }).notNull(),
+    heading: integer("heading"),
+    speedKph: numeric("speed_kph", { precision: 6, scale: 2 }),
+    accuracyM: integer("accuracy_m"),
+    status: varchar("status", { length: 32 }).notNull().default("on_the_way"), // on_the_way | arrived | loading | in_transit | delivered
+    recordedAt: timestamp("recorded_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("tracking_events_booking_recorded_idx").on(
+      table.bookingId,
+      table.recordedAt
+    ),
+  ]
 );
 
 // ── Reviews ─────────────────────────────────────────────────────
