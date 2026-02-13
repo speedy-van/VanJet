@@ -1,0 +1,21 @@
+{
+  "name": "VanJet – UK Removal & Man and Van",
+  "short_name": "VanJet",
+  "description": "Book trusted removal services and man-and-van drivers across the UK. Instant quotes, live tracking, secure payments.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1D4ED8",
+  "icons": [
+    {
+      "src": "/images/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/images/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
