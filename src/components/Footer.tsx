@@ -56,9 +56,9 @@ export function Footer() {
               📞 020 1234 5678
             </Text>
           </Link>
-          <Link href="mailto:hello@vanjet.co.uk">
+          <Link href="mailto:hello@van-jet.com">
             <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">
-              ✉️ hello@vanjet.co.uk
+              ✉️ hello@van-jet.com
             </Text>
           </Link>
           <Text fontSize="14px">London, United Kingdom</Text>

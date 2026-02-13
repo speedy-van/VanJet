@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
               </Text>
               <Input
                 type="email"
-                placeholder="admin@vanjet.co.uk"
+                placeholder="admin@van-jet.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

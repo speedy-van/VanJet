@@ -6,7 +6,7 @@
 
 Built with Next.js 16 · Chakra UI · Neon Postgres · Stripe Connect · Mapbox
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspeedy-van%2FVanJet&env=DATABASE_URL,NEXT_PUBLIC_MAPBOX_TOKEN,STRIPE_SECRET_KEY,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,NEXTAUTH_SECRET,NEXTAUTH_URL,ADMIN_EMAIL,ADMIN_PASSWORD&project-name=vanjet&repository-name=VanJet)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fspeedy-van%2FVanJet&env=DATABASE_URL,NEXT_PUBLIC_MAPBOX_TOKEN,STRIPE_SECRET_KEY,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,NEXTAUTH_SECRET,NEXTAUTH_URL,ADMIN_EMAIL,ADMIN_PASSWORD&project-name=van-jet&repository-name=VanJet)
 
 </div>
 
@@ -190,7 +190,7 @@ Click the "Deploy with Vercel" button at the top of this README. You'll be promp
 2. Import the repository in [Vercel Dashboard](https://vercel.com/new)
 3. Set **Root Directory** to `my-vanjet` (if the repo root is the parent folder) or leave as `/` if the Next.js project is at root
 4. Add all environment variables from the table above
-5. Set `NEXTAUTH_URL` and `NEXT_PUBLIC_URL` to your Vercel domain (e.g. `https://vanjet.vercel.app`)
+5. Set `NEXTAUTH_URL` and `NEXT_PUBLIC_URL` to your production domain (`https://van-jet.com`)
 6. Deploy
 
 ### Post-Deploy

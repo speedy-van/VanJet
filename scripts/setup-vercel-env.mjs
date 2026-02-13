@@ -53,21 +53,21 @@ const envVars = [
   },
   {
     name: "NEXTAUTH_URL",
-    value: "https://vanjet.com",
+    value: "https://van-jet.com",
     sensitive: false,
     targets: ["production"],
     note: "Must match your production domain exactly.",
   },
   {
     name: "NEXT_PUBLIC_URL",
-    value: "https://vanjet.com",
+    value: "https://van-jet.com",
     sensitive: false,
     targets: ["production"],
     note: "Public-facing app URL.",
   },
   {
     name: "ADMIN_EMAIL",
-    value: "<admin@vanjet.com>",
+    value: "<admin@van-jet.com>",
     sensitive: true,
     targets: ["production", "preview"],
     note: "Admin dashboard login email.",
@@ -135,8 +135,8 @@ console.log("");
 console.log("After setting all variables:");
 console.log("  1. vercel --prod          # Deploy to production");
 console.log("  2. npm run db:push        # Sync database schema");
-console.log("  3. Test: https://vanjet.com");
-console.log("  4. Set up Stripe webhook: https://vanjet.com/api/webhooks/stripe");
+console.log("  3. Test: https://van-jet.com");
+console.log("  4. Set up Stripe webhook: https://van-jet.com/api/webhooks/stripe");
 console.log("");
 
 console.log("╔══════════════════════════════════════════════════════╗");
