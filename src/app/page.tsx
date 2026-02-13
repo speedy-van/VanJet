@@ -19,8 +19,13 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { RecentMoves } from "@/components/RecentMoves";
 import { PricingBanner } from "@/components/PricingBanner";
 import { Footer } from "@/components/Footer";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export default function HomePage() {
+  const moves = useCountUp({ end: 10000, duration: 2200, suffix: "+", separator: "," });
+  const rating = useCountUp({ end: 4.8, duration: 1800, suffix: "★", decimals: 1 });
+  const drivers = useCountUp({ end: 500, duration: 2000, suffix: "+" });
+
   return (
     <Box>
       <Navbar />
@@ -119,24 +124,24 @@ export default function HomePage() {
               justify="center"
             >
               <VStack gap={0}>
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                  10,000+
+                <Text ref={moves.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                  {moves.display}
                 </Text>
                 <Text fontSize="sm" opacity={0.8}>
                   Moves completed
                 </Text>
               </VStack>
               <VStack gap={0}>
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                  4.8★
+                <Text ref={rating.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                  {rating.display}
                 </Text>
                 <Text fontSize="sm" opacity={0.8}>
                   Average rating
                 </Text>
               </VStack>
               <VStack gap={0}>
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                  500+
+                <Text ref={drivers.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                  {drivers.display}
                 </Text>
                 <Text fontSize="sm" opacity={0.8}>
                   Verified drivers
