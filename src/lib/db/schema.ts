@@ -53,6 +53,13 @@ export const driverProfiles = pgTable(
     totalJobs: integer("total_jobs").notNull().default(0),
     bio: text("bio"),
     verified: boolean("verified").notNull().default(false),
+    // Application tracking
+    applicationStatus: varchar("application_status", { length: 20 })
+      .notNull()
+      .default("pending"), // pending | approved | rejected
+    rejectionReason: text("rejection_reason"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: varchar("reviewed_by", { length: 255 }),
     ...timestamps,
   },
   (table) => [index("driver_profiles_user_id_idx").on(table.userId)]

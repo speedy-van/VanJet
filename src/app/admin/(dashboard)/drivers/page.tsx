@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { driverProfiles, users } from "@/lib/db/schema";
 import { eq, desc, count } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
+import Link from "next/link";
 import { DriverVerifyToggle } from "@/components/admin/DriverVerifyToggle";
 
 const LIMIT = 20;
@@ -62,9 +63,20 @@ export default async function AdminDriversPage({ searchParams }: Props) {
 
   return (
     <Box>
-      <Text fontSize="xl" fontWeight="700" mb={4} color="gray.800">
-        Drivers ({total})
-      </Text>
+      <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={2}>
+        <Text fontSize="xl" fontWeight="700" color="gray.800">
+          Drivers ({total})
+        </Text>
+        <Link href="/admin/applications">
+          <Box
+            px={3} py={1} borderRadius="md" bg="blue.500" color="white"
+            fontSize="sm" fontWeight="600" _hover={{ bg: "blue.600" }}
+            cursor="pointer"
+          >
+            📝 Driver Applications
+          </Box>
+        </Link>
+      </Flex>
 
       {/* Filter */}
       <Flex gap={2} mb={4} flexWrap="wrap">
