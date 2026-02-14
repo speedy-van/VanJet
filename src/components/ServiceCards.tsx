@@ -9,6 +9,8 @@ interface Service {
   title: string;
   description: string;
   image: string;
+  emoji: string;
+  accentColor: string;
 }
 
 const services: Service[] = [
@@ -19,6 +21,8 @@ const services: Service[] = [
       "Full house moves with professional loading, transport and unloading across the UK.",
     image:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    emoji: "🏠",
+    accentColor: "# 1D4ED8", // Blue
   },
   {
     id: "office_move",
@@ -27,6 +31,8 @@ const services: Service[] = [
       "Efficient office and commercial moves with minimal downtime for your business.",
     image:
       "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+    emoji: "🏢",
+    accentColor: "#7C3AED", // Purple
   },
   {
     id: "single_item",
@@ -35,6 +41,8 @@ const services: Service[] = [
       "Need just one item moved? A sofa, wardrobe or appliance — we've got you covered.",
     image:
       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80",
+    emoji: "📦",
+    accentColor: "#059669", // Green
   },
   {
     id: "storage",
@@ -43,6 +51,8 @@ const services: Service[] = [
       "Secure collection and delivery to storage facilities anywhere in the UK.",
     image:
       "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+    emoji: "🗄️",
+    accentColor: "#D97706", // Amber
   },
   {
     id: "packing",
@@ -51,6 +61,8 @@ const services: Service[] = [
       "Professional packing and wrapping to keep your belongings safe during transit.",
     image:
       "https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?auto=format&fit=crop&w=800&q=80",
+    emoji: "🎁",
+    accentColor: "#DB2777", // Pink
   },
   {
     id: "piano_specialist",
@@ -59,6 +71,8 @@ const services: Service[] = [
       "Pianos, antiques, gym equipment and other items that need specialist handling.",
     image:
       "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=800&q=80",
+    emoji: "🎹",
+    accentColor: "#DC2626", // Red
   },
 ];
 
@@ -172,43 +186,62 @@ export function ServiceCards() {
                   minH="380px"
                   display="flex"
                   flexDirection="column"
-                  justifyContent="flex-end"
+                  justifyContent="space-between"
                   p={{ base: 6, md: 7 }}
                 >
-                  <Text
-                    fontSize={{ base: "2xl", md: "3xl" }}
-                    fontWeight="800"
-                    color="white"
-                    mb={2}
-                    maxW="75%"
-                    lineHeight="1.15"
-                  >
-                    {s.title}
-                  </Text>
-
-                  <Text
-                    fontSize={{ base: "14px", md: "15px" }}
-                    color="white"
-                    opacity={0.9}
-                    lineHeight="1.6"
-                    maxW="75%"
+                  {/* Icon container at top */}
+                  <Box
+                    w="52px"
+                    h="52px"
+                    borderRadius="12px"
+                    bg={`${s.accentColor}1F`} // 12% opacity
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="24px"
                     mb={4}
+                    flexShrink={0}
                   >
-                    {s.description}
-                  </Text>
+                    {s.emoji}
+                  </Box>
 
-                  <Text
-                    fontSize="15px"
-                    fontWeight="600"
-                    color="white"
-                    display="inline-block"
-                    width="fit-content"
-                    borderBottom="2px solid transparent"
-                    transition="border-color 0.25s ease"
-                    _groupHover={{ borderColor: "#F97316" }}
-                  >
-                    Get Quotes &rarr;
-                  </Text>
+                  {/* Bottom content */}
+                  <Box>
+                    <Text
+                      fontSize={{ base: "2xl", md: "3xl" }}
+                      fontWeight="800"
+                      color="white"
+                      mb={2}
+                      maxW="75%"
+                      lineHeight="1.15"
+                    >
+                      {s.title}
+                    </Text>
+
+                    <Text
+                      fontSize={{ base: "14px", md: "15px" }}
+                      color="white"
+                      opacity={0.9}
+                      lineHeight="1.6"
+                      maxW="75%"
+                      mb={4}
+                    >
+                      {s.description}
+                    </Text>
+
+                    <Text
+                      fontSize="15px"
+                      fontWeight="600"
+                      color="white"
+                      display="inline-block"
+                      width="fit-content"
+                      borderBottom="2px solid transparent"
+                      transition="border-color 0.25s ease"
+                      _groupHover={{ borderColor: "#F59E0B" }}
+                    >
+                      Get Quotes &rarr;
+                    </Text>
+                  </Box>
                 </Box>
               </Box>
             </Link>
