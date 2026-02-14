@@ -138,7 +138,7 @@ export function RecentMoves() {
             <Text color="#6B7280" fontSize="14px" mb={2}>
               {move.items}
             </Text>
-            <Text color="#9CA3AF" fontSize="13px">
+            <Text color="#9CA3AF" fontSize="13px" suppressHydrationWarning>
               {getRelativeTime(move.timestamp)}
             </Text>
           </Box>
