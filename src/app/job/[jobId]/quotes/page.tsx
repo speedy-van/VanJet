@@ -96,7 +96,7 @@ export default function JobQuotesPage({
   } | null>(null);
   
   const [sortBy, setSortBy] = useState<SortOption>("price-low");
-  const [showDetails, setShowDetails] = useState(true);
+  const [showDetails,setShowDetails] = useState(true);
 
   useEffect(() => {
     fetchQuotes();
@@ -179,7 +179,7 @@ export default function JobQuotesPage({
       <Flex minH="60vh" align="center" justify="center">
         <VStack gap={3}>
           <Spinner size="lg" color="blue.500" />
-          <Text color="gray.500">œºœ∫œ¶+Ë œ∫+‰œ¨œ°+‡+Ë+‰... Loading quotes...</Text>
+          <Text color="gray.500">Loading quotes...</Text>
         </VStack>
       </Flex>
     );
@@ -191,7 +191,7 @@ export default function JobQuotesPage({
         <Box bg="red.50" p={4} borderRadius="lg">
           <Text color="red.600" fontWeight="600">{error}</Text>
           <Button mt={3} onClick={() => window.location.reload()}>
-            œ—œ¶œ∫œªœÆ œ∫+‰+‡œ°œ∫+Í+‰œÆ Retry
+            Retry
           </Button>
         </Box>
       </Box>
@@ -224,7 +224,7 @@ export default function JobQuotesPage({
               <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
                 <Box>
                   <Text fontSize="xs" color="gray.500" mb={1}>
-                    œ¶+È+‡ œ∫+‰+‡œ¶œºœ¶ BOOKING REFERENCE
+                    BOOKING REFERENCE
                   </Text>
                   <Text
                     fontSize={{ base: "xl", md: "2xl" }}
@@ -251,11 +251,11 @@ export default function JobQuotesPage({
                     fontSize="sm"
                     fontWeight="700"
                   >
-                    {job.status === "accepted" ? "‘£Ù +‡+Èœø+Í+‰ Accepted" : 
-                     job.status === "quoted" ? "≠É∆º œ¶œ¶+Íœ¬ Quoted" : job.status}
+                    {job.status === "accepted" ? "Accepted" : 
+                     job.status === "quoted" ? "Quoted" : job.status}
                   </Badge>
                   <Text fontSize="xs" color="gray.500">
-                    {quotes.length} {quotes.length === 1 ? "œ¶œ¶œ¬ Quote" : "œ¶œ¶+Íœ¬ Quotes"}
+                    {quotes.length} {quotes.length === 1 ? "Quote" : "Quotes"}
                   </Text>
                 </VStack>
               </Flex>
@@ -275,10 +275,10 @@ export default function JobQuotesPage({
               <HStack justify="space-between" flexWrap="wrap" gap={3}>
                 <Box>
                   <Text fontWeight="800" color="green.700" fontSize="lg">
-                    ‘£Ù œ¨+‡ +Èœø+Í+‰ œ∫+‰œ¶œ¶œ¬ Quote Accepted
+                    Quote Accepted
                   </Text>
                   <Text fontSize="sm" color="green.600" mt={1}>
-                    œ∫+‰œ¶œ¶œ¶ œ∫+‰+Â+Áœ∫œ™+Ë: Final Price: {formatGBP(acceptResult.price ?? 0)}
+                    Final Price: {formatGBP(acceptResult.price ?? 0)}
                   </Text>
                 </Box>
                 <Link
@@ -291,7 +291,7 @@ export default function JobQuotesPage({
                     size="lg"
                     _hover={{ bg: "#047857" }}
                   >
-                    ≠É∆¶ œ∫œª+¸œ¶ œ∫+‰œÛ+Â Pay Now
+                    Pay Now
                   </Button>
                 </Link>
               </HStack>
@@ -322,14 +322,14 @@ export default function JobQuotesPage({
                 >
                   <HStack justify="space-between" mb={4}>
                     <Text fontSize="lg" fontWeight="800" color="gray.800">
-                      ≠ÉÙ™ œ¨+¸œ∫œ¡+Ë+‰ œ∫+‰+Â+È+‰ Job Details
+                      Job Details
                     </Text>
                     <Button
                       size="xs"
                       variant="ghost"
                       onClick={() => setShowDetails(!showDetails)}
                     >
-                      {showDetails ? "œ—œ´+¸œ∫œÌ Hide" : "œ¶œ¶œ¬ Show"}
+                      {showDetails ? "Hide" : "Show"}
                     </Button>
                   </HStack>
 
@@ -337,31 +337,31 @@ export default function JobQuotesPage({
                     <VStack gap={3} align="stretch" fontSize="sm">
                       <Box>
                         <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
-                          +‡+Â FROM
+                          FROM
                         </Text>
                         <Text color="gray.800">{job.pickupAddress}</Text>
                         {job.pickupFloor !== null && (
                           <Text fontSize="xs" color="gray.500">
-                            œ∫+‰œ¿œ∫œø+È {job.pickupFloor} ‘«Û {job.pickupHasLift ? "‘£Ù +‡œ¡œ¶œª Lift" : "‘‹· œøœª+Í+Â +‡œ¡œ¶œª No Lift"}
+                            Floor {job.pickupFloor} ‚Ä¢ {job.pickupHasLift ? "Lift Available" : "No Lift"}
                           </Text>
                         )}
                       </Box>
 
                       <Box>
                         <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
-                          œ—+‰+Î TO
+                          TO
                         </Text>
                         <Text color="gray.800">{job.deliveryAddress}</Text>
                         {job.deliveryFloor !== null && (
                           <Text fontSize="xs" color="gray.500">
-                            œ∫+‰œ¿œ∫œø+È {job.deliveryFloor} ‘«Û {job.deliveryHasLift ? "‘£Ù +‡œ¡œ¶œª Lift" : "‘‹· œøœª+Í+Â +‡œ¡œ¶œª No Lift"}
+                            Floor {job.deliveryFloor} ‚Ä¢ {job.deliveryHasLift ? "Lift Available" : "No Lift"}
                           </Text>
                         )}
                       </Box>
 
                       <Flex gap={3} flexWrap="wrap" fontSize="xs">
                         <Badge colorPalette="blue" px={2} py={1}>
-                          ≠ÉÙ‡ {new Date(job.moveDate).toLocaleDateString("en-GB", {
+                          {new Date(job.moveDate).toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",
@@ -369,12 +369,12 @@ export default function JobQuotesPage({
                         </Badge>
                         {job.distanceMiles && (
                           <Badge colorPalette="gray" px={2} py={1}>
-                            ≠ÉÙ≈ {job.distanceMiles} mi
+                            {job.distanceMiles} mi
                           </Badge>
                         )}
                         {job.needsPacking && (
                           <Badge colorPalette="orange" px={2} py={1}>
-                            ≠ÉÙ™ +Ëœ°œ¨œ∫œº œ¨œ¶+‰+Ë+¸ Needs Packing
+                            Needs Packing
                           </Badge>
                         )}
                       </Flex>
@@ -382,7 +382,7 @@ export default function JobQuotesPage({
                       {job.estimatedPrice && (
                         <Box bg="blue.50" p={3} borderRadius="md">
                           <Text fontSize="xs" color="blue.600" mb={1}>
-                            œ∫+‰œ¶œ¶œ¶ œ∫+‰œ¨+Èœª+Ëœ¶+Ë Estimated Price
+                            Estimated Price
                           </Text>
                           <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
                             {formatGBP(job.estimatedPrice)}
@@ -405,7 +405,7 @@ export default function JobQuotesPage({
                   borderColor="gray.100"
                 >
                   <Text fontSize="lg" fontWeight="800" color="gray.800" mb={3}>
-                    ≠ÉÙÔ œ∫+‰œ¶+¸œ¶ Items ({items.reduce((s, i) => s + i.quantity, 0)})
+                    Items ({items.reduce((s, i) => s + i.quantity, 0)})
                   </Text>
                   
                   <VStack gap={2} align="stretch" maxH="400px" overflowY="auto">
@@ -422,7 +422,7 @@ export default function JobQuotesPage({
                             {item.name}
                           </Text>
                           <Badge colorPalette="blue" px={2} py={0.5}>
-                            +˘{item.quantity}
+                            x{item.quantity}
                           </Badge>
                         </HStack>
                         {item.category && (
@@ -431,10 +431,10 @@ export default function JobQuotesPage({
                           </Text>
                         )}
                         <Flex gap={2} mt={1} flexWrap="wrap" fontSize="xs" color="gray.500">
-                          {item.weightKg && <Text>‘‹˚¥©≈ {item.weightKg}kg</Text>}
-                          {item.volumeM3 && <Text>≠ÉÙ™ {item.volumeM3}m-¶</Text>}
-                          {item.fragile && <Text>‘‹·¥©≈ +Èœ∫œø+‰ +‰+‰+‚œ¶œ¶ Fragile</Text>}
-                          {item.requiresDismantling && <Text>≠Éˆ∫ +Ëœ°œ¨œ∫œº +¸+‚ Dismantling</Text>}
+                          {item.weightKg && <Text>{item.weightKg}kg</Text>}
+                          {item.volumeM3 && <Text>{item.volumeM3}m¬≥</Text>}
+                          {item.fragile && <Text>Fragile</Text>}
+                          {item.requiresDismantling && <Text>Dismantling Required</Text>}
                         </Flex>
                         {item.notes && (
                           <Text fontSize="xs" color="gray.600" mt={2} fontStyle="italic">
@@ -447,12 +447,12 @@ export default function JobQuotesPage({
 
                   <Box mt={3} pt={3} borderTop="1px solid" borderColor="gray.200">
                     <HStack justify="space-between" fontSize="sm">
-                      <Text color="gray.600">œ∫+‰+Íœ¶+Â œ∫+‰+‚+‰+Ë Total Weight:</Text>
+                      <Text color="gray.600">Total Weight:</Text>
                       <Text fontWeight="700">{totalWeight.toFixed(1)} kg</Text>
                     </HStack>
                     <HStack justify="space-between" fontSize="sm">
-                      <Text color="gray.600">œ∫+‰œ°œº+‡ œ∫+‰+‚+‰+Ë Total Volume:</Text>
-                      <Text fontWeight="700">{totalVolume.toFixed(2)} m-¶</Text>
+                      <Text color="gray.600">Total Volume:</Text>
+                      <Text fontWeight="700">{totalVolume.toFixed(2)} m¬≥</Text>
                     </HStack>
                   </Box>
                 </Box>
@@ -472,7 +472,7 @@ export default function JobQuotesPage({
               >
                 <HStack gap={3} flexWrap="wrap">
                   <Text fontSize="sm" fontWeight="600" color="gray.600">
-                    œ¨œ¶œ¨+Ëœø Sort:
+                    Sort:
                   </Text>
                   <Box>
                     <select
@@ -488,10 +488,10 @@ export default function JobQuotesPage({
                         cursor: "pointer",
                       }}
                     >
-                      <option value="price-low">œ˙+È+‰ œ¶œ¶œ¶ Price: Low ‘Â∆ High</option>
-                      <option value="price-high">œ˙œ¶+‰+Î œ¶œ¶œ¶ Price: High ‘Â∆ Low</option>
-                      <option value="rating">œ˙œ¶+‰+Î œ¨+È+Ë+Ë+‡ Rating: High ‘Â∆ Low</option>
-                      <option value="recent">œ∫+‰œ˙œ°œªœΩ Most Recent</option>
+                      <option value="price-low">Price: Low to High</option>
+                      <option value="price-high">Price: High to Low</option>
+                      <option value="rating">Rating: High to Low</option>
+                      <option value="recent">Most Recent</option>
                     </select>
                   </Box>
                   <Button
@@ -500,7 +500,7 @@ export default function JobQuotesPage({
                     onClick={fetchQuotes}
                     ml="auto"
                   >
-                    ≠Éˆ‰ œ¨œ°œª+ËœΩ Refresh
+                    Refresh
                   </Button>
                 </HStack>
               </Box>
@@ -516,14 +516,11 @@ export default function JobQuotesPage({
                   border="2px dashed"
                   borderColor="gray.200"
                 >
-                  <Text fontSize="3xl" mb={2}>≠ÉÙ°</Text>
+                  <Text fontSize="3xl" mb={2}>üì≠</Text>
                   <Text fontSize="lg" fontWeight="700" color="gray.600">
-                    +‰œ∫ œ¨+Íœºœª œ¶œ¶+Íœ¬ œøœ¶œª No Quotes Yet
+                    No Quotes Yet
                   </Text>
                   <Text fontSize="sm" color="gray.400" mt={2}>
-                    œ∫+‰œ¶œ∫œ™+È+Í+Â +¸+Ë +‡+Âœ¿+Èœ¨+‚ œ¶+Ëœøœªœ˙+Í+Â œøœ—œ¶œ¶œ∫+‰ œ¶œ¶+Íœ¬+Á+‡ +Èœ¶+Ëœøœ∫+Ô
-                  </Text>
-                  <Text fontSize="sm" color="gray.400">
                     Drivers in your area will start sending quotes shortly
                   </Text>
                 </Box>
@@ -572,7 +569,7 @@ export default function JobQuotesPage({
                             </Text>
                             {q.driver.verified && (
                               <Badge colorPalette="green" px={2} py={0.5} fontSize="xs">
-                                ‘£Ù +‡+ÍœΩ+È Verified
+                                Verified
                               </Badge>
                             )}
                           </HStack>
@@ -582,9 +579,9 @@ export default function JobQuotesPage({
                             </Text>
                           )}
                           <HStack gap={2} mt={1} fontSize="xs" color="gray.500">
-                            <Text>‘°… {q.driver.rating.toFixed(1)}</Text>
-                            <Text>‘«Û</Text>
-                            <Text>{q.driver.totalJobs} +Íœ©+Ë+¸œÆ jobs</Text>
+                            <Text>‚≠ê {q.driver.rating.toFixed(1)}</Text>
+                            <Text>‚Ä¢</Text>
+                            <Text>{q.driver.totalJobs} jobs</Text>
                           </HStack>
                         </Box>
                       </HStack>
@@ -598,8 +595,8 @@ export default function JobQuotesPage({
                             q.price < job.estimatedPrice ? "green.600" : "orange.600"
                           }>
                             {q.price < job.estimatedPrice 
-                              ? `œ˙+È+‰ œø+« ${formatGBP(job.estimatedPrice - q.price)}`
-                              : `œ˙œ¶+‰+Î œø+« ${formatGBP(q.price - job.estimatedPrice)}`}
+                              ? `${formatGBP(job.estimatedPrice - q.price)} below`
+                              : `${formatGBP(q.price - job.estimatedPrice)} above`}
                           </Text>
                         )}
                       </VStack>
@@ -609,22 +606,22 @@ export default function JobQuotesPage({
                     <Flex gap={2} flexWrap="wrap" fontSize="xs">
                       {q.driver.vanSize && (
                         <Badge colorPalette="gray" px={2} py={1}>
-                          ≠É‹… {q.driver.vanSize}
+                          üöê {q.driver.vanSize}
                         </Badge>
                       )}
                       {q.estimatedDuration && (
                         <Badge colorPalette="blue" px={2} py={1}>
-                          ‘≈¶ {q.estimatedDuration}
+                          ‚è±Ô∏è {q.estimatedDuration}
                         </Badge>
                       )}
                       {q.driver.email && (
                         <Badge colorPalette="gray" px={2} py={1}>
-                          ‘£Î¥©≈ {q.driver.email}
+                          ‚úâÔ∏è {q.driver.email}
                         </Badge>
                       )}
                       {q.driver.phone && (
                         <Badge colorPalette="gray" px={2} py={1}>
-                          ≠ÉÙ◊ {q.driver.phone}
+                          üìû {q.driver.phone}
                         </Badge>
                       )}
                     </Flex>
@@ -633,7 +630,7 @@ export default function JobQuotesPage({
                     {q.message && (
                       <Box bg="blue.50" p={3} borderRadius="md">
                         <Text fontSize="sm" color="gray.700">
-                          ≠É∆º &ldquo;{q.message}&rdquo;
+                          &ldquo;{q.message}&rdquo;
                         </Text>
                       </Box>
                     )}
@@ -649,7 +646,7 @@ export default function JobQuotesPage({
                         fontSize="md"
                         fontWeight="700"
                       >
-                        ‘£Ù œ¨+‡ œ∫+‰+Èœø+Í+‰ Accepted
+                        Accepted
                       </Badge>
                     ) : q.status === "rejected" ? (
                       <Badge
@@ -660,12 +657,10 @@ export default function JobQuotesPage({
                         alignSelf="flex-start"
                         fontSize="md"
                       >
-                        ‘£˘ +‡œ¶+¸+Íœ¬ Rejected
+                        Rejected
                       </Badge>
                     ) : !hasAcceptedQuote && !q.driver.stripeOnboarded ? (
                       <Text fontSize="sm" color="orange.600" fontWeight="600">
-                        ‘‹· +Áœ¶œ∫ œ∫+‰œ¶œ∫œ™+È +‰+‡ +Ë+‚+‡+‰ œ—œ¶œªœ∫œª œ∫+‰œª+¸œ¶ œøœ¶œª
-                        <br />
                         This driver hasn&apos;t completed payment setup yet
                       </Text>
                     ) : !hasAcceptedQuote ? (
@@ -680,13 +675,13 @@ export default function JobQuotesPage({
                         _disabled={{ opacity: 0.6 }}
                       >
                         {accepting === q.id
-                          ? "œºœ∫œ¶+Ë œ∫+‰+Èœø+Í+‰... Accepting..."
-                          : `‘£Ù +Èœø+Í+‰ Accept ‘«ˆ ${formatGBP(q.price)}`}
+                          ? "Accepting..."
+                          : `Accept ‚Ä¢ ${formatGBP(q.price)}`}
                       </Button>
                     ) : null}
 
                     <Text fontSize="xs" color="gray.400" textAlign="right">
-                      œ¨+‡ œ∫+‰œ—œ¶œ¶œ∫+‰ Submitted: {new Date(q.createdAt).toLocaleString("en-GB", {
+                      Submitted: {new Date(q.createdAt).toLocaleString("en-GB", {
                         day: "numeric",
                         month: "short",
                         hour: "2-digit",
