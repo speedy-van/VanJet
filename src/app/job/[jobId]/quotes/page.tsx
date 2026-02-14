@@ -359,6 +359,43 @@ export default function JobQuotesPage({
             </Box>
           )}
 
+          {/* Mobile-only: Items Summary Card (visible before scrolling to Job Details) */}
+          {items.length > 0 && (
+            <Box
+              display={{ base: "block", lg: "none" }}
+              bg="white"
+              borderRadius="xl"
+              shadow="sm"
+              p={4}
+              border="1px solid"
+              borderColor="gray.100"
+            >
+              <Text fontSize="md" fontWeight="800" color="gray.800" mb={2}>
+                Items ({items.reduce((s, i) => s + i.quantity, 0)})
+              </Text>
+              <VStack gap={1} align="stretch" fontSize="sm">
+                {items.slice(0, 3).map((item) => (
+                  <HStack key={item.id} justify="space-between">
+                    <Text color="gray.700" truncate maxW="200px">
+                      {item.name}
+                    </Text>
+                    <Badge colorPalette="blue" px={2} py={0.5} fontSize="xs">
+                      x{item.quantity}
+                    </Badge>
+                  </HStack>
+                ))}
+                {items.length > 3 && (
+                  <Text fontSize="xs" color="gray.500">
+                    +{items.length - 3} more items...
+                  </Text>
+                )}
+              </VStack>
+              <HStack justify="space-between" mt={2} pt={2} borderTop="1px solid" borderColor="gray.200" fontSize="xs">
+                <Text color="gray.500">Total: {totalWeight.toFixed(1)}kg • {totalVolume.toFixed(2)}m³</Text>
+              </HStack>
+            </Box>
+          )}
+
           {/* Main Grid: Job Details | Quotes */}
           <Grid
             templateColumns={{ base: "1fr", lg: "400px 1fr" }}
