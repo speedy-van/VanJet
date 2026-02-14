@@ -673,12 +673,12 @@ export default function JobQuotesPage({
                           fontWeight="900"
                           fontSize="xl"
                         >
-                          {q.driver.name.charAt(0).toUpperCase()}
+                          {(q.driver.name || "D").charAt(0).toUpperCase()}
                         </Flex>
                         <Box>
                           <HStack gap={2}>
                             <Text fontWeight="800" fontSize="md" color="gray.800">
-                              {q.driver.name}
+                              {q.driver.name || "Driver"}
                             </Text>
                             {q.driver.verified && (
                               <Badge colorPalette="green" px={2} py={0.5} fontSize="xs">
