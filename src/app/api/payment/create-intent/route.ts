@@ -1,7 +1,7 @@
 // ─── VanJet · Create Payment Intent API ──────────────────────
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { jobs, quotes, driverProfiles } from "@/lib/db/schema";
+import { jobs, quotes, driverProfiles, users } from "@/lib/db/schema";
 import { createPaymentIntent } from "@/lib/stripe";
 import { eq } from "drizzle-orm";
 
@@ -84,6 +84,13 @@ export async function POST(req: NextRequest) {
 
       const amountPence = Math.round(pricePounds * 100);
 
+      // Fetch driver details
+      const [driver] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, quote.driverId))
+        .limit(1);
+
       const { clientSecret, paymentIntentId } =
         await createPaymentIntent({
           amountPence,
@@ -100,6 +107,21 @@ export async function POST(req: NextRequest) {
         paymentIntentId,
         amountPence,
         driverStripeAccountId: driverProfile.stripeAccountId,
+        job: {
+          id: job.id,
+          referenceNumber: job.referenceNumber,
+          pickupAddress: job.pickupAddress,
+          deliveryAddress: job.deliveryAddress,
+          moveDate: job.moveDate,
+          distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        },
+        quote: {
+          id: quote.id,
+          price: pricePounds,
+          driverName: driver?.name || "Driver",
+          driverCompany: driverProfile.companyName,
+          vanSize: driverProfile.vanSize,
+        },
       });
     }
 

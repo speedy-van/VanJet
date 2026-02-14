@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { jobs, quotes, users, driverProfiles } from "@/lib/db/schema";
+import { jobs, quotes, users, driverProfiles, jobItems } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(
@@ -29,6 +29,12 @@ export async function GET(
       return NextResponse.json({ error: "Job not found." }, { status: 404 });
     }
 
+    // ── Fetch job items ───────────────────────────────────────
+    const items = await db
+      .select()
+      .from(jobItems)
+      .where(eq(jobItems.jobId, jobId));
+
     // ── Fetch all quotes with driver details ──────────────────
     const allQuotes = await db
       .select({
@@ -36,6 +42,7 @@ export async function GET(
         price: quotes.price,
         message: quotes.message,
         estimatedDuration: quotes.estimatedDuration,
+        driverPhone: users.phone,
         status: quotes.status,
         expiresAt: quotes.expiresAt,
         createdAt: quotes.createdAt,
@@ -85,7 +92,8 @@ export async function GET(
         createdAt: q.createdAt,
         driver: {
           id: q.driverId,
-          name: q.driverName,
+          email: q.driverEmail,
+          phone: q.driverPhone,
           companyName: profile?.companyName ?? null,
           vanSize: profile?.vanSize ?? null,
           rating: profile?.rating ? Number(profile.rating) : 0,
@@ -99,6 +107,7 @@ export async function GET(
     return NextResponse.json({
       job: {
         id: job.id,
+        referenceNumber: job.referenceNumber,
         jobType: job.jobType,
         status: job.status,
         pickupAddress: job.pickupAddress,
@@ -106,7 +115,26 @@ export async function GET(
         moveDate: job.moveDate,
         estimatedPrice: job.estimatedPrice ? Number(job.estimatedPrice) : null,
         distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        description: job.description,
+        pickupFloor: job.pickupFloor,
+        deliveryFloor: job.deliveryFloor,
+        pickupHasLift: job.pickupHasLift,
+        deliveryHasLift: job.deliveryHasLift,
+        needsPacking: job.needsPacking,
+        contactName: job.contactName,
+        contactPhone: job.contactPhone,
       },
+      items: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        quantity: item.quantity,
+        weightKg: item.weightKg ? Number(item.weightKg) : null,
+        volumeM3: item.volumeM3 ? Number(item.volumeM3) : null,
+        fragile: item.fragile,
+        requiresDismantling: item.requiresDismantling,
+        notes: item.notes,
+      })),
       quotes: result,
     });
   } catch (err) {
