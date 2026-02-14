@@ -1,7 +1,7 @@
 // ─── VanJet · Admin Jobs Page ─────────────────────────────────
 import { db } from "@/lib/db";
 import { jobs, quotes } from "@/lib/db/schema";
-import { eq, desc, count, sql, or, like, and, ilike } from "drizzle-orm";
+import { eq, desc, count, sql, or, and, ilike } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { formatGBP } from "@/lib/money/format";
 import Link from "next/link";
@@ -27,13 +27,11 @@ export default async function AdminJobsPage({ searchParams }: Props) {
     conditionsArray.push(eq(jobs.status, statusFilter));
   }
   
-  // Add search filter (search by reference number or jobId - case insensitive)
+  // Add search filter (search by reference number - case insensitive)
+  // Note: UUID id column cannot use ILIKE, so only search reference number
   if (searchQuery) {
     conditionsArray.push(
-      or(
-        ilike(jobs.referenceNumber, `%${searchQuery}%`),
-        ilike(jobs.id, `%${searchQuery}%`)
-      )
+      ilike(jobs.referenceNumber, `%${searchQuery}%`)
     );
   }
   
