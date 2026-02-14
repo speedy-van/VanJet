@@ -40,6 +40,16 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
     notFound();
   }
 
+  // ── Token expiry check ──────────────────────────────────────
+  if (booking.trackingExpiresAt && new Date() > booking.trackingExpiresAt) {
+    // Auto-disable tracking
+    await db
+      .update(bookings)
+      .set({ trackingEnabled: false, updatedAt: new Date() })
+      .where(eq(bookings.id, booking.id));
+    notFound();
+  }
+
   const [job] = await db
     .select({
       pickupAddress: jobs.pickupAddress,
@@ -63,6 +73,7 @@ export default async function TrackingPage({ params }: TrackingPageProps) {
   const trackingData = {
     token,
     bookingStatus: booking.status,
+    orderNumber: booking.orderNumber ?? undefined,
     pickup: {
       address: job.pickupAddress,
       lat: job.pickupLat ? Number(job.pickupLat) : null,

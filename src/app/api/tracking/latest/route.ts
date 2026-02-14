@@ -3,10 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { bookings, bookingTrackingEvents, jobs } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { getLatestLimiter, applyRateLimit, getClientIP } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  // ── Rate limiting ─────────────────────────────────────────
+  const rateLimited = await applyRateLimit(
+    getLatestLimiter(),
+    getClientIP(req)
+  );
+  if (rateLimited) return rateLimited;
+
   const token = req.nextUrl.searchParams.get("token");
 
   if (!token) {
@@ -34,6 +42,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       { error: "Tracking is disabled for this booking." },
       { status: 403 }
+    );
+  }
+
+  // ── Token expiry check ──────────────────────────────────────
+  if (booking.trackingExpiresAt && new Date() > booking.trackingExpiresAt) {
+    // Auto-disable tracking
+    await db
+      .update(bookings)
+      .set({ trackingEnabled: false, updatedAt: new Date() })
+      .where(eq(bookings.id, booking.id));
+    return NextResponse.json(
+      { error: "Tracking has expired for this delivery." },
+      { status: 410 }
     );
   }
 

@@ -33,6 +33,7 @@ interface LocationPoint {
 interface TrackingData {
   token: string;
   bookingStatus: string;
+  orderNumber?: string;
   pickup: LocationPoint;
   delivery: LocationPoint;
   moveDate: string;
@@ -293,6 +294,11 @@ export function LiveTracking({ data }: { data: TrackingData }) {
           <Heading as="h1" size={{ base: "lg", md: "xl" }} color="blue.700" textAlign="center">
             Live Tracking
           </Heading>
+          {data.orderNumber && (
+            <Text fontSize="sm" fontWeight="700" color="gray.600" fontFamily="mono">
+              Order {data.orderNumber}
+            </Text>
+          )}
           <HStack gap={2} flexWrap="wrap" justifyContent="center">
             <ConnectionBadge status={connectionStatus} />
             {lastUpdated && (

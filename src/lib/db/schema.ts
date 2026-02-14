@@ -181,11 +181,16 @@ export const bookings = pgTable(
     // Live tracking
     trackingToken: text("tracking_token").unique(),
     trackingEnabled: boolean("tracking_enabled").notNull().default(true),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+    trackingExpiresAt: timestamp("tracking_expires_at", { withTimezone: true }),
+    // Human-friendly order number (VJ-0042)
+    orderNumber: varchar("order_number", { length: 10 }).unique(),
     ...timestamps,
   },
   (table) => [
     index("bookings_job_id_idx").on(table.jobId),
     uniqueIndex("bookings_tracking_token_idx").on(table.trackingToken),
+    uniqueIndex("bookings_order_number_idx").on(table.orderNumber),
   ]
 );
 

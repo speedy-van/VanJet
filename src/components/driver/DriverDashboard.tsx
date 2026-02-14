@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import { DriverAutoTracking } from "./DriverAutoTracking";
 
 interface DriverProfile {
   companyName: string | null;
@@ -29,6 +30,7 @@ interface DriverProfile {
 
 interface DriverBooking {
   bookingId: string;
+  orderNumber: string | null;
   status: string;
   finalPrice: string;
   trackingToken: string | null;
@@ -285,9 +287,16 @@ export function DriverDashboardClient({ user, profile, bookings, stripeOnboarded
                     mb={2}
                   >
                     <Box>
-                      <Text fontWeight="700" color="#1D4ED8" fontSize="xl">
-                        {formatGBP(Number(b.finalPrice))}
-                      </Text>
+                      <HStack gap={2} mb={1}>
+                        <Text fontWeight="700" color="#1D4ED8" fontSize="xl">
+                          {formatGBP(Number(b.finalPrice))}
+                        </Text>
+                        {b.orderNumber && (
+                          <Badge colorPalette="blue" variant="subtle" fontSize="xs" fontFamily="mono">
+                            {b.orderNumber}
+                          </Badge>
+                        )}
+                      </HStack>
                       <Text fontSize="xs" color="#9CA3AF">
                         {new Date(b.moveDate).toLocaleDateString("en-GB", {
                           day: "numeric",
@@ -346,18 +355,12 @@ export function DriverDashboardClient({ user, profile, bookings, stripeOnboarded
                   {b.trackingToken &&
                     (b.status === "confirmed" ||
                       b.status === "in_progress") && (
-                      <Link href={`/track/${b.trackingToken}`}>
-                        <Button
-                          size="sm"
-                          bg="#059669"
-                          color="white"
-                          fontWeight="600"
-                          borderRadius="6px"
-                          _hover={{ bg: "#047857" }}
-                        >
-                          Live Tracking
-                        </Button>
-                      </Link>
+                      <Box mt={2}>
+                        <DriverAutoTracking
+                          bookingId={b.bookingId}
+                          orderNumber={b.orderNumber ?? undefined}
+                        />
+                      </Box>
                     )}
                 </Box>
               ))}

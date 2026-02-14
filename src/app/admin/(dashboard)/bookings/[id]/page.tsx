@@ -54,6 +54,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
   // Serialize for client component
   const serializedBooking = {
     id: booking.id,
+    orderNumber: booking.orderNumber ?? null,
     jobId: booking.jobId,
     quoteId: booking.quoteId,
     driverId: booking.driverId,
@@ -141,7 +142,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
           </Text>
         </Link>
         <Text fontSize="xl" fontWeight="700" color="gray.800">
-          Booking Details
+          Booking Details {booking.orderNumber ? `· ${booking.orderNumber}` : ""}
         </Text>
       </Flex>
 

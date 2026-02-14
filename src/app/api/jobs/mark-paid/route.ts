@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { jobs, bookings, quotes, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateTrackingToken } from "@/lib/tracking/token";
+import { generateOrderNumber } from "@/lib/order-number";
 import { sendBookingConfirmation } from "@/lib/resend";
 import { sendBookingConfirmedSMS } from "@/lib/sms";
 
@@ -112,6 +113,7 @@ export async function POST(req: NextRequest) {
 
     const finalPrice = job.estimatedPrice ?? "0";
     const trackingToken = generateTrackingToken();
+    const orderNumber = await generateOrderNumber();
 
     const [booking] = await db
       .insert(bookings)
@@ -123,6 +125,7 @@ export async function POST(req: NextRequest) {
         status: "confirmed",
         trackingToken,
         trackingEnabled: true,
+        orderNumber,
       })
       .returning();
 

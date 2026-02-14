@@ -45,6 +45,7 @@ export default async function DriverDashboardPage() {
   const driverBookings = await db
     .select({
       bookingId: bookings.id,
+      orderNumber: bookings.orderNumber,
       status: bookings.status,
       finalPrice: bookings.finalPrice,
       trackingToken: bookings.trackingToken,

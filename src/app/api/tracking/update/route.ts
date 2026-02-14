@@ -5,6 +5,7 @@ import { bookings, bookingTrackingEvents } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
+import { getUpdateLimiter, applyRateLimit } from "@/lib/rate-limit";
 
 const VALID_STATUSES = [
   "on_the_way",
@@ -40,6 +41,13 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+
+    // ── Rate limiting ─────────────────────────────────────────
+    const rateLimited = await applyRateLimit(
+      getUpdateLimiter(),
+      `driver:${authedUserId}`
+    );
+    if (rateLimited) return rateLimited;
 
     // ── Parse body ────────────────────────────────────────────
     const body = await req.json();
@@ -111,6 +119,21 @@ export async function POST(req: NextRequest) {
       accuracyM: accuracyM != null ? Number(accuracyM) : null,
       status: trackingStatus,
     });
+
+    // ── Handle "delivered" status → set expiry ────────────────
+    if (trackingStatus === "delivered") {
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // +24h
+      await db
+        .update(bookings)
+        .set({
+          status: "completed",
+          deliveredAt: now,
+          trackingExpiresAt: expiresAt,
+          updatedAt: now,
+        })
+        .where(eq(bookings.id, bookingId));
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

@@ -25,6 +25,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
     db
       .select({
         id: bookings.id,
+        orderNumber: bookings.orderNumber,
         jobId: bookings.jobId,
         finalPrice: bookings.finalPrice,
         paymentStatus: bookings.paymentStatus,
@@ -88,6 +89,9 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
           <Box as="thead" bg="gray.50">
             <Box as="tr">
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
+                Order #
+              </Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
                 Booking ID
               </Box>
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
@@ -115,7 +119,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
           <Box as="tbody">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
+                <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
                   No bookings found.
                 </td>
               </tr>
@@ -131,6 +135,9 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                     borderColor="gray.100"
                     _hover={{ bg: "gray.50" }}
                   >
+                    <Box as="td" px={4} py={3} fontSize="xs" fontWeight="600" color="blue.600" fontFamily="mono">
+                      {b.orderNumber ?? "—"}
+                    </Box>
                     <Box as="td" px={4} py={3} fontSize="xs">
                       <Link
                         href={`/admin/bookings/${b.id}`}

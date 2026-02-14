@@ -42,6 +42,9 @@ interface UpdateBookingBody {
   contactName?: string;
   contactPhone?: string;
   items?: UpdateItemInput[];
+  // Tracking admin controls
+  trackingEnabled?: boolean;
+  extendTrackingHours?: number; // extend trackingExpiresAt by N hours
 }
 
 // ── Route handler ──────────────────────────────────────────────
@@ -111,7 +114,10 @@ export async function PATCH(
 
   const hasItemsUpdate = Array.isArray(body.items);
 
-  if (!hasJobUpdate && !hasItemsUpdate) {
+  const hasTrackingUpdate =
+    body.trackingEnabled !== undefined || body.extendTrackingHours != null;
+
+  if (!hasJobUpdate && !hasItemsUpdate && !hasTrackingUpdate) {
     return NextResponse.json(
       { error: "No fields to update." },
       { status: 400 }
@@ -212,6 +218,37 @@ export async function PATCH(
       }));
       await db.insert(jobItems).values(insertRows);
     }
+  }
+
+  // ── Handle tracking admin controls ──────────────────────────
+  const bookingUpdate: Record<string, unknown> = {};
+
+  if (body.trackingEnabled !== undefined) {
+    bookingUpdate.trackingEnabled = body.trackingEnabled;
+    diff["trackingEnabled"] = {
+      old: booking.trackingEnabled,
+      new: body.trackingEnabled,
+    };
+  }
+
+  if (body.extendTrackingHours != null && body.extendTrackingHours > 0) {
+    const hours = body.extendTrackingHours;
+    const base = booking.trackingExpiresAt ?? new Date();
+    const newExpiry = new Date(base.getTime() + hours * 60 * 60 * 1000);
+    bookingUpdate.trackingExpiresAt = newExpiry;
+    bookingUpdate.trackingEnabled = true; // re-enable if extending
+    diff["trackingExpiresAt"] = {
+      old: booking.trackingExpiresAt?.toISOString() ?? null,
+      new: newExpiry.toISOString(),
+    };
+  }
+
+  if (Object.keys(bookingUpdate).length > 0) {
+    bookingUpdate.updatedAt = new Date();
+    await db
+      .update(bookings)
+      .set(bookingUpdate)
+      .where(eq(bookings.id, bookingId));
   }
 
   // Write audit log

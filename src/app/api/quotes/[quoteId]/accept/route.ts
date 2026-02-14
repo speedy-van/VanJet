@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { jobs, quotes, bookings } from "@/lib/db/schema";
 import { eq, and, ne } from "drizzle-orm";
 import { generateTrackingToken } from "@/lib/tracking/token";
+import { generateOrderNumber } from "@/lib/order-number";
 
 export async function POST(
   req: NextRequest,
@@ -84,6 +85,7 @@ export async function POST(
 
     // ── Create booking (awaiting payment) ───────────────────────
     const trackingToken = generateTrackingToken();
+    const orderNumber = await generateOrderNumber();
 
     const [booking] = await db
       .insert(bookings)
@@ -96,11 +98,13 @@ export async function POST(
         status: "confirmed",
         trackingToken,
         trackingEnabled: true,
+        orderNumber,
       })
       .returning();
 
     return NextResponse.json({
       bookingId: booking.id,
+      orderNumber: booking.orderNumber,
       jobId: quote.jobId,
       quoteId: quote.id,
       driverId: quote.driverId,
