@@ -12,8 +12,7 @@ import {
 } from "@chakra-ui/react";
 import type { BookingFormData } from "./types";
 import { WIZARD_STEPS } from "./types";
-import { StepPickup } from "./StepPickup";
-import { StepDropoff } from "./StepDropoff";
+import { StepAddresses } from "./StepAddresses";
 import { StepItems } from "./StepItems";
 import { StepSchedule } from "./StepSchedule";
 import { StepReview } from "./StepReview";
@@ -34,9 +33,6 @@ export function BookingWizard() {
         hasLift: false,
         notes: "",
       },
-      contactName: "",
-      contactPhone: "",
-      contactEmail: "",
       dropoff: {
         address: "",
         lat: 0,
@@ -46,6 +42,9 @@ export function BookingWizard() {
         hasLift: false,
         notes: "",
       },
+      contactName: "",
+      contactPhone: "",
+      contactEmail: "",
       items: [],
       needsPacking: false,
       schedule: {
@@ -78,39 +77,32 @@ export function BookingWizard() {
         )}
 
         {/* Steps */}
-        {step === 0 && <StepPickup form={form} onNext={next} />}
+        {step === 0 && <StepAddresses form={form} onNext={next} />}
         {step === 1 && (
-          <StepDropoff
-            form={form}
-            onNext={next}
-            onBack={back}
-          />
-        )}
-        {step === 2 && (
           <StepItems form={form} onNext={next} onBack={back} />
         )}
-        {step === 3 && (
+        {step === 2 && (
           <StepSchedule
             form={form}
             onNext={next}
             onBack={back}
           />
         )}
-        {step === 4 && (
+        {step === 3 && (
           <StepReview
             form={form}
             onNext={next}
             onBack={back}
           />
         )}
-        {step === 5 && (
+        {step === 4 && (
           <StepPayment
             form={form}
             onNext={next}
             onBack={back}
           />
         )}
-        {step === 6 && <StepSuccess form={form} />}
+        {step === 5 && <StepSuccess form={form} />}
       </Container>
     </Box>
   );

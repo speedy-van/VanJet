@@ -57,6 +57,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   const [pricingEngine, setPricingEngine] = useState<PricingEngineResult | null>(null);
   const [jobResult, setJobResult] = useState<JobCreateResult | null>(null);
   const [error, setError] = useState("");
+  const [contactError, setContactError] = useState("");
 
   const vals = form.getValues();
   const timeLabel =
@@ -70,6 +71,22 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
 
   /** Step 1: Get detailed pricing breakdown from the pricing engine. */
   const fetchPricing = async () => {
+    // Validate contact fields before proceeding
+    const currentVals = form.getValues();
+    const name = (currentVals.contactName ?? "").trim();
+    const email = (currentVals.contactEmail ?? "").trim();
+    const phone = (currentVals.contactPhone ?? "").trim();
+
+    if (!name || !email || !phone) {
+      setContactError("Please fill in all contact fields before getting a price.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setContactError("Please enter a valid email address.");
+      return;
+    }
+    setContactError("");
+
     setLoading(true);
     setError("");
 
@@ -273,14 +290,88 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
           )}
         </SummarySection>
 
-        <SummarySection title="Contact">
-          <SummaryLine label="Name" value={vals.contactName} />
-          <SummaryLine label="Phone" value={vals.contactPhone} />
-          <SummaryLine
-            label="Email"
-            value={vals.contactEmail ?? ""}
-          />
-        </SummarySection>
+        {/* Contact info — editable fields */}
+        <Box
+          borderWidth="1px"
+          borderColor="blue.200"
+          borderRadius="lg"
+          p={4}
+          bg="blue.50"
+        >
+          <Text fontSize="sm" fontWeight="700" color="gray.800" mb={3}>
+            Contact Details
+          </Text>
+          <VStack gap={3} align="stretch">
+            <Box>
+              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                Full Name *
+              </Text>
+              <input
+                type="text"
+                placeholder="e.g. John Smith"
+                {...form.register("contactName")}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  background: "white",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+              />
+            </Box>
+            <Box>
+              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                Email Address *
+              </Text>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                {...form.register("contactEmail")}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  background: "white",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+              />
+            </Box>
+            <Box>
+              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                Phone Number *
+              </Text>
+              <input
+                type="tel"
+                placeholder="07XXX XXXXXX"
+                {...form.register("contactPhone")}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  background: "white",
+                  outline: "none",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+              />
+            </Box>
+            {contactError && (
+              <Text fontSize="xs" color="red.500" fontWeight="600">
+                {contactError}
+              </Text>
+            )}
+          </VStack>
+        </Box>
 
         {/* Pricing — Detailed Breakdown */}
         {(pricingEngine || jobResult) && (

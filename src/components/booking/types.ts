@@ -30,21 +30,20 @@ export interface ScheduleData {
 }
 
 export interface BookingFormData {
-  // Step 1: Pickup
+  // Step 1: Addresses (Pickup + Drop-off)
   pickup: AddressData;
+  dropoff: AddressData;
+  // Step 2: Items
+  items: BookingItem[];
+  needsPacking: boolean;
+  // Step 3: Schedule
+  schedule: ScheduleData;
+  // Step 4: Review (contact captured here + computed pricing)
   contactName: string;
   contactPhone: string;
   contactEmail: string;
-  // Step 2: Drop-off
-  dropoff: AddressData;
-  // Step 3: Items
-  items: BookingItem[];
-  needsPacking: boolean;
-  // Step 4: Schedule
-  schedule: ScheduleData;
-  // Step 5: Review (computed)
   jobType: string;
-  // Step 6: Payment
+  // Step 5: Payment
   jobId?: string;
   estimatedPrice?: number;
   priceRange?: { min: number; max: number };
@@ -63,8 +62,7 @@ export const TIME_WINDOWS = [
 ] as const;
 
 export const WIZARD_STEPS = [
-  "Pickup",
-  "Drop-off",
+  "Addresses",
   "Items",
   "Schedule",
   "Review",

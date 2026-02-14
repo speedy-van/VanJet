@@ -1,7 +1,7 @@
 // ─── VanJet · Booking Wizard Validators ──────────────────────
 import * as yup from "yup";
 
-export const pickupSchema = yup.object({
+export const addressesSchema = yup.object({
   pickup: yup.object({
     address: yup.string().required("Pickup address is required."),
     lat: yup.number().required(),
@@ -11,11 +11,6 @@ export const pickupSchema = yup.object({
     hasLift: yup.boolean().default(false),
     notes: yup.string().default(""),
   }),
-  contactName: yup.string().default(""),
-  contactPhone: yup.string().default(""),
-});
-
-export const dropoffSchema = yup.object({
   dropoff: yup.object({
     address: yup.string().required("Delivery address is required."),
     lat: yup.number().required(),
@@ -41,4 +36,14 @@ export const scheduleSchema = yup.object({
     timeWindow: yup.string().required("Please select a time window."),
     flexibleDates: yup.boolean().default(false),
   }),
+});
+
+export const contactSchema = yup.object({
+  contactName: yup.string().required("Full name is required.").trim(),
+  contactEmail: yup
+    .string()
+    .required("Email address is required.")
+    .email("Please enter a valid email address.")
+    .trim(),
+  contactPhone: yup.string().required("Phone number is required.").trim(),
 });
