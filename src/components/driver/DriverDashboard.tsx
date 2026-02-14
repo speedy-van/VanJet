@@ -1,6 +1,7 @@
 "use client";
 
 // ─── VanJet · Driver Dashboard Client Component ───────────────
+import { useState } from "react";
 import { formatGBP, formatGBPWhole } from "@/lib/money/format";
 import {
   Box,
@@ -43,9 +44,10 @@ interface Props {
   user: { name: string; email: string };
   profile: DriverProfile | null;
   bookings: DriverBooking[];
+  stripeOnboarded?: boolean;
 }
 
-export function DriverDashboardClient({ user, profile, bookings }: Props) {
+export function DriverDashboardClient({ user, profile, bookings, stripeOnboarded }: Props) {
   return (
     <Box bg="gray.50" minH="100dvh" pb={8}>
       <Container maxW="container.lg" pt={6} px={{ base: 3, md: 6 }}>
@@ -161,6 +163,26 @@ export function DriverDashboardClient({ user, profile, bookings }: Props) {
             </Text>
           </Box>
         )}
+
+        {/* Action CTAs */}
+        <Flex gap={3} mb={6} flexWrap="wrap">
+          <Link href="/driver/jobs" style={{ flex: 1 }}>
+            <Button
+              w="full"
+              bg="#1D4ED8"
+              color="white"
+              fontWeight="700"
+              size="lg"
+              borderRadius="xl"
+              _hover={{ bg: "#1840B8" }}
+            >
+              📋 Available Jobs
+            </Button>
+          </Link>
+          {!stripeOnboarded && (
+            <StripeConnectCTA />
+          )}
+        </Flex>
 
         {/* Stats Row */}
         <Flex gap={4} mb={6} flexWrap="wrap">
@@ -344,5 +366,44 @@ export function DriverDashboardClient({ user, profile, bookings }: Props) {
         </Box>
       </Container>
     </Box>
+  );
+}
+
+function StripeConnectCTA() {
+  const [loading, setLoading] = useState(false);
+
+  async function handleConnect() {
+    setLoading(true);
+    try {
+      // Step 1: create account if needed
+      await fetch("/api/driver/stripe/connect", { method: "POST" });
+
+      // Step 2: get onboarding link
+      const res = await fetch("/api/driver/stripe/onboarding-link");
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      alert("Failed to start Stripe onboarding. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      flex="1"
+      bg="#F59E0B"
+      color="white"
+      fontWeight="700"
+      size="lg"
+      borderRadius="xl"
+      onClick={handleConnect}
+      disabled={loading}
+      _hover={{ bg: "#D97706" }}
+    >
+      {loading ? "Setting up..." : "💳 Connect Stripe"}
+    </Button>
   );
 }

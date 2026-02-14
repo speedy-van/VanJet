@@ -87,6 +87,7 @@ export default async function DriverDashboardPage() {
           : null
       }
       bookings={serialisedBookings}
+      stripeOnboarded={!!profile?.stripeAccountId}
     />
   );
 }

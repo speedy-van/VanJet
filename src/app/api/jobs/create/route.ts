@@ -1,11 +1,12 @@
 // ─── VanJet · Create Job API ──────────────────────────────────
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { jobs, jobItems, users } from "@/lib/db/schema";
+import { jobs, jobItems, users, driverProfiles } from "@/lib/db/schema";
 import { geocodeAddress, getDirections } from "@/lib/mapbox";
 import { calculatePrice, validatePriceWithGrok } from "@/lib/pricing";
 import type { PricingInput } from "@/lib/pricing";
 import { sendJobConfirmation } from "@/lib/resend";
+import { sendDriverNewJobSMS } from "@/lib/sms";
 import { eq } from "drizzle-orm";
 
 interface CreateJobBody {
@@ -273,6 +274,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Notify eligible drivers (fire-and-forget) ─────────────
+    notifyEligibleDrivers(
+      newJob.id,
+      pickup.placeName,
+      delivery.placeName,
+      Number(pickup.lat),
+      Number(pickup.lng)
+    ).catch((err) => console.error("[VanJet] Driver notify error:", err));
+
     // ── Response ──────────────────────────────────────────────
     return NextResponse.json({
       jobId: newJob.id,
@@ -293,4 +303,57 @@ export async function POST(req: NextRequest) {
       err instanceof Error ? err.message : "An unexpected error occurred.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+/** Notify approved drivers within coverage radius about a new job */
+async function notifyEligibleDrivers(
+  jobId: string,
+  pickup: string,
+  delivery: string,
+  pickupLat: number,
+  pickupLng: number
+) {
+  const allDrivers = await db
+    .select({
+      userId: driverProfiles.userId,
+      baseLat: driverProfiles.baseLat,
+      baseLng: driverProfiles.baseLng,
+      coverageRadius: driverProfiles.coverageRadius,
+      applicationStatus: driverProfiles.applicationStatus,
+    })
+    .from(driverProfiles)
+    .where(eq(driverProfiles.applicationStatus, "approved"));
+
+  for (const d of allDrivers) {
+    // Filter by coverage if driver has base coordinates
+    if (d.baseLat && d.baseLng) {
+      const dist = haversine(
+        Number(d.baseLat), Number(d.baseLng),
+        pickupLat, pickupLng
+      );
+      if (dist > (d.coverageRadius ?? 50)) continue;
+    }
+
+    // Fetch driver's phone for SMS
+    const [user] = await db
+      .select({ phone: users.phone })
+      .from(users)
+      .where(eq(users.id, d.userId))
+      .limit(1);
+
+    if (user?.phone) {
+      sendDriverNewJobSMS(user.phone, pickup, delivery).catch(() => {});
+    }
+  }
+}
+
+function haversine(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3958.8;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }

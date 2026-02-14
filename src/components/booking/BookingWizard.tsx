@@ -16,7 +16,6 @@ import { StepAddresses } from "./StepAddresses";
 import { StepItems } from "./StepItems";
 import { StepSchedule } from "./StepSchedule";
 import { StepReview } from "./StepReview";
-import { StepPayment } from "./StepPayment";
 import { StepSuccess } from "./StepSuccess";
 
 export function BookingWizard() {
@@ -95,14 +94,7 @@ export function BookingWizard() {
             onBack={back}
           />
         )}
-        {step === 4 && (
-          <StepPayment
-            form={form}
-            onNext={next}
-            onBack={back}
-          />
-        )}
-        {step === 5 && <StepSuccess form={form} />}
+        {step === 4 && <StepSuccess form={form} />}
       </Container>
     </Box>
   );

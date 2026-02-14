@@ -1,13 +1,17 @@
 // ─── VanJet · Mark Job as Paid API ────────────────────────────
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { jobs, bookings } from "@/lib/db/schema";
+import { jobs, bookings, quotes, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateTrackingToken } from "@/lib/tracking/token";
+import { sendBookingConfirmation } from "@/lib/resend";
+import { sendBookingConfirmedSMS } from "@/lib/sms";
 
 interface MarkPaidBody {
   jobId: string;
   paymentIntentId: string;
+  bookingId?: string; // if booking already exists (quote-based flow)
+  quoteId?: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -41,13 +45,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Update job status ─────────────────────────────────────
+    // ── Quote-based flow: booking already exists ────────────────
+    if (body.bookingId) {
+      const [existing] = await db
+        .select()
+        .from(bookings)
+        .where(eq(bookings.id, body.bookingId))
+        .limit(1);
+
+      if (existing) {
+        await db
+          .update(bookings)
+          .set({
+            stripePaymentIntentId: body.paymentIntentId,
+            paymentStatus: "paid",
+            updatedAt: new Date(),
+          })
+          .where(eq(bookings.id, body.bookingId));
+
+        await db
+          .update(jobs)
+          .set({ status: "accepted", updatedAt: new Date() })
+          .where(eq(jobs.id, body.jobId));
+
+        // Notify both parties
+        const [customer] = await db.select().from(users).where(eq(users.id, job.customerId)).limit(1);
+        if (existing.driverId) {
+          const [driver] = await db.select().from(users).where(eq(users.id, existing.driverId)).limit(1);
+          if (driver?.email) {
+            sendBookingConfirmation({
+              to: driver.email,
+              name: driver.name,
+              bookingId: existing.id,
+              moveDate: job.moveDate.toLocaleDateString("en-GB"),
+              price: existing.finalPrice,
+            }).catch((e) => console.error("[VanJet] Booking email error:", e));
+          }
+          if (driver?.phone) {
+            sendBookingConfirmedSMS(driver.phone, existing.id, job.moveDate.toLocaleDateString("en-GB"))
+              .catch((e) => console.error("[VanJet] Booking SMS error:", e));
+          }
+        }
+        if (customer?.email) {
+          sendBookingConfirmation({
+            to: customer.email,
+            name: customer.name,
+            bookingId: existing.id,
+            moveDate: job.moveDate.toLocaleDateString("en-GB"),
+            price: existing.finalPrice,
+          }).catch((e) => console.error("[VanJet] Booking email error:", e));
+        }
+
+        return NextResponse.json({
+          bookingId: existing.id,
+          trackingToken: existing.trackingToken,
+          status: "paid",
+        });
+      }
+    }
+
+    // ── Direct booking flow (no prior booking) ──────────────────
     await db
       .update(jobs)
       .set({ status: "accepted" })
       .where(eq(jobs.id, body.jobId));
 
-    // ── Create booking record ─────────────────────────────────
     const finalPrice = job.estimatedPrice ?? "0";
     const trackingToken = generateTrackingToken();
 
@@ -63,6 +125,18 @@ export async function POST(req: NextRequest) {
         trackingEnabled: true,
       })
       .returning();
+
+    // Notify customer
+    const [customer] = await db.select().from(users).where(eq(users.id, job.customerId)).limit(1);
+    if (customer?.email) {
+      sendBookingConfirmation({
+        to: customer.email,
+        name: customer.name,
+        bookingId: booking.id,
+        moveDate: job.moveDate.toLocaleDateString("en-GB"),
+        price: finalPrice,
+      }).catch((e) => console.error("[VanJet] Booking email error:", e));
+    }
 
     return NextResponse.json({
       bookingId: booking.id,

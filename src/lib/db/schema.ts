@@ -46,7 +46,9 @@ export const driverProfiles = pgTable(
     companyName: varchar("company_name", { length: 255 }),
     vanSize: varchar("van_size", { length: 50 }), // e.g. "Luton", "LWB", "Transit"
     maxWeightKg: integer("max_weight_kg"),
-    coverageRadius: integer("coverage_radius_km"),
+    coverageRadius: integer("coverage_radius_km"), // stored in miles (column name kept for migration safety)
+    baseLat: numeric("base_lat", { precision: 10, scale: 7 }),
+    baseLng: numeric("base_lng", { precision: 10, scale: 7 }),
     stripeAccountId: varchar("stripe_account_id", { length: 255 }),
     stripeOnboarded: boolean("stripe_onboarded").notNull().default(false),
     rating: numeric("rating", { precision: 3, scale: 2 }).default("0"),

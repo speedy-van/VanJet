@@ -40,8 +40,8 @@ export function StepSuccess({ form }: StepSuccessProps) {
         </Text>
 
         <Text fontSize="15px" color="#4B5563" maxW="400px" lineHeight="1.7">
-          Your move has been booked successfully. We will match you
-          with a verified driver shortly.
+          Your move request has been submitted. Drivers in your area
+          will start sending quotes shortly.
         </Text>
 
         {jobId && (
@@ -64,19 +64,19 @@ export function StepSuccess({ form }: StepSuccessProps) {
           A confirmation email has been sent to your email address.
         </Text>
 
-        {trackingToken && (
-          <Link href={`/track/${trackingToken}`}>
+        {jobId && (
+          <Link href={`/job/${jobId}/quotes`}>
             <Button
-              bg="#059669"
+              bg="#F59E0B"
               color="white"
               size="lg"
               fontWeight="700"
               borderRadius="8px"
               h="48px"
               w="full"
-              _hover={{ bg: "#047857" }}
+              _hover={{ bg: "#D97706" }}
             >
-              Live Tracking
+              View Driver Quotes
             </Button>
           </Link>
         )}
