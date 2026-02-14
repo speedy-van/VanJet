@@ -33,16 +33,16 @@ interface HeroImage {
 
 const HERO_IMAGES: HeroImage[] = [
   {
-    src: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?auto=format&fit=crop&w=900&q=80",
-    alt: "Professional movers loading a van",
+    src: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=900&q=80",
+    alt: "Professional movers loading boxes into a removal van",
   },
   {
-    src: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=600&q=80",
-    alt: "Neatly packed moving boxes",
+    src: "https://images.unsplash.com/photo-1603796846097-bee99e4a601f?auto=format&fit=crop&w=600&q=80",
+    alt: "Cardboard moving boxes stacked and ready for transport",
   },
   {
-    src: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?auto=format&fit=crop&w=600&q=80",
-    alt: "Furniture being handled by professional removals team",
+    src: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+    alt: "Two movers carrying furniture during a house move",
   },
 ];
 
