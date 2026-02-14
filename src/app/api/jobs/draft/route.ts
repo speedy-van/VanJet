@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
     console.error("[VanJet] Create draft job error:", err);
     const message =
       err instanceof Error ? err.message : "An unexpected error occurred.";
+    console.error("[VanJet] Returning error response:", { error: message });
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

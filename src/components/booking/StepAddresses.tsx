@@ -233,8 +233,17 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
         });
 
         if (!res.ok) {
-          const errorData = await res.json();
-          console.error("Draft job API error:", errorData);
+          const text = await res.text();
+          console.error("Draft job API error response:", text);
+          
+          let errorData;
+          try {
+            errorData = JSON.parse(text);
+          } catch (parseErr) {
+            console.error("Failed to parse error response as JSON");
+            throw new Error(`Draft job creation failed (${res.status}): ${text || res.statusText}`);
+          }
+          
           throw new Error(errorData.error || "Failed to create draft job");
         }
 
