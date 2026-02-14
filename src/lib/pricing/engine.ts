@@ -5,6 +5,7 @@
 import {
   BASE_PRICES,
   DISTANCE_RATES,
+  DISTANCE_RATES_COMPETITIVE,
   VEHICLE_CAPACITY,
   VEHICLE_MULTIPLIERS,
   FLOOR_CHARGES,
@@ -73,15 +74,19 @@ export interface PricingBreakdown {
 // ── Helpers ────────────────────────────────────────────────────
 
 /** Calculate tiered distance cost (one-way miles, then apply round-trip multiplier). */
-export function calculateDistanceCost(distanceMiles: number): number {
+export function calculateDistanceCost(
+  distanceMiles: number,
+  useCompetitiveRates = false
+): number {
+  const rates = useCompetitiveRates ? DISTANCE_RATES_COMPETITIVE : DISTANCE_RATES;
   let cost = 0;
   let remaining = distanceMiles;
 
-  for (const tier of DISTANCE_RATES.tiers) {
+  for (const tier of rates.tiers) {
     if (remaining <= 0) break;
     const prevLimit =
-      DISTANCE_RATES.tiers.indexOf(tier) > 0
-        ? DISTANCE_RATES.tiers[DISTANCE_RATES.tiers.indexOf(tier) - 1].upToMiles
+      rates.tiers.indexOf(tier) > 0
+        ? rates.tiers[rates.tiers.indexOf(tier) - 1].upToMiles
         : 0;
     const tierRange = Math.min(remaining, tier.upToMiles - prevLimit);
     cost += tierRange * tier.ratePerMile;
@@ -89,9 +94,9 @@ export function calculateDistanceCost(distanceMiles: number): number {
   }
 
   // Round-trip adjustment (driver has to return)
-  cost *= DISTANCE_RATES.roundTripMultiplier;
+  cost *= rates.roundTripMultiplier;
 
-  return Math.max(cost, DISTANCE_RATES.minimumCharge);
+  return Math.max(cost, rates.minimumCharge);
 }
 
 /** Recommend vehicle type based on total volume and weight. Returns type + count. */
@@ -238,7 +243,13 @@ function calculateExtraServices(
 // ── Main Engine ────────────────────────────────────────────────
 
 /** Calculate a deterministic price for a removal job. */
-export function calculatePrice(input: PricingInput): PricingBreakdown {
+export function calculatePrice(
+  input: PricingInput,
+  options?: { useCompetitiveRates?: boolean; enableVat?: boolean }
+): PricingBreakdown {
+  const useCompetitiveRates = options?.useCompetitiveRates ?? false;
+  const enableVat = options?.enableVat ?? true;
+  
   // Aggregate items
   const totalVolumeM3 = input.items.reduce(
     (s, i) => s + i.volumeM3 * i.quantity,
@@ -254,7 +265,7 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
   const basePrice = BASE_PRICES[input.jobType] ?? BASE_PRICES.man_and_van;
 
   // Distance
-  const distanceCost = calculateDistanceCost(input.distanceMiles);
+  const distanceCost = calculateDistanceCost(input.distanceMiles, useCompetitiveRates);
 
   // Floor
   const floorCost = calculateFloorCost(
@@ -281,8 +292,8 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
   const rawSubtotal = basePrice + distanceCost + floorCost + extras.cost;
   const subtotal = rawSubtotal * vehicleMult * demandMult;
 
-  // VAT
-  const vatAmount = subtotal * VAT_RATE;
+  // VAT (conditional based on registration status)
+  const vatAmount = enableVat ? subtotal * VAT_RATE : 0;
   const totalPrice = subtotal + vatAmount;
 
   // Platform fee (hidden, taken from driver)
@@ -324,7 +335,9 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
       amount: rawSubtotal * vehicleMult * (demandMult - 1),
     });
   }
-  breakdown.push({ label: "VAT (20%)", amount: vatAmount });
+  if (enableVat && vatAmount > 0) {
+    breakdown.push({ label: "VAT (20%)", amount: vatAmount });
+  }
 
   return {
     basePrice,

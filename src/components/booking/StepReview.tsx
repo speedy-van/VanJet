@@ -596,13 +596,15 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
                   textAlign="center"
                 >
                   <Text fontSize="sm" opacity={0.9} mb={2}>
-                    Estimated Price
+                    Estimated Price Range
                   </Text>
                   <Text fontSize="3xl" fontWeight="900" lineHeight="1.1" mb={1}>
                     {formatGBP(finalMinPrice)} – {formatGBP(finalMaxPrice)}
                   </Text>
                   <Text fontSize="xs" opacity={0.8}>
-                    Including VAT
+                    {pricingEngine?.vatAmount && pricingEngine.vatAmount > 0 
+                      ? "Including VAT" 
+                      : "Drivers will send quotes"}
                   </Text>
 
                   {/* Collapsible breakdown */}

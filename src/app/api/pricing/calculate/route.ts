@@ -12,6 +12,11 @@ import {
 } from "@/lib/pricing";
 import type { PricingInput } from "@/lib/pricing";
 
+// ── Pricing Profile Configuration ─────────────────────────────
+const PRICING_PROFILE = process.env.PRICING_PROFILE ?? "competitive";
+const ENABLE_VAT = process.env.ENABLE_VAT === "true";
+const PRICING_DEBUG = process.env.PRICING_DEBUG === "true";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -66,7 +71,40 @@ export async function POST(req: Request) {
     };
 
     // ── Run rules-based engine ────────────────────────────────
-    let result = calculatePrice(input);
+    const useCompetitiveRates = PRICING_PROFILE === "competitive";
+    let result = calculatePrice(input, { 
+      useCompetitiveRates, 
+      enableVat: ENABLE_VAT 
+    });
+
+    // ── Debug logging (sanitized, no PII) ────────────────────
+    if (PRICING_DEBUG) {
+      console.log("\n[PRICING_DEBUG] =====================================");
+      console.log(`[PRICING_DEBUG] Profile: ${PRICING_PROFILE} | VAT: ${ENABLE_VAT}`);
+      console.log(`[PRICING_DEBUG] Input:`, {
+        jobType: input.jobType,
+        distanceMiles: input.distanceMiles,
+        itemCount: input.items.length,
+        totalWeight: input.items.reduce((s, i) => s + i.weightKg * i.quantity, 0),
+        totalVolume: input.items.reduce((s, i) => s + i.volumeM3 * i.quantity, 0),
+        pickupFloor: input.pickupFloor,
+        deliveryFloor: input.deliveryFloor,
+        preferredDate: input.preferredDate.toISOString().slice(0, 10),
+      });
+      console.log(`[PRICING_DEBUG] Breakdown:`, {
+        basePrice: result.basePrice,
+        distanceCost: result.distanceCost,
+        floorCost: result.floorCost,
+        extraServices: result.extraServices,
+        vehicleMultiplier: result.vehicleMultiplier,
+        demandMultiplier: result.demandMultiplier,
+        subtotal: result.subtotal,
+        vatAmount: result.vatAmount,
+        totalPrice: result.totalPrice,
+        priceRange: `£${result.priceMin} - £${result.priceMax}`,
+      });
+      console.log("[PRICING_DEBUG] =====================================\n");
+    }
 
     // ── Apply learning hooks ──────────────────────────────────
     const acceptAdj = getAcceptanceAdjustment(
@@ -95,6 +133,7 @@ export async function POST(req: Request) {
     let aiConfidence: number | null = null;
     let aiWarnings: string[] = [];
     let aiExplanation: string | null = null;
+    let aiAdjusted = false;
 
     const aiValidation = await validatePriceWithGrok(input, result);
 
@@ -117,22 +156,60 @@ export async function POST(req: Request) {
           // Blend: 60% engine + 40% AI
           const blended =
             result.totalPrice * 0.6 + aiValidation.adjustedPrice * 0.4;
+          
+          if (PRICING_DEBUG) {
+            console.log("[PRICING_DEBUG] AI ADJUSTMENT TRIGGERED:");
+            console.log(`  Engine: £${result.totalPrice.toFixed(2)}`);
+            console.log(`  AI Suggested: £${aiValidation.adjustedPrice.toFixed(2)}`);
+            console.log(`  Blended (60/40): £${blended.toFixed(2)}`);
+            console.log(`  Confidence: ${aiValidation.confidence}%`);
+          }
+          
           result = {
             ...result,
             totalPrice: round2(blended),
             priceMin: roundTo5(blended * 0.85),
             priceMax: roundTo5(blended * 1.15),
           };
+          aiAdjusted = true;
         }
       }
     }
 
-    return NextResponse.json({
+    // ── Response ──────────────────────────────────────────────
+    const response: any = {
       ...result,
       aiConfidence,
       aiWarnings,
       aiExplanation,
-    });
+    };
+
+    // Include debug breakdown if enabled (sanitized)
+    if (PRICING_DEBUG) {
+      response.debugBreakdown = {
+        profile: PRICING_PROFILE,
+        vatEnabled: ENABLE_VAT,
+        aiAdjusted,
+        requestSummary: {
+          jobType: input.jobType,
+          distanceMiles: input.distanceMiles,
+          itemCount: input.items.length,
+        },
+        calculation: {
+          base: result.basePrice,
+          distance: result.distanceCost,
+          floors: result.floorCost,
+          extras: result.extraServices,
+          vehicleMult: result.vehicleMultiplier,
+          demandMult: result.demandMultiplier,
+          subtotal: result.subtotal,
+          vat: result.vatAmount,
+          total: result.totalPrice,
+        },
+      };
+    }
+
+    return NextResponse.json(response);
   } catch (err) {
     console.error("[VanJet] Pricing calculation error:", err);
     return NextResponse.json(

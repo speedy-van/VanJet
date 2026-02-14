@@ -53,8 +53,20 @@ export const JOB_TYPE_LABELS: Record<string, string> = {
   storage: "Storage & Collection",
 };
 
+/** Distance rate tier structure */
+export type DistanceRateTier = {
+  upToMiles: number;
+  ratePerMile: number;
+};
+
+export type DistanceRates = {
+  tiers: DistanceRateTier[];
+  minimumCharge: number;
+  roundTripMultiplier: number;
+};
+
 /** Distance pricing tiers (per mile, one-way — round trip applied in engine). */
-export const DISTANCE_RATES = {
+export const DISTANCE_RATES: DistanceRates = {
   tiers: [
     { upToMiles: 6, ratePerMile: 4.00 },
     { upToMiles: 31, ratePerMile: 2.90 },
@@ -64,7 +76,20 @@ export const DISTANCE_RATES = {
   ],
   minimumCharge: 15,
   roundTripMultiplier: 1.4, // driver returns partially loaded or empty
-} as const;
+};
+
+/** Competitive distance rates (marketplace-aligned, ~30% lower). */
+export const DISTANCE_RATES_COMPETITIVE: DistanceRates = {
+  tiers: [
+    { upToMiles: 6, ratePerMile: 2.80 },   // -30%
+    { upToMiles: 31, ratePerMile: 2.00 },  // -31%
+    { upToMiles: 62, ratePerMile: 1.50 },  // -33%
+    { upToMiles: 186, ratePerMile: 1.20 }, // -31%
+    { upToMiles: Infinity, ratePerMile: 1.00 }, // -31%
+  ],
+  minimumCharge: 10,
+  roundTripMultiplier: 1.0, // competitive = one-way pricing only
+};
 
 /** Vehicle types available in fleet. */
 export type VehicleType =
