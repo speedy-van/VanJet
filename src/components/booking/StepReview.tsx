@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   VStack,
@@ -83,6 +83,18 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     0
   );
 
+  // Watch for address changes after pricing - invalidate pricing if addresses change
+  const pickupAddress = form.watch("pickup.address");
+  const dropoffAddress = form.watch("dropoff.address");
+  
+  useEffect(() => {
+    // If pricing exists and addresses change, clear pricing to force re-calculation
+    if (pricingEngine || jobResult) {
+      setPricingEngine(null);
+      setJobResult(null);
+    }
+  }, [pickupAddress, dropoffAddress]);
+
   // Calculate add-ons cost
   const addOnsCost = 
     (packingAddon ? (totalItems > 20 ? 150 : 50) : 0) +
@@ -97,28 +109,24 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   // UK average comparison (mock calculation)
   const ukAverageSaving = pricingEngine ? Math.round(((pricingEngine.demandMultiplier < 1 ? 15 : 8))) : null;
 
-  /** Check if addresses need confirmation before proceeding */
-  const handleContinue = () => {
-    const currentVals = form.getValues();
-    
-    // Check pickup
-    const pickupNeedsConfirm = 
-      currentVals.pickup.precision === "postcode" &&
-      !currentVals.pickup.confirmed;
-    
-    // Check dropoff
-    const dropoffNeedsConfirm =
-      currentVals.dropoff.precision === "postcode" &&
-      !currentVals.dropoff.confirmed;
-    
-    // If either needs confirmation, show modal
-    if (pickupNeedsConfirm || dropoffNeedsConfirm) {
-      setShowConfirmModal(true);
-      return;
+  /** Update job addresses in DB after confirmation */
+  const updateJobAddresses = async (jobId: string, currentVals: typeof vals) => {
+    try {
+      await fetch(`/api/jobs/${jobId}/update`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          pickupAddress: currentVals.pickup.address,
+          pickupLat: currentVals.pickup.lat,
+          pickupLng: currentVals.pickup.lng,
+          deliveryAddress: currentVals.dropoff.address,
+          deliveryLat: currentVals.dropoff.lat,
+          deliveryLng: currentVals.dropoff.lng,
+        }),
+      });
+    } catch (err) {
+      console.error("[VanJet] Failed to update job addresses:", err);
     }
-    
-    // Otherwise proceed normally
-    onNext();
   };
 
   /** Handle address confirmation from modal */
@@ -146,18 +154,31 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     form.setValue("dropoff.precision", "full");
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     const currentVals = form.getValues();
-    const allConfirmed =
-      (!currentVals.pickup.precision || currentVals.pickup.precision !== "postcode" || currentVals.pickup.confirmed) &&
-      (!currentVals.dropoff.precision || currentVals.dropoff.precision !== "postcode" || currentVals.dropoff.confirmed);
+    const pickupNeedsConfirm = 
+      currentVals.pickup.precision === "postcode" &&
+      !currentVals.pickup.confirmed;
     
-    if (allConfirmed) {
+    const dropoffNeedsConfirm =
+      currentVals.dropoff.precision === "postcode" &&
+      !currentVals.dropoff.confirmed;
+
+    // If still needs confirmation, don't proceed with pricing
+    if (pickupNeedsConfirm || dropoffNeedsConfirm) {
       setShowConfirmModal(false);
-      onNext(); // Proceed to payment
-    } else {
-      setShowConfirmModal(false);
+      return;
     }
+    
+    // All confirmed - update DB addresses if job exists, then proceed with pricing
+    setShowConfirmModal(false);
+    
+    if (currentVals.jobId) {
+      await updateJobAddresses(currentVals.jobId, currentVals);
+    }
+    
+    // Now that addresses are confirmed and updated, proceed with pricing
+    await fetchPricing();
   };
 
   /** Step 1: Get detailed pricing breakdown from the pricing engine. */
@@ -177,6 +198,21 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       return;
     }
     setContactError("");
+
+    // CRITICAL: Check if addresses need confirmation BEFORE pricing
+    const pickupNeedsConfirm = 
+      currentVals.pickup.precision === "postcode" &&
+      !currentVals.pickup.confirmed;
+    
+    const dropoffNeedsConfirm =
+      currentVals.dropoff.precision === "postcode" &&
+      !currentVals.dropoff.confirmed;
+    
+    // Block pricing if addresses aren't confirmed
+    if (pickupNeedsConfirm || dropoffNeedsConfirm) {
+      setShowConfirmModal(true);
+      return; // Do NOT proceed with pricing
+    }
 
     setLoading(true);
     setError("");
@@ -734,7 +770,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
                   borderRadius="lg"
                   _hover={{ bg: "#D97706" }}
                   _active={{ bg: "#B45309" }}
-                  onClick={handleContinue}
+                  onClick={onNext}
                 >
                   Confirm & Find Drivers →
                 </Button>

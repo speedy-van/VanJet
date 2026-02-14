@@ -18,6 +18,14 @@ interface UpdateJobBody {
   floorLevel?: number;
   hasLift?: boolean;
   needsPacking?: boolean;
+  // Address updates (for confirmed addresses)
+  pickupAddress?: string;
+  pickupLat?: number;
+  pickupLng?: number;
+  deliveryAddress?: string;
+  deliveryLat?: number;
+  deliveryLng?: number;
+  // Floor/access details
   pickupFloor?: number;
   pickupFlat?: string;
   pickupHasLift?: boolean;
@@ -121,29 +129,39 @@ export async function PATCH(
 
     const estimatedPrice = finalTotal;
 
-    // Update job
+    // Update job (include address fields if provided)
+    const updateData: Record<string, unknown> = {
+      estimatedPrice: String(estimatedPrice),
+      description: body.description ?? null,
+      floorLevel: body.floorLevel ?? null,
+      hasLift: body.hasLift ?? false,
+      needsPacking: body.needsPacking ?? false,
+      pickupFloor: body.pickupFloor ?? null,
+      pickupFlat: body.pickupFlat ?? null,
+      pickupHasLift: body.pickupHasLift ?? null,
+      pickupNotes: body.pickupNotes ?? null,
+      deliveryFloor: body.deliveryFloor ?? null,
+      deliveryFlat: body.deliveryFlat ?? null,
+      deliveryHasLift: body.deliveryHasLift ?? null,
+      deliveryNotes: body.deliveryNotes ?? null,
+      preferredTimeWindow: body.preferredTimeWindow ?? null,
+      flexibleDates: body.flexibleDates ?? false,
+      contactName: body.contactName ?? null,
+      contactPhone: body.contactPhone ?? null,
+      updatedAt: new Date(),
+    };
+
+    // Include address updates if provided (for confirmed addresses)
+    if (body.pickupAddress !== undefined) updateData.pickupAddress = body.pickupAddress;
+    if (body.pickupLat !== undefined) updateData.pickupLat = String(body.pickupLat);
+    if (body.pickupLng !== undefined) updateData.pickupLng = String(body.pickupLng);
+    if (body.deliveryAddress !== undefined) updateData.deliveryAddress = body.deliveryAddress;
+    if (body.deliveryLat !== undefined) updateData.deliveryLat = String(body.deliveryLat);
+    if (body.deliveryLng !== undefined) updateData.deliveryLng = String(body.deliveryLng);
+
     await db
       .update(jobs)
-      .set({
-        estimatedPrice: String(estimatedPrice),
-        description: body.description ?? null,
-        floorLevel: body.floorLevel ?? null,
-        hasLift: body.hasLift ?? false,
-        needsPacking: body.needsPacking ?? false,
-        pickupFloor: body.pickupFloor ?? null,
-        pickupFlat: body.pickupFlat ?? null,
-        pickupHasLift: body.pickupHasLift ?? null,
-        pickupNotes: body.pickupNotes ?? null,
-        deliveryFloor: body.deliveryFloor ?? null,
-        deliveryFlat: body.deliveryFlat ?? null,
-        deliveryHasLift: body.deliveryHasLift ?? null,
-        deliveryNotes: body.deliveryNotes ?? null,
-        preferredTimeWindow: body.preferredTimeWindow ?? null,
-        flexibleDates: body.flexibleDates ?? false,
-        contactName: body.contactName ?? null,
-        contactPhone: body.contactPhone ?? null,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(jobs.id, jobId));
 
     // Delete old items and insert new ones
