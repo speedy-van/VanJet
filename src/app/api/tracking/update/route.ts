@@ -43,11 +43,29 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Rate limiting ─────────────────────────────────────────
-    const rateLimited = await applyRateLimit(
-      getUpdateLimiter(),
+    const limiter = await getUpdateLimiter();
+    const rateLimitResult = await applyRateLimit(
+      limiter,
       `driver:${authedUserId}`
     );
-    if (rateLimited) return rateLimited;
+
+    if (!rateLimitResult.ok && !rateLimitResult.skipped) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Remaining": String(rateLimitResult.remaining ?? 0),
+            "X-RateLimit-Reset": String(rateLimitResult.reset ?? Date.now()),
+            "Retry-After": String(
+              Math.ceil(
+                ((rateLimitResult.reset ?? Date.now()) - Date.now()) / 1000
+              )
+            ),
+          },
+        }
+      );
+    }
 
     // ── Parse body ────────────────────────────────────────────
     const body = await req.json();

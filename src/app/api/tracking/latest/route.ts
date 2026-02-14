@@ -9,11 +9,24 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   // ── Rate limiting ─────────────────────────────────────────
-  const rateLimited = await applyRateLimit(
-    getLatestLimiter(),
-    getClientIP(req)
-  );
-  if (rateLimited) return rateLimited;
+  const limiter = await getLatestLimiter();
+  const rateLimitResult = await applyRateLimit(limiter, getClientIP(req));
+
+  if (!rateLimitResult.ok && !rateLimitResult.skipped) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Remaining": String(rateLimitResult.remaining ?? 0),
+          "X-RateLimit-Reset": String(rateLimitResult.reset ?? Date.now()),
+          "Retry-After": String(
+            Math.ceil(((rateLimitResult.reset ?? Date.now()) - Date.now()) / 1000)
+          ),
+        },
+      }
+    );
+  }
 
   const token = req.nextUrl.searchParams.get("token");
 

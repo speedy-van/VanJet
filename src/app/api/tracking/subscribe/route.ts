@@ -13,11 +13,22 @@ const MAX_SSE_DURATION_MS = 30 * 60 * 1000;
 
 export async function GET(req: NextRequest) {
   // ── Rate limiting ─────────────────────────────────────────
-  const rateLimited = await applyRateLimit(
-    getSubscribeLimiter(),
-    getClientIP(req)
-  );
-  if (rateLimited) return rateLimited;
+  const limiter = await getSubscribeLimiter();
+  const rateLimitResult = await applyRateLimit(limiter, getClientIP(req));
+
+  if (!rateLimitResult.ok && !rateLimitResult.skipped) {
+    return new Response(JSON.stringify({ error: "Too many requests" }), {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "X-RateLimit-Remaining": String(rateLimitResult.remaining ?? 0),
+        "X-RateLimit-Reset": String(rateLimitResult.reset ?? Date.now()),
+        "Retry-After": String(
+          Math.ceil(((rateLimitResult.reset ?? Date.now()) - Date.now()) / 1000)
+        ),
+      },
+    });
+  }
 
   const token = req.nextUrl.searchParams.get("token");
 

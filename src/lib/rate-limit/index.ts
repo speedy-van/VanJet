@@ -1,54 +1,101 @@
 // ─── VanJet · Rate Limiter (Upstash Redis) ────────────────────
 // Sliding-window rate limiting for tracking endpoints.
-// Requires env: UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
+// Optional: requires UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
+// Gracefully skips limiting if not configured.
 
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 
-// Lazy-init to avoid crashing if env vars are missing at import time
-let redis: Redis | null = null;
+// Types
+interface RateLimitResult {
+  ok: boolean;
+  remaining: number | null;
+  reset: number | null;
+  skipped: boolean;
+}
 
-function getRedis(): Redis | null {
+// Lazy-init Redis and Ratelimit only if env vars are present
+let redis: any = null;
+let Ratelimit: any = null;
+let Redis: any = null;
+
+function isRedisConfigured(): boolean {
+  return !!(
+    process.env.UPSTASH_REDIS_REST_URL &&
+    process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
+
+async function getRedis(): Promise<any> {
+  if (!isRedisConfigured()) return null;
   if (redis) return redis;
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  redis = new Redis({ url, token });
-  return redis;
+
+  try {
+    // Dynamic import to avoid build-time crashes when deps missing
+    const { Redis: RedisClass } = await import("@upstash/redis");
+    Redis = RedisClass;
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    });
+    return redis;
+  } catch (err) {
+    console.warn("[VanJet] Redis init failed:", err);
+    return null;
+  }
+}
+
+async function getRatelimitClass(): Promise<any> {
+  if (Ratelimit) return Ratelimit;
+  try {
+    const module = await import("@upstash/ratelimit");
+    Ratelimit = module.Ratelimit;
+    return Ratelimit;
+  } catch (err) {
+    console.warn("[VanJet] Ratelimit import failed:", err);
+    return null;
+  }
 }
 
 // ── Pre-configured limiters ────────────────────────────────────
 
 /** /api/tracking/latest — 60 requests per minute per IP */
-export function getLatestLimiter(): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
-  return new Ratelimit({
+export async function getLatestLimiter(): Promise<any> {
+  if (!isRedisConfigured()) return null;
+  const r = await getRedis();
+  const RatelimitClass = await getRatelimitClass();
+  if (!r || !RatelimitClass) return null;
+
+  return new RatelimitClass({
     redis: r,
-    limiter: Ratelimit.slidingWindow(60, "60 s"),
+    limiter: RatelimitClass.slidingWindow(60, "60 s"),
     prefix: "rl:tracking:latest",
   });
 }
 
 /** /api/tracking/subscribe — 10 connections per minute per IP */
-export function getSubscribeLimiter(): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
-  return new Ratelimit({
+export async function getSubscribeLimiter(): Promise<any> {
+  if (!isRedisConfigured()) return null;
+  const r = await getRedis();
+  const RatelimitClass = await getRatelimitClass();
+  if (!r || !RatelimitClass) return null;
+
+  return new RatelimitClass({
     redis: r,
-    limiter: Ratelimit.slidingWindow(10, "60 s"),
+    limiter: RatelimitClass.slidingWindow(10, "60 s"),
     prefix: "rl:tracking:subscribe",
   });
 }
 
 /** /api/tracking/update — 30 requests per minute per driver */
-export function getUpdateLimiter(): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
-  return new Ratelimit({
+export async function getUpdateLimiter(): Promise<any> {
+  if (!isRedisConfigured()) return null;
+  const r = await getRedis();
+  const RatelimitClass = await getRatelimitClass();
+  if (!r || !RatelimitClass) return null;
+
+  return new RatelimitClass({
     redis: r,
-    limiter: Ratelimit.slidingWindow(30, "60 s"),
+    limiter: RatelimitClass.slidingWindow(30, "60 s"),
     prefix: "rl:tracking:update",
   });
 }
@@ -60,25 +107,27 @@ export function getClientIP(req: Request): string {
   return "unknown";
 }
 
-// ── Helper: apply limiter and return 429 if exceeded ───────────
+// ── Helper: apply limiter and return result ────────────────────
 export async function applyRateLimit(
-  limiter: Ratelimit | null,
+  limiter: any,
   identifier: string
-): Promise<NextResponse | null> {
-  if (!limiter) return null; // skip if Redis not configured
-  const { success, remaining, reset } = await limiter.limit(identifier);
-  if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      {
-        status: 429,
-        headers: {
-          "X-RateLimit-Remaining": String(remaining),
-          "X-RateLimit-Reset": String(reset),
-          "Retry-After": String(Math.ceil((reset - Date.now()) / 1000)),
-        },
-      }
-    );
+): Promise<RateLimitResult> {
+  // Skip if Redis not configured
+  if (!limiter) {
+    return { ok: true, remaining: null, reset: null, skipped: true };
   }
-  return null;
+
+  try {
+    const { success, remaining, reset } = await limiter.limit(identifier);
+    return {
+      ok: success,
+      remaining,
+      reset,
+      skipped: false,
+    };
+  } catch (err) {
+    console.warn("[VanJet] Rate limit check failed:", err);
+    // Fail open — allow request if Redis errors
+    return { ok: true, remaining: null, reset: null, skipped: true };
+  }
 }
