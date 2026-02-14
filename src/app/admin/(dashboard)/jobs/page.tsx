@@ -1,7 +1,7 @@
 // ─── VanJet · Admin Jobs Page ─────────────────────────────────
 import { db } from "@/lib/db";
 import { jobs, quotes } from "@/lib/db/schema";
-import { eq, desc, count, sql, or, like } from "drizzle-orm";
+import { eq, desc, count, sql, or, like, and, ilike } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { formatGBP } from "@/lib/money/format";
 import Link from "next/link";
@@ -20,19 +20,24 @@ export default async function AdminJobsPage({ searchParams }: Props) {
   const searchQuery = params.q || "";
   const offset = (page - 1) * LIMIT;
 
-  // Build conditions
-  let conditions = statusFilter ? eq(jobs.status, statusFilter) : undefined;
+  // Build conditions array
+  const conditionsArray = [];
   
-  // Add search filter (search by reference number or jobId)
-  if (searchQuery) {
-    const searchCondition = or(
-      like(jobs.referenceNumber, `%${searchQuery}%`),
-      like(jobs.id, `%${searchQuery}%`)
-    );
-    conditions = conditions 
-      ? sql`${conditions} AND ${searchCondition}`
-      : searchCondition;
+  if (statusFilter) {
+    conditionsArray.push(eq(jobs.status, statusFilter));
   }
+  
+  // Add search filter (search by reference number or jobId - case insensitive)
+  if (searchQuery) {
+    conditionsArray.push(
+      or(
+        ilike(jobs.referenceNumber, `%${searchQuery}%`),
+        ilike(jobs.id, `%${searchQuery}%`)
+      )
+    );
+  }
+  
+  const conditions = conditionsArray.length > 0 ? and(...conditionsArray) : undefined;
 
   const [jobRows, [totalResult]] = await Promise.all([
     db
