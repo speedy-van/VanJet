@@ -10,7 +10,23 @@ interface RecentMove {
   type: string;
   items: string;
   price: string;
-  date: string;
+  timestamp: number; // milliseconds since event
+}
+
+// Helper function for relative time
+function getRelativeTime(msAgo: number): string {
+  const minutes = Math.floor(msAgo / 60000);
+  const hours = Math.floor(msAgo / 3600000);
+  const days = Math.floor(msAgo / 86400000);
+  
+  if (minutes < 60) return `${minutes} minutes ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  if (hours < 48) return 'Yesterday';
+  if (days < 7) return `${days} days ago`;
+  
+  // For older dates, show formatted date
+  const date = new Date(Date.now() - msAgo);
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 }
 
 const recentMoves: RecentMove[] = [
@@ -21,7 +37,7 @@ const recentMoves: RecentMove[] = [
     type: "House Move",
     items: "3-bed house — 42 items",
     price: "£485",
-    date: "2 hours ago",
+    timestamp: 2 * 3600000, // 2 hours ago
   },
   {
     id: "2",
@@ -30,7 +46,7 @@ const recentMoves: RecentMove[] = [
     type: "Office Relocation",
     items: "Small office — 18 items",
     price: "£310",
-    date: "5 hours ago",
+    timestamp: 5 * 3600000, // 5 hours ago
   },
   {
     id: "3",
@@ -39,7 +55,7 @@ const recentMoves: RecentMove[] = [
     type: "Single Item",
     items: "Upright piano",
     price: "£165",
-    date: "Yesterday",
+    timestamp: 22 * 3600000, // 22 hours ago
   },
   {
     id: "4",
@@ -48,7 +64,7 @@ const recentMoves: RecentMove[] = [
     type: "Storage Collection",
     items: "12 boxes + wardrobe",
     price: "£120",
-    date: "Yesterday",
+    timestamp: 26 * 3600000, // 26 hours ago
   },
 ];
 
@@ -96,7 +112,7 @@ export function RecentMoves() {
             >
             {/* Price — first, biggest, boldest */}
             <Text
-              fontSize={{ base: "1.5rem", md: "1.75rem" }}
+              fontSize="2xl"
               fontWeight="800"
               color="#1D4ED8"
               mb={2}
@@ -123,7 +139,7 @@ export function RecentMoves() {
               {move.items}
             </Text>
             <Text color="#9CA3AF" fontSize="13px">
-              {move.date}
+              {getRelativeTime(move.timestamp)}
             </Text>
           </Box>
           </StaggerChild>

@@ -14,15 +14,44 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ServiceCards } from "@/components/ServiceCards";
 import { HowItWorks } from "@/components/HowItWorks";
 import { RecentMoves } from "@/components/RecentMoves";
+import { Reviews } from "@/components/Reviews";
+import { PricingTable } from "@/components/PricingTable";
 import { PricingBanner } from "@/components/PricingBanner";
 import { Footer } from "@/components/Footer";
 import { SpringHover } from "@/components/animations/Motion";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+// CountUp hook
+function useCountUp(end: number, duration: number = 1500) {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let startTime: number;
+    let animationFrame: number;
+    
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      setCount(Math.floor(progress * end));
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration]);
+  
+  return count;
+}
 
 /* ── Hero image data ─────────────────────────────────────────── */
 interface HeroImage {
@@ -54,13 +83,17 @@ const NEON_SHADOW_HOVER =
   "0 0 0 1px rgba(59, 130, 246, 0.5), 0 0 50px rgba(59, 130, 246, 0.3), 0 20px 40px rgba(0,0,0,0.25)";
 
 export default function HomePage() {
+  const moves = useCountUp(1240, 1500);
+  const rating = useCountUp(48, 1500); // 4.8 * 10
+  const drivers = useCountUp(94, 1500);
+
   return (
     <Box pb={{ base: "80px", lg: "0" }}>
       <Navbar />
 
-      {/* ── Hero Section — Navy to Blue Gradient ────────────── */}
+      {/* ── Hero Section — Gradient Background ────────────── */}
       <Box
-        bg="linear-gradient(135deg, #0F2D5E 0%, #1E40AF 100%)"
+        bg="linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #1D4ED8 100%)"
         color="white"
         py={{ base: 14, md: 20, lg: 24 }}
         px={{ base: 4, md: 8 }}
@@ -168,76 +201,108 @@ export default function HomePage() {
                         h="48px"
                       />
                     </Stack>
-                    <Link href="/book" style={{ width: "100%" }}>
-                      <SpringHover>
+                    <HStack gap={3} w="100%">
+                      <Link href="/book" style={{ flex: 1 }}>
+                        <SpringHover>
+                          <Button
+                            w="100%"
+                            size="lg"
+                            bg="#F59E0B"
+                            color="#111827"
+                            fontWeight="800"
+                            fontSize="16px"
+                            h="52px"
+                            borderRadius="8px"
+                            _hover={{ bg: "#D97706", transform: "scale(1.02)" }}
+                          >
+                            Get Instant Quote →
+                          </Button>
+                        </SpringHover>
+                      </Link>
+                      <Link href="/#how-it-works">
                         <Button
-                          w="100%"
                           size="lg"
-                          bg="#F97316"
+                          variant="outline"
+                          border="2px solid rgba(255,255,255,0.4)"
                           color="white"
-                          fontWeight="700"
+                          fontWeight="600"
                           fontSize="16px"
                           h="52px"
                           borderRadius="8px"
-                          _hover={{ bg: "#EA580C" }}
-                          _active={{ bg: "#C2410C" }}
+                          bg="transparent"
+                          _hover={{ bg: "rgba(255,255,255,0.1)" }}
                         >
-                          Get Instant Quote →
+                          See How It Works
                         </Button>
-                      </SpringHover>
-                    </Link>
+                      </Link>
+                    </HStack>
                   </VStack>
                 </Box>
               </motion.div>
 
-              {/* Trust bullets */}
+              {/* Trust Bar */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.8, ease: EASE }}
+                transition={{ duration: 0.6, delay: 0.75, ease: EASE }}
+              >
+                <Flex
+                  gap={{ base: 2, md: 4 }}
+                  mt={{ base: 4, md: 5 }}
+                  flexWrap="wrap"
+                  justify={{ base: "center", lg: "flex-start" }}
+                  align="center"
+                  fontSize="14px"
+                  color="rgba(255,255,255,0.75)"
+                  maxW={{ base: "640px", lg: "100%" }}
+                  mx={{ base: "auto", lg: 0 }}
+                >
+                  <Text>✅ Free quotes</Text>
+                  <Text display={{ base: "none", sm: "block" }}>|</Text>
+                  <Text>✅ Verified drivers</Text>
+                  <Text display={{ base: "none", sm: "block" }}>|</Text>
+                  <Text>✅ £50k insurance</Text>
+                  <Text display={{ base: "none", sm: "block" }}>|</Text>
+                  <Text>✅ 48hr cancellation</Text>
+                </Flex>
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.9, ease: EASE }}
               >
                 <HStack
-                  gap={{ base: 3, md: 4 }}
+                  gap={{ base: 6, md: 10 }}
                   mt={{ base: 6, md: 8 }}
                   flexWrap="wrap"
                   justify={{ base: "center", lg: "flex-start" }}
                 >
-                  <Box
-                    px={4}
-                    py={2}
-                    borderRadius="full"
-                    bg="rgba(255, 255, 255, 0.15)"
-                    backdropFilter="blur(8px)"
-                    border="1px solid rgba(255, 255, 255, 0.2)"
-                  >
-                    <Text fontSize="14px" fontWeight="600">
-                      🇬🇧 UK-wide coverage
+                  <VStack gap={0}>
+                    <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                      {moves.toLocaleString()}+
                     </Text>
-                  </Box>
-                  <Box
-                    px={4}
-                    py={2}
-                    borderRadius="full"
-                    bg="rgba(255, 255, 255, 0.15)"
-                    backdropFilter="blur(8px)"
-                    border="1px solid rgba(255, 255, 255, 0.2)"
-                  >
-                    <Text fontSize="14px" fontWeight="600">
-                      ✓ Verified drivers
+                    <Text fontSize="sm" opacity={0.8}>
+                      Moves completed
                     </Text>
-                  </Box>
-                  <Box
-                    px={4}
-                    py={2}
-                    borderRadius="full"
-                    bg="rgba(255, 255, 255, 0.15)"
-                    backdropFilter="blur(8px)"
-                    border="1px solid rgba(255, 255, 255, 0.2)"
-                  >
-                    <Text fontSize="14px" fontWeight="600">
-                      🔐 Secure payments
+                  </VStack>
+                  <VStack gap={0}>
+                    <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                      {(rating / 10).toFixed(1)}★
                     </Text>
-                  </Box>
+                    <Text fontSize="sm" opacity={0.8}>
+                      Average rating
+                    </Text>
+                  </VStack>
+                  <VStack gap={0}>
+                    <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
+                      {drivers}+
+                    </Text>
+                    <Text fontSize="sm" opacity={0.8}>
+                      Verified drivers
+                    </Text>
+                  </VStack>
                 </HStack>
               </motion.div>
             </Box>
@@ -355,6 +420,8 @@ export default function HomePage() {
       <ServiceCards />
       <HowItWorks />
       <RecentMoves />
+      <Reviews />
+      <PricingTable />
       <PricingBanner />
       <Footer />
 
@@ -377,14 +444,13 @@ export default function HomePage() {
           <Button
             w="100%"
             size="lg"
-            bg="#F97316"
-            color="white"
-            fontWeight="700"
+            bg="#F59E0B"
+            color="#111827"
+            fontWeight="800"
             fontSize="16px"
             h="52px"
             borderRadius="10px"
-            _hover={{ bg: "#EA580C" }}
-            _active={{ bg: "#C2410C" }}
+            _hover={{ bg: "#D97706" }}
           >
             Get Free Quote →
           </Button>

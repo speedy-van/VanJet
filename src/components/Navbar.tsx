@@ -80,12 +80,11 @@ export function Navbar() {
             <Link href="/book">
               <Button
                 size={{ base: "sm", md: "md" }}
-                bg="#F97316"
-                color="white"
+                bg="#F59E0B"
+                color="#111827"
                 fontWeight="700"
                 borderRadius="8px"
-                _hover={{ bg: "#EA580C" }}
-                _active={{ bg: "#C2410C" }}
+                _hover={{ bg: "#D97706" }}
               >
                 Get Quote
               </Button>
@@ -135,14 +134,14 @@ export function Navbar() {
           </Box>
 
           {/* Phone number — prominent */}
-          <Link href="tel:+4402012345678">
+          <Link href="tel:+441202129746">
             <Text
               fontSize="lg"
               fontWeight="700"
-              color="#0F2D5E"
+              color="#1D4ED8"
               mb={8}
             >
-              📞 020 1234 5678
+              📞 01202 129746
             </Text>
           </Link>
 

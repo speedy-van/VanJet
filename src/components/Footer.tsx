@@ -51,9 +51,9 @@ export function Footer() {
           <Text fontWeight="600" color="white" fontSize="15px" mb={1}>
             Contact
           </Text>
-          <Link href="tel:+4402012345678">
+          <Link href="tel:+441202129746">
             <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms" fontWeight="600">
-              020 1234 5678
+              01202 129746
             </Text>
           </Link>
           <Link href="mailto:hello@van-jet.com">
@@ -61,7 +61,10 @@ export function Footer() {
               hello@van-jet.com
             </Text>
           </Link>
-          <Text fontSize="14px">London, United Kingdom</Text>
+          <Text fontSize="14px">United Kingdom</Text>
+          <Text fontSize="13px" color="#94A3B8" mt={2}>
+            We're available 7 days a week
+          </Text>
         </VStack>
       </SimpleGrid>
 
@@ -112,7 +115,7 @@ export function Footer() {
 
       <Box borderTopWidth="1px" borderColor="#1E293B" pt={5}>
         <Text textAlign="center" fontSize="13px" color="#64748B">
-          &copy; {new Date().getFullYear()} VanJet Ltd. All rights reserved. Registered in England &amp; Wales.
+          &copy; {new Date().getFullYear()} VanJet Ltd. All rights reserved. Registered in England &amp; Wales | ICO Registered Data Controller
         </Text>
       </Box>
     </Box>
