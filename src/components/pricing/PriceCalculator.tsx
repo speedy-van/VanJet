@@ -4,6 +4,7 @@
 // Mobile-first, English only, LTR, no car transport options.
 
 import { useState } from "react";
+import { formatGBP } from "@/lib/money/format";
 import {
   Box,
   VStack,
@@ -422,10 +423,10 @@ export function PriceCalculator() {
                 Estimated Price (incl. VAT)
               </Text>
               <Text fontSize="3xl" fontWeight="900" color="blue.600">
-                £{result.priceMin} – £{result.priceMax}
+                {formatGBP(result.priceMin)} – {formatGBP(result.priceMax)}
               </Text>
               <Text fontSize="lg" fontWeight="700" color="gray.700" mt={1}>
-                Mid-point: £{result.totalPrice.toFixed(2)}
+                Mid-point: {formatGBP(result.totalPrice)}
               </Text>
             </Box>
 
@@ -477,7 +478,7 @@ export function PriceCalculator() {
                   <Flex key={i} justify="space-between" fontSize="sm">
                     <Text color="gray.600">{line.label}</Text>
                     <Text color="gray.800" fontWeight="500">
-                      £{line.amount.toFixed(2)}
+                      {formatGBP(line.amount)}
                     </Text>
                   </Flex>
                 ))}
@@ -490,7 +491,7 @@ export function PriceCalculator() {
                   <Flex justify="space-between" fontWeight="700">
                     <Text color="gray.800">Total (incl. VAT)</Text>
                     <Text color="blue.600">
-                      £{result.totalPrice.toFixed(2)}
+                      {formatGBP(result.totalPrice)}
                     </Text>
                   </Flex>
                 </Box>

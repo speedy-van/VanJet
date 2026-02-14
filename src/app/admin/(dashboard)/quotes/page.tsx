@@ -2,8 +2,7 @@
 import { db } from "@/lib/db";
 import { quotes, jobs, users } from "@/lib/db/schema";
 import { eq, desc, count } from "drizzle-orm";
-import { Box, Flex, Text } from "@chakra-ui/react";
-import { QuoteActions } from "@/components/admin/QuoteActions";
+import { Box, Flex, Text } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";import { QuoteActions } from "@/components/admin/QuoteActions";
 
 const LIMIT = 20;
 
@@ -131,7 +130,7 @@ export default async function AdminQuotesPage({ searchParams }: Props) {
                     {q.driverId.slice(0, 8)}…
                   </Box>
                   <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
-                    £{Number(q.price).toFixed(2)}
+                    {formatGBP(Number(q.price))}
                   </Box>
                   <Box as="td" px={4} py={3}>
                     {q.estimatedDuration || "—"}

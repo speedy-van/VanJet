@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { jobs, jobItems, quotes, users, bookings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
-import Link from "next/link";
+import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";import Link from "next/link";
 import { JobStatusForm } from "@/components/admin/JobStatusForm";
 
 interface Props {
@@ -67,11 +66,11 @@ export default async function AdminJobDetailPage({ params }: Props) {
           <InfoRow label="Flexible Dates" value={job.flexibleDates ? "Yes" : "No"} />
           <InfoRow
             label="Est. Price"
-            value={job.estimatedPrice ? `£${Number(job.estimatedPrice).toFixed(2)}` : "—"}
+            value={job.estimatedPrice ? formatGBP(Number(job.estimatedPrice)) : "—"}
           />
           <InfoRow
             label="Final Price"
-            value={job.finalPrice ? `£${Number(job.finalPrice).toFixed(2)}` : "—"}
+            value={job.finalPrice ? formatGBP(Number(job.finalPrice)) : "—"}
           />
           <InfoRow
             label="Distance"
@@ -231,7 +230,7 @@ export default async function AdminJobDetailPage({ params }: Props) {
                       {q.driverId.slice(0, 8)}…
                     </Box>
                     <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
-                      £{Number(q.price).toFixed(2)}
+                      {formatGBP(Number(q.price))}
                     </Box>
                     <Box as="td" px={4} py={3} maxW="200px" truncate>
                       {q.message || "—"}
@@ -292,7 +291,7 @@ export default async function AdminJobDetailPage({ params }: Props) {
                       {b.id.slice(0, 8)}…
                     </Box>
                     <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
-                      £{Number(b.finalPrice).toFixed(2)}
+                      {formatGBP(Number(b.finalPrice))}
                     </Box>
                     <Box as="td" px={4} py={3} textTransform="capitalize">
                       {b.paymentStatus}

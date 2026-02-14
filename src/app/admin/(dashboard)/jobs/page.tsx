@@ -2,8 +2,7 @@
 import { db } from "@/lib/db";
 import { jobs, users } from "@/lib/db/schema";
 import { eq, desc, count, sql } from "drizzle-orm";
-import { Box, Flex, Text } from "@chakra-ui/react";
-import Link from "next/link";
+import { Box, Flex, Text } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";import Link from "next/link";
 
 const LIMIT = 20;
 
@@ -150,7 +149,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
                     <StatusBadge status={job.status} />
                   </Box>
                   <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
-                    {job.estimatedPrice ? `£${Number(job.estimatedPrice).toFixed(2)}` : "—"}
+                    {job.estimatedPrice ? formatGBP(Number(job.estimatedPrice)) : "—"}
                   </Box>
                   <Box as="td" px={4} py={3} color="gray.500" whiteSpace="nowrap">
                     {new Date(job.moveDate).toLocaleDateString("en-GB")}

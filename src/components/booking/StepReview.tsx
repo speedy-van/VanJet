@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { TIME_WINDOWS } from "./types";
 import type { BookingForm } from "./types";
+import { formatGBP } from "@/lib/money/format";
 
 interface StepReviewProps {
   form: BookingForm;
@@ -91,11 +92,12 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     setError("");
 
     try {
+      // Use fresh values (currentVals) for all API calls
       // Determine job type heuristically
       const jobType =
-        vals.jobType && vals.jobType !== ""
-          ? vals.jobType
-          : vals.items.length > 5
+        currentVals.jobType && currentVals.jobType !== ""
+          ? currentVals.jobType
+          : currentVals.items.length > 5
             ? "house_move"
             : "single_item";
 
@@ -105,23 +107,23 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobType,
-          distanceKm: vals.distanceKm ?? 15, // fallback; will be overwritten by job create
-          items: vals.items.map((i) => ({
+          distanceKm: currentVals.distanceKm ?? 15,
+          items: currentVals.items.map((i) => ({
             name: i.name,
             quantity: i.quantity,
             weightKg: i.weightKg,
             volumeM3: i.volumeM3,
           })),
-          pickupFloor: vals.pickup.floor,
-          pickupHasElevator: vals.pickup.hasLift,
-          deliveryFloor: vals.dropoff.floor,
-          deliveryHasElevator: vals.dropoff.hasLift,
-          requiresPackaging: vals.needsPacking,
+          pickupFloor: currentVals.pickup.floor,
+          pickupHasElevator: currentVals.pickup.hasLift,
+          deliveryFloor: currentVals.dropoff.floor,
+          deliveryHasElevator: currentVals.dropoff.hasLift,
+          requiresPackaging: currentVals.needsPacking,
           requiresAssembly: false,
           requiresDisassembly: false,
           requiresCleaning: false,
           insuranceLevel: "basic",
-          preferredDate: vals.schedule.preferredDate,
+          preferredDate: currentVals.schedule.preferredDate,
         }),
       });
 
@@ -131,7 +133,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       }
 
       // Then create the job (which also gets distance via Mapbox)
-      const itemsPayload = vals.items.map((i) => ({
+      const itemsPayload = currentVals.items.map((i) => ({
         name: i.name,
         category: i.category,
         quantity: i.quantity,
@@ -146,24 +148,24 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contactEmail: vals.contactEmail,
-          contactName: vals.contactName,
-          contactPhone: vals.contactPhone,
+          contactEmail: email,
+          contactName: name,
+          contactPhone: phone,
           jobType,
-          pickupAddress: vals.pickup.address,
-          deliveryAddress: vals.dropoff.address,
-          moveDate: new Date(vals.schedule.preferredDate).toISOString(),
-          needsPacking: vals.needsPacking,
-          pickupFloor: vals.pickup.floor,
-          pickupFlat: vals.pickup.flat,
-          pickupHasLift: vals.pickup.hasLift,
-          pickupNotes: vals.pickup.notes,
-          deliveryFloor: vals.dropoff.floor,
-          deliveryFlat: vals.dropoff.flat,
-          deliveryHasLift: vals.dropoff.hasLift,
-          deliveryNotes: vals.dropoff.notes,
-          preferredTimeWindow: vals.schedule.timeWindow,
-          flexibleDates: vals.schedule.flexibleDates,
+          pickupAddress: currentVals.pickup.address,
+          deliveryAddress: currentVals.dropoff.address,
+          moveDate: new Date(currentVals.schedule.preferredDate).toISOString(),
+          needsPacking: currentVals.needsPacking,
+          pickupFloor: currentVals.pickup.floor,
+          pickupFlat: currentVals.pickup.flat,
+          pickupHasLift: currentVals.pickup.hasLift,
+          pickupNotes: currentVals.pickup.notes,
+          deliveryFloor: currentVals.dropoff.floor,
+          deliveryFlat: currentVals.dropoff.flat,
+          deliveryHasLift: currentVals.dropoff.hasLift,
+          deliveryNotes: currentVals.dropoff.notes,
+          preferredTimeWindow: currentVals.schedule.timeWindow,
+          flexibleDates: currentVals.schedule.flexibleDates,
           items: itemsPayload,
         }),
       });
@@ -392,19 +394,19 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
               {pricingEngine ? (
                 <>
                   <Text fontSize={{ base: "2.5rem", md: "3rem" }} fontWeight="800" color="#1D4ED8" lineHeight="1.1">
-                    £{pricingEngine.priceMin} – £{pricingEngine.priceMax}
+                    {formatGBP(pricingEngine.priceMin)} – {formatGBP(pricingEngine.priceMax)}
                   </Text>
                   <Text fontSize="lg" fontWeight="700" color="#374151" mt={2}>
-                    Mid-point: £{pricingEngine.totalPrice.toFixed(2)}
+                    Mid-point: {formatGBP(pricingEngine.totalPrice)}
                   </Text>
                 </>
               ) : jobResult ? (
                 <>
                   <Text fontSize={{ base: "2.5rem", md: "3rem" }} fontWeight="800" color="#1D4ED8" lineHeight="1.1">
-                    £{jobResult.priceRange.min.toFixed(2)} – £{jobResult.priceRange.max.toFixed(2)}
+                    {formatGBP(jobResult.priceRange.min)} – {formatGBP(jobResult.priceRange.max)}
                   </Text>
                   <Text fontSize="lg" fontWeight="700" color="#374151" mt={2}>
-                    £{jobResult.estimatedPrice.toFixed(2)}
+                    {formatGBP(jobResult.estimatedPrice)}
                   </Text>
                 </>
               ) : null}
@@ -448,14 +450,14 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
                     <Flex key={i} justify="space-between" fontSize="sm">
                       <Text color="gray.600">{line.label}</Text>
                       <Text color="gray.800" fontWeight="500">
-                        £{line.amount.toFixed(2)}
+                        {formatGBP(line.amount)}
                       </Text>
                     </Flex>
                   ))}
                   <Box borderTopWidth="1px" borderColor="gray.200" pt={2} mt={1}>
                     <Flex justify="space-between" fontWeight="700">
                       <Text color="#111827">Total (incl. VAT)</Text>
-                      <Text color="#1D4ED8" fontSize="lg">£{pricingEngine.totalPrice.toFixed(2)}</Text>
+                      <Text color="#1D4ED8" fontSize="lg">{formatGBP(pricingEngine.totalPrice)}</Text>
                     </Flex>
                   </Box>
                 </VStack>

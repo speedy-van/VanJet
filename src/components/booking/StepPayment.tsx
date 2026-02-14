@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Box, VStack, Text, Button, HStack } from "@chakra-ui/react";
+import { formatGBP } from "@/lib/money/format";
 import {
   Elements,
   PaymentElement,
@@ -235,7 +236,7 @@ function PaymentForm({
             <Text fontSize="sm" color="gray.500">
               You will be charged{" "}
               <Text as="span" fontWeight="700" color="brand.500">
-                £{estimatedPrice.toFixed(2)}
+                {formatGBP(estimatedPrice)}
               </Text>
             </Text>
           )}
@@ -274,7 +275,7 @@ function PaymentForm({
           >
             {processing
               ? "Processing..."
-              : `Pay £${(estimatedPrice ?? 0).toFixed(2)}`}
+              : `Pay ${formatGBP(estimatedPrice)}`}
           </Button>
         </HStack>
       </VStack>

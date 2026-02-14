@@ -2,8 +2,7 @@
 import { db } from "@/lib/db";
 import { users, jobs, bookings, driverProfiles, quotes } from "@/lib/db/schema";
 import { count, sum, eq } from "drizzle-orm";
-import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
-
+import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";
 async function getStats() {
   const [
     [jobCount],
@@ -72,7 +71,7 @@ export default async function AdminDashboardPage() {
         <StatCard label="Quotes" value={stats.quotes} color="orange.600" />
         <StatCard
           label="Revenue (Paid)"
-          value={`£${Number(stats.revenue).toFixed(2)}`}
+          value={formatGBP(Number(stats.revenue))}
           color="green.700"
         />
       </SimpleGrid>
@@ -154,7 +153,7 @@ async function RecentJobsTable() {
                 <StatusBadge status={job.status} />
               </Box>
               <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
-                {job.estimatedPrice ? `£${Number(job.estimatedPrice).toFixed(2)}` : "—"}
+                {job.estimatedPrice ? formatGBP(Number(job.estimatedPrice)) : "—"}
               </Box>
               <Box as="td" px={4} py={3} color="gray.500">
                 {new Date(job.moveDate).toLocaleDateString("en-GB")}

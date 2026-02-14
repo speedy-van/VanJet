@@ -20,7 +20,7 @@ export async function geocodeAddress(
 
   const url = `${MAPBOX_BASE}/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
-  )}.json?country=GB&limit=1&access_token=${token}`;
+  )}.json?country=GB&language=en&types=address,postcode,place&limit=1&access_token=${token}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error("Geocoding request failed.");

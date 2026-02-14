@@ -21,16 +21,18 @@ export function AddressAutocomplete({
   value,
   onChange,
   onSelect,
-  placeholder = "Start typing an address...",
+  placeholder = "Start typing a UK address...",
 }: AddressAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
+  const [noResults, setNoResults] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchSuggestions = useCallback(async (query: string) => {
     if (query.length < 3) {
       setSuggestions([]);
       setOpen(false);
+      setNoResults(false);
       return;
     }
     const token = publicEnv.MAPBOX_TOKEN;
@@ -39,7 +41,7 @@ export function AddressAutocomplete({
     try {
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         query
-      )}.json?country=GB&limit=5&types=address,place,postcode&access_token=${token}`;
+      )}.json?country=GB&language=en&autocomplete=true&limit=6&types=address,place,postcode&access_token=${token}`;
       const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
@@ -51,7 +53,13 @@ export function AddressAutocomplete({
         })
       );
       setSuggestions(results);
-      setOpen(results.length > 0);
+      if (results.length > 0) {
+        setOpen(true);
+        setNoResults(false);
+      } else {
+        setOpen(false);
+        setNoResults(true);
+      }
     } catch {
       /* silent */
     }
@@ -60,6 +68,7 @@ export function AddressAutocomplete({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     onChange(val);
+    setNoResults(false);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => fetchSuggestions(val), 300);
   };
@@ -69,6 +78,7 @@ export function AddressAutocomplete({
     onSelect({ address: s.placeName, lat: s.lat, lng: s.lng });
     setSuggestions([]);
     setOpen(false);
+    setNoResults(false);
   };
 
   return (
@@ -82,6 +92,14 @@ export function AddressAutocomplete({
         autoComplete="off"
         bg="white"
       />
+      <Text fontSize="2xs" color="gray.400" mt={0.5}>
+        UK addresses only
+      </Text>
+      {noResults && value.length >= 3 && (
+        <Text fontSize="xs" color="red.500" mt={1}>
+          Please enter a UK address.
+        </Text>
+      )}
       {open && suggestions.length > 0 && (
         <VStack
           position="absolute"
@@ -97,8 +115,9 @@ export function AddressAutocomplete({
           zIndex={100}
           p={1}
           gap={0}
-          maxH="220px"
+          maxH="260px"
           overflowY="auto"
+          WebkitOverflowScrolling="touch"
         >
           {suggestions.map((s, i) => (
             <Box

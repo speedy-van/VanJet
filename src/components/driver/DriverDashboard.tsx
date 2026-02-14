@@ -1,6 +1,7 @@
 "use client";
 
 // ─── VanJet · Driver Dashboard Client Component ───────────────
+import { formatGBP, formatGBPWhole } from "@/lib/money/format";
 import {
   Box,
   Container,
@@ -178,10 +179,9 @@ export function DriverDashboardClient({ user, profile, bookings }: Props) {
             },
             {
               label: "Total Earnings",
-              value: `£${bookings
+              value: formatGBPWhole(bookings
                 .filter((b) => b.status === "completed")
-                .reduce((sum, b) => sum + Number(b.finalPrice) * 0.85, 0)
-                .toFixed(0)}`,
+                .reduce((sum, b) => sum + Number(b.finalPrice) * 0.85, 0)),
               color: "#111827",
             },
           ].map((stat) => (
@@ -264,7 +264,7 @@ export function DriverDashboardClient({ user, profile, bookings }: Props) {
                   >
                     <Box>
                       <Text fontWeight="700" color="#1D4ED8" fontSize="xl">
-                        £{Number(b.finalPrice).toFixed(2)}
+                        {formatGBP(Number(b.finalPrice))}
                       </Text>
                       <Text fontSize="xs" color="#9CA3AF">
                         {new Date(b.moveDate).toLocaleDateString("en-GB", {
