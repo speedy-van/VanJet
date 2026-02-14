@@ -1,5 +1,6 @@
 // ─── VanJet · Chakra UI v3 Design System ──────────────────────
 // Brand Blue #1D4ED8 · Amber CTA #F59E0B · Success Green #059669
+// Background #F8FAFC · Border #E2E8F0 · Card Shadow 0 1px 3px
 // Warm neutrals · Inter · 8px spacing base · 12px card radius
 import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
 
@@ -64,6 +65,15 @@ const vanjetConfig = defineConfig({
           800: { value: "#1F2937" },
           900: { value: "#111827" },
         },
+        // ── UI Tokens ────────────────────────────────────────
+        bg: {
+          page:   { value: "#F8FAFC" },  // Soft background
+          card:   { value: "#FFFFFF" },  // Card background
+        },
+        border: {
+          card:   { value: "#E2E8F0" },  // Card borders
+          input:  { value: "#E5E7EB" },  // Input borders
+        },
       },
       fonts: {
         heading: { value: "Inter, -apple-system, sans-serif" },
@@ -74,6 +84,10 @@ const vanjetConfig = defineConfig({
         button: { value: "8px" },
         input:  { value: "8px" },
         badge:  { value: "9999px" },
+      },
+      shadows: {
+        card:   { value: "0 1px 3px rgba(0, 0, 0, 0.08)" },
+        hover:  { value: "0 4px 12px rgba(0, 0, 0, 0.12)" },
       },
     },
   },
