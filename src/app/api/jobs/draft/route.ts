@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Resolve customer
+    // Resolve customer - create a guest user if needed
     let customerId = body.customerId;
 
     if (!customerId && body.contactEmail) {
@@ -53,7 +53,17 @@ export async function POST(req: NextRequest) {
     }
 
     if (!customerId) {
-      customerId = "00000000-0000-0000-0000-000000000000"; // Placeholder for guest
+      // Create a temporary guest user for anonymous bookings
+      const tempEmail = `guest-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@vanjet.temp`;
+      const [guestUser] = await db
+        .insert(users)
+        .values({
+          email: tempEmail,
+          name: "Guest User",
+          role: "customer",
+        })
+        .returning();
+      customerId = guestUser.id;
     }
 
     // Geocode addresses
