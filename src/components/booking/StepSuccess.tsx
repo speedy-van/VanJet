@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, VStack, Text, Button, Flex } from "@chakra-ui/react";
+import { Box, VStack, Text, Button, Flex, SimpleGrid } from "@chakra-ui/react";
 import Link from "next/link";
 import type { BookingForm } from "./types";
 
@@ -8,9 +8,29 @@ interface StepSuccessProps {
   form: BookingForm;
 }
 
+const NEXT_STEPS = [
+  {
+    icon: "📩",
+    title: "Drivers send quotes",
+    description:
+      "Verified drivers in your area will review your request and send competitive quotes — usually within minutes.",
+  },
+  {
+    icon: "⚖️",
+    title: "Compare & choose",
+    description:
+      "Review each driver\u2019s price, rating, van size, and reviews. Pick the one that suits you best.",
+  },
+  {
+    icon: "💳",
+    title: "Pay & track",
+    description:
+      "Pay securely online. Your driver is confirmed instantly and you can track your move in real time.",
+  },
+];
+
 export function StepSuccess({ form }: StepSuccessProps) {
   const jobId = form.watch("jobId");
-  const trackingToken = form.watch("trackingToken");
 
   return (
     <Box
@@ -21,6 +41,7 @@ export function StepSuccess({ form }: StepSuccessProps) {
       textAlign="center"
     >
       <VStack gap={6}>
+        {/* ── Success icon ─────────────────────────────────── */}
         <Flex
           w="80px"
           h="80px"
@@ -36,18 +57,18 @@ export function StepSuccess({ form }: StepSuccessProps) {
         </Flex>
 
         <Text fontSize="1.75rem" fontWeight="800" color="#111827">
-          Booking confirmed!
+          Request submitted!
         </Text>
 
-        <Text fontSize="15px" color="#4B5563" maxW="400px" lineHeight="1.7">
-          Your move request has been submitted. Drivers in your area
-          will start sending quotes shortly.
+        <Text fontSize="15px" color="#4B5563" maxW="420px" lineHeight="1.7">
+          Your move request is now live. Verified drivers in your area will
+          start sending quotes shortly — no commitment until you choose one.
         </Text>
 
         {jobId && (
           <Box bg="#F9FAFB" px={5} py={3} borderRadius="8px">
             <Text fontSize="14px" color="#6B7280">
-              Booking reference
+              Request reference
             </Text>
             <Text
               fontSize="lg"
@@ -64,6 +85,49 @@ export function StepSuccess({ form }: StepSuccessProps) {
           A confirmation email has been sent to your email address.
         </Text>
 
+        {/* ── What happens next — 3-step guide ─────────────── */}
+        <Box w="full" mt={2}>
+          <Text
+            fontSize="md"
+            fontWeight="700"
+            color="#111827"
+            mb={4}
+            textAlign="center"
+          >
+            What happens next?
+          </Text>
+
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+            {NEXT_STEPS.map((step, i) => (
+              <Box
+                key={i}
+                bg="#F9FAFB"
+                borderRadius="10px"
+                p={5}
+                textAlign="center"
+                borderWidth="1px"
+                borderColor="#E5E7EB"
+              >
+                <Text fontSize="2xl" mb={2}>
+                  {step.icon}
+                </Text>
+                <Text
+                  fontSize="14px"
+                  fontWeight="700"
+                  color="#111827"
+                  mb={1}
+                >
+                  {step.title}
+                </Text>
+                <Text fontSize="13px" color="#6B7280" lineHeight="1.6">
+                  {step.description}
+                </Text>
+              </Box>
+            ))}
+          </SimpleGrid>
+        </Box>
+
+        {/* ── CTA buttons ──────────────────────────────────── */}
         {jobId && (
           <Link href={`/job/${jobId}/quotes`}>
             <Button
@@ -76,7 +140,7 @@ export function StepSuccess({ form }: StepSuccessProps) {
               w="full"
               _hover={{ bg: "#D97706" }}
             >
-              View Driver Quotes
+              View Driver Quotes →
             </Button>
           </Link>
         )}

@@ -158,31 +158,31 @@ export function generateHowItWorksSchema() {
     "@type": "HowTo",
     name: "How to Book a VanJet Removal",
     description:
-      "Book a removal or delivery in 4 simple steps with VanJet UK.",
+      "Get competitive quotes from verified drivers in 4 simple steps with VanJet UK.",
     step: [
       {
         "@type": "HowToStep",
         position: 1,
-        name: "Enter your addresses",
-        text: "Provide your pickup and delivery addresses. We cover the whole of the UK.",
+        name: "Tell us what you need",
+        text: "Enter your pickup and delivery addresses, select items you are moving, and choose a date.",
       },
       {
         "@type": "HowToStep",
         position: 2,
-        name: "Add your items",
-        text: "Select items from our catalogue or add custom items with weight and size.",
+        name: "Receive driver quotes",
+        text: "Your request goes live to verified drivers in your area. They review your job and send competitive quotes — usually within minutes.",
       },
       {
         "@type": "HowToStep",
         position: 3,
-        name: "Get instant pricing",
-        text: "Our hybrid pricing engine calculates a fair, transparent quote in seconds.",
+        name: "Compare and choose",
+        text: "Compare quotes side by side — see each driver's price, rating, van size, and reviews. Pick the one that suits you best.",
       },
       {
         "@type": "HowToStep",
         position: 4,
-        name: "Book and pay securely",
-        text: "Confirm your booking and pay securely online. Track your move in real time.",
+        name: "Pay securely and track",
+        text: "Pay online with Stripe. Your driver is confirmed instantly and you can track your move in real time.",
       },
     ],
   };

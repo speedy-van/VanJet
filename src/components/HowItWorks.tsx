@@ -8,19 +8,19 @@ const steps = [
     number: "1",
     title: "Tell us what you need",
     description:
-      "Enter your pickup and delivery addresses, choose what you're moving, and pick a date.",
+      "Enter your pickup and delivery addresses, select items you\u2019re moving, and pick a date — takes under 2 minutes.",
   },
   {
     number: "2",
-    title: "Get instant quotes",
+    title: "Receive driver quotes",
     description:
-      "Our AI estimates a fair price range and local drivers send their best offers.",
+      "Your request goes live to verified drivers in your area. They\u2019ll send competitive quotes — usually within minutes.",
   },
   {
     number: "3",
-    title: "Book & relax",
+    title: "Compare, pay & relax",
     description:
-      "Choose the driver you like, pay securely, and track your move in real time.",
+      "Compare prices, ratings, and reviews side by side. Choose your driver, pay securely, and track your move in real time.",
   },
 ];
 
