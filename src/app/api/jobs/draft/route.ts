@@ -94,6 +94,8 @@ export async function POST(req: NextRequest) {
             deliveryLat: String(delivery.lat),
             deliveryLng: String(delivery.lng),
             moveDate: body.moveDate ? new Date(body.moveDate) : new Date(),
+            contactName: null,
+            contactPhone: null,
           })
           .returning();
 
@@ -109,7 +111,9 @@ export async function POST(req: NextRequest) {
           }
           continue;
         } else {
-          throw err;
+          // Re-throw with more details
+          const errMsg = err instanceof Error ? err.message : String(err);
+          throw new Error(`Database insert failed: ${errMsg}`);
         }
       }
     }
