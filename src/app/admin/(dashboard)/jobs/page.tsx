@@ -1,28 +1,44 @@
 // ─── VanJet · Admin Jobs Page ─────────────────────────────────
 import { db } from "@/lib/db";
-import { jobs, users } from "@/lib/db/schema";
-import { eq, desc, count, sql } from "drizzle-orm";
-import { Box, Flex, Text } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";import Link from "next/link";
+import { jobs, quotes } from "@/lib/db/schema";
+import { eq, desc, count, sql, or, like } from "drizzle-orm";
+import { Box, Flex, Text } from "@chakra-ui/react";
+import { formatGBP } from "@/lib/money/format";
+import Link from "next/link";
+import { SearchBar } from "./SearchBar";
 
 const LIMIT = 20;
 
 interface Props {
-  searchParams: Promise<{ page?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; status?: string; q?: string }>;
 }
 
 export default async function AdminJobsPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
   const statusFilter = params.status || "";
+  const searchQuery = params.q || "";
   const offset = (page - 1) * LIMIT;
 
   // Build conditions
-  const conditions = statusFilter ? eq(jobs.status, statusFilter) : undefined;
+  let conditions = statusFilter ? eq(jobs.status, statusFilter) : undefined;
+  
+  // Add search filter (search by reference number or jobId)
+  if (searchQuery) {
+    const searchCondition = or(
+      like(jobs.referenceNumber, `%${searchQuery}%`),
+      like(jobs.id, `%${searchQuery}%`)
+    );
+    conditions = conditions 
+      ? sql`${conditions} AND ${searchCondition}`
+      : searchCondition;
+  }
 
   const [jobRows, [totalResult]] = await Promise.all([
     db
       .select({
         id: jobs.id,
+        referenceNumber: jobs.referenceNumber,
         pickupAddress: jobs.pickupAddress,
         deliveryAddress: jobs.deliveryAddress,
         status: jobs.status,
@@ -31,6 +47,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
         moveDate: jobs.moveDate,
         contactName: jobs.contactName,
         createdAt: jobs.createdAt,
+        quoteCount: sql<number>`(SELECT COUNT(*) FROM ${quotes} WHERE ${quotes.jobId} = ${jobs.id})`.as("quote_count"),
       })
       .from(jobs)
       .where(conditions)
@@ -55,6 +72,11 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           Jobs ({total})
         </Text>
       </Flex>
+
+      {/* Search Bar */}
+      <Box mb={4}>
+        <SearchBar currentQuery={searchQuery} />
+      </Box>
 
       {/* Status Filter Tabs */}
       <Flex gap={2} mb={4} flexWrap="wrap">
@@ -92,6 +114,9 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           <Box as="thead" bg="gray.50">
             <Box as="tr">
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
+                Reference
+              </Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
                 Contact
               </Box>
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
@@ -105,6 +130,9 @@ export default async function AdminJobsPage({ searchParams }: Props) {
               </Box>
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
                 Status
+              </Box>
+              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">
+                Quotes
               </Box>
               <Box as="th" textAlign="right" px={4} py={3} fontWeight="600" color="gray.600">
                 Price
@@ -120,7 +148,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           <Box as="tbody">
             {jobRows.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
+                <td colSpan={10} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
                   No jobs found.
                 </td>
               </tr>
@@ -133,6 +161,9 @@ export default async function AdminJobsPage({ searchParams }: Props) {
                   borderColor="gray.100"
                   _hover={{ bg: "gray.50" }}
                 >
+                  <Box as="td" px={4} py={3} fontWeight="600" fontFamily="mono" fontSize="xs" color="blue.600">
+                    {job.referenceNumber}
+                  </Box>
                   <Box as="td" px={4} py={3} fontWeight="500">
                     {job.contactName || "—"}
                   </Box>
@@ -147,6 +178,9 @@ export default async function AdminJobsPage({ searchParams }: Props) {
                   </Box>
                   <Box as="td" px={4} py={3}>
                     <StatusBadge status={job.status} />
+                  </Box>
+                  <Box as="td" px={4} py={3} textAlign="center" fontWeight="700" color={job.quoteCount > 0 ? "green.600" : "gray.400"}>
+                    {job.quoteCount}
                   </Box>
                   <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
                     {job.estimatedPrice ? formatGBP(Number(job.estimatedPrice)) : "—"}
@@ -178,7 +212,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
         <Flex justify="center" mt={4} gap={2}>
           {page > 1 && (
             <Link
-              href={`/admin/jobs?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+              href={`/admin/jobs?page=${page - 1}${statusFilter ? `&status=${statusFilter}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`}
             >
               <Box
                 px={3}
@@ -200,7 +234,7 @@ export default async function AdminJobsPage({ searchParams }: Props) {
           </Box>
           {page < totalPages && (
             <Link
-              href={`/admin/jobs?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}`}
+              href={`/admin/jobs?page=${page + 1}${statusFilter ? `&status=${statusFilter}` : ""}${searchQuery ? `&q=${searchQuery}` : ""}`}
             >
               <Box
                 px={3}

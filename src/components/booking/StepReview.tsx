@@ -46,6 +46,7 @@ interface PricingEngineResult {
 
 interface JobCreateResult {
   jobId: string;
+  referenceNumber: string;
   estimatedPrice: number;
   priceRange: { min: number; max: number };
   explanation: string;
@@ -202,6 +203,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       const data: JobCreateResult = await res.json();
       setJobResult(data);
       form.setValue("jobId", data.jobId);
+      form.setValue("referenceNumber", data.referenceNumber);
       form.setValue("estimatedPrice", data.estimatedPrice);
       form.setValue("priceRange", data.priceRange);
       form.setValue("distanceMiles", data.distanceMiles);
@@ -219,12 +221,28 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     <Box bg="white" borderRadius="xl" shadow="sm" p={{ base: 5, md: 8 }}>
       <VStack gap={6} align="stretch">
         <Box>
-          <Text fontSize="xl" fontWeight="800" color="gray.800">
-            Review & Get Quote
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            Check the details below, then get your instant price.
-          </Text>
+          <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
+            <Box>
+              <Text fontSize="xl" fontWeight="800" color="gray.800">
+                Review & Get Quote
+              </Text>
+              <Text fontSize="sm" color="gray.500">
+                Check the details below, then get your instant price.
+              </Text>
+            </Box>
+            {jobResult?.referenceNumber && (
+              <Badge
+                colorPalette="blue"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="sm"
+                fontWeight="700"
+              >
+                Ref: {jobResult.referenceNumber}
+              </Badge>
+            )}
+          </Flex>
         </Box>
 
         {/* ── 2-COLUMN LAYOUT ───────────────────────────────────── */}

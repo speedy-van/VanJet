@@ -50,6 +50,7 @@ export async function sendJobConfirmation({
   to,
   customerName,
   jobId,
+  referenceNumber,
   pickup,
   delivery,
   moveDate,
@@ -58,6 +59,7 @@ export async function sendJobConfirmation({
   to: string;
   customerName: string;
   jobId: string;
+  referenceNumber?: string;
   pickup: string;
   delivery: string;
   moveDate: string;
@@ -72,6 +74,7 @@ export async function sendJobConfirmation({
       We've received your removal request. Here are the details:
     </p>
     <table style="width:100%;font-size:14px;color:#333;margin:16px 0;" cellpadding="6">
+      ${referenceNumber ? `<tr><td style="font-weight:600;width:120px;">Reference</td><td><strong style="font-family:monospace;color:#1D4ED8;">${referenceNumber}</strong></td></tr>` : ""}
       <tr><td style="font-weight:600;width:120px;">Job ID</td><td>${jobId}</td></tr>
       <tr><td style="font-weight:600;">Pickup</td><td>${pickup}</td></tr>
       <tr><td style="font-weight:600;">Delivery</td><td>${delivery}</td></tr>
@@ -93,7 +96,7 @@ export async function sendJobConfirmation({
   return resend.emails.send({
     from: FROM,
     to,
-    subject: `VanJet — Job Created (${jobId.slice(0, 8)})`,
+    subject: referenceNumber ? `VanJet — Job Created (${referenceNumber})` : `VanJet — Job Created (${jobId.slice(0, 8)})`,
     html,
   });
 }

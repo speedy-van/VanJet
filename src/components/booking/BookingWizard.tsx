@@ -70,6 +70,26 @@ export function BookingWizard() {
   return (
     <Box minH="100vh" bg="#F9FAFB" py={{ base: 6, md: 10 }}>
       <Container maxW="700px" px={{ base: 4, md: 6 }}>
+        {/* Reference Number Badge (sticky at top when available) */}
+        {form.watch("referenceNumber") && (
+          <Box
+            bg="white"
+            borderRadius="lg"
+            shadow="sm"
+            px={4}
+            py={2}
+            mb={4}
+            textAlign="center"
+          >
+            <Text fontSize="sm" color="gray.600" mb={1}>
+              Your Booking Reference
+            </Text>
+            <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
+              {form.watch("referenceNumber")}
+            </Text>
+          </Box>
+        )}
+
         {/* Progress stepper */}
         {step < WIZARD_STEPS.length - 1 && (
           <ProgressStepper current={step} />

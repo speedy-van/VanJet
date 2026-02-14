@@ -31,6 +31,7 @@ const NEXT_STEPS = [
 
 export function StepSuccess({ form }: StepSuccessProps) {
   const jobId = form.watch("jobId");
+  const referenceNumber = form.watch("referenceNumber");
 
   return (
     <Box
@@ -65,10 +66,10 @@ export function StepSuccess({ form }: StepSuccessProps) {
           start sending quotes shortly — no commitment until you choose one.
         </Text>
 
-        {jobId && (
+        {referenceNumber && (
           <Box bg="#F9FAFB" px={5} py={3} borderRadius="8px">
             <Text fontSize="14px" color="#6B7280">
-              Request reference
+              Booking Reference
             </Text>
             <Text
               fontSize="lg"
@@ -76,7 +77,7 @@ export function StepSuccess({ form }: StepSuccessProps) {
               color="#111827"
               fontFamily="mono"
             >
-              {jobId.slice(0, 8).toUpperCase()}
+              {referenceNumber}
             </Text>
           </Box>
         )}

@@ -72,6 +72,7 @@ export const jobs = pgTable(
   "jobs",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    referenceNumber: varchar("reference_number", { length: 10 }).notNull().unique(),
     customerId: uuid("customer_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -109,7 +110,10 @@ export const jobs = pgTable(
     contactPhone: varchar("contact_phone", { length: 30 }),
     ...timestamps,
   },
-  (table) => [index("jobs_customer_id_idx").on(table.customerId)]
+  (table) => [
+    index("jobs_customer_id_idx").on(table.customerId),
+    uniqueIndex("jobs_reference_number_idx").on(table.referenceNumber),
+  ]
 );
 
 // ── Job Items ───────────────────────────────────────────────────

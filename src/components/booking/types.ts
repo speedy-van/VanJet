@@ -45,6 +45,7 @@ export interface BookingFormData {
   jobType: string;
   // Step 5: Payment
   jobId?: string;
+  referenceNumber?: string;
   estimatedPrice?: number;
   priceRange?: { min: number; max: number };
   distanceMiles?: number;

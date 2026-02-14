@@ -8,6 +8,7 @@ import type { PricingInput } from "@/lib/pricing";
 import { sendJobConfirmation } from "@/lib/resend";
 import { sendDriverNewJobSMS } from "@/lib/sms";
 import { eq } from "drizzle-orm";
+import { generateReferenceNumber } from "@/lib/reference-number";
 
 interface CreateJobBody {
   // Auth: provide customerId OR contactEmail (guest checkout)
@@ -198,43 +199,72 @@ export async function POST(req: NextRequest) {
 
     const estimatedPrice = finalTotal;
 
-    // ── Insert job ────────────────────────────────────────────
-    const [newJob] = await db
-      .insert(jobs)
-      .values({
-        customerId: customerId!,
-        jobType: body.jobType,
-        pickupAddress: pickup.placeName,
-        pickupLat: String(pickup.lat),
-        pickupLng: String(pickup.lng),
-        deliveryAddress: delivery.placeName,
-        deliveryLat: String(delivery.lat),
-        deliveryLng: String(delivery.lng),
-        distanceKm: String(directions.distanceMiles), // stored in miles (not km)
-        moveDate,
-        description: body.description ?? null,
-        estimatedPrice: String(estimatedPrice),
-        floorLevel: body.floorLevel ?? null,
-        hasLift: body.hasLift ?? false,
-        needsPacking: body.needsPacking ?? false,
-        // Pickup extras
-        pickupFloor: body.pickupFloor ?? null,
-        pickupFlat: body.pickupFlat ?? null,
-        pickupHasLift: body.pickupHasLift ?? null,
-        pickupNotes: body.pickupNotes ?? null,
-        // Delivery extras
-        deliveryFloor: body.deliveryFloor ?? null,
-        deliveryFlat: body.deliveryFlat ?? null,
-        deliveryHasLift: body.deliveryHasLift ?? null,
-        deliveryNotes: body.deliveryNotes ?? null,
-        // Schedule
-        preferredTimeWindow: body.preferredTimeWindow ?? null,
-        flexibleDates: body.flexibleDates ?? false,
-        // Contact
-        contactName: body.contactName ?? null,
-        contactPhone: body.contactPhone ?? null,
-      })
-      .returning();
+    // ── Insert job with retry logic for unique reference ─────
+    const MAX_RETRIES = 20;
+    let newJob: typeof jobs.$inferSelect | null = null;
+    let referenceNumber = "";
+    
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      referenceNumber = generateReferenceNumber();
+      
+      try {
+        const [job] = await db
+          .insert(jobs)
+          .values({
+            referenceNumber,
+            customerId: customerId!,
+            jobType: body.jobType,
+            pickupAddress: pickup.placeName,
+            pickupLat: String(pickup.lat),
+            pickupLng: String(pickup.lng),
+            deliveryAddress: delivery.placeName,
+            deliveryLat: String(delivery.lat),
+            deliveryLng: String(delivery.lng),
+            distanceKm: String(directions.distanceMiles), // stored in miles (not km)
+            moveDate,
+            description: body.description ?? null,
+            estimatedPrice: String(estimatedPrice),
+            floorLevel: body.floorLevel ?? null,
+            hasLift: body.hasLift ?? false,
+            needsPacking: body.needsPacking ?? false,
+            // Pickup extras
+            pickupFloor: body.pickupFloor ?? null,
+            pickupFlat: body.pickupFlat ?? null,
+            pickupHasLift: body.pickupHasLift ?? null,
+            pickupNotes: body.pickupNotes ?? null,
+            // Delivery extras
+            deliveryFloor: body.deliveryFloor ?? null,
+            deliveryFlat: body.deliveryFlat ?? null,
+            deliveryHasLift: body.deliveryHasLift ?? null,
+            deliveryNotes: body.deliveryNotes ?? null,
+            // Schedule
+            preferredTimeWindow: body.preferredTimeWindow ?? null,
+            flexibleDates: body.flexibleDates ?? false,
+            // Contact
+            contactName: body.contactName ?? null,
+            contactPhone: body.contactPhone ?? null,
+          })
+          .returning();
+        
+        newJob = job;
+        break; // Success, exit retry loop
+      } catch (err) {
+        // Check if it's a unique constraint violation
+        if (err instanceof Error && err.message.includes("unique")) {
+          if (attempt === MAX_RETRIES - 1) {
+            throw new Error("Failed to generate unique reference number after multiple attempts.");
+          }
+          // Continue to next attempt
+        } else {
+          // Other error, re-throw
+          throw err;
+        }
+      }
+    }
+
+    if (!newJob) {
+      throw new Error("Failed to create job.");
+    }
 
     // ── Insert items ──────────────────────────────────────────
     if (itemsArr.length > 0) {
@@ -257,6 +287,7 @@ export async function POST(req: NextRequest) {
     // ── Send email confirmation (fire-and-forget) ─────────────
     if (customerEmail) {
       sendJobConfirmation({
+      referenceNumber,
         to: customerEmail,
         customerName: body.contactName || "Customer",
         jobId: newJob.id,
