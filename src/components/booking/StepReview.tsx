@@ -59,6 +59,12 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   const [jobResult, setJobResult] = useState<JobCreateResult | null>(null);
   const [error, setError] = useState("");
   const [contactError, setContactError] = useState("");
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  
+  // Add-ons state
+  const [packingAddon, setPackingAddon] = useState(false);
+  const [insuranceAddon, setInsuranceAddon] = useState(false);
+  const [assemblyAddon, setAssemblyAddon] = useState(false);
 
   const vals = form.getValues();
   const timeLabel =
@@ -69,6 +75,24 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     (s, i) => s + i.weightKg * i.quantity,
     0
   );
+  const totalVolume = vals.items.reduce(
+    (s, i) => s + i.volumeM3 * i.quantity,
+    0
+  );
+
+  // Calculate add-ons cost
+  const addOnsCost = 
+    (packingAddon ? (totalItems > 20 ? 150 : 50) : 0) +
+    (insuranceAddon ? 25 : 0) +
+    (assemblyAddon ? 60 : 0);
+
+  // Final price with add-ons
+  const finalMinPrice = (pricingEngine?.priceMin || jobResult?.priceRange.min || 0) + addOnsCost;
+  const finalMaxPrice = (pricingEngine?.priceMax || jobResult?.priceRange.max || 0) + addOnsCost;
+  const finalMidPrice = (pricingEngine?.totalPrice || jobResult?.estimatedPrice || 0) + addOnsCost;
+
+  // UK average comparison (mock calculation)
+  const ukAverageSaving = pricingEngine ? Math.round(((pricingEngine.demandMultiplier < 1 ? 15 : 8))) : null;
 
   /** Step 1: Get detailed pricing breakdown from the pricing engine. */
   const fetchPricing = async () => {
@@ -192,316 +216,447 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   };
 
   return (
-    <Box bg="white" borderRadius="12px" boxShadow="0 1px 3px rgba(0,0,0,0.08)" p={{ base: 5, md: 8 }}>
-      <VStack gap={5} align="stretch">
+    <Box bg="white" borderRadius="xl" shadow="sm" p={{ base: 5, md: 8 }}>
+      <VStack gap={6} align="stretch">
         <Box>
-          <Text fontSize="xl" fontWeight="800" color="#111827">
-            Review your booking
+          <Text fontSize="xl" fontWeight="800" color="gray.800">
+            Review & Get Quote
           </Text>
-          <Text fontSize="15px" color="#6B7280">
+          <Text fontSize="sm" color="gray.500">
             Check the details below, then get your instant price.
           </Text>
         </Box>
 
-        {/* Summary sections */}
-        <SummarySection title="Pickup">
-          <SummaryLine label="Address" value={vals.pickup.address} />
-          {vals.pickup.floor > 0 && (
-            <SummaryLine
-              label="Floor"
-              value={`Level ${vals.pickup.floor}${vals.pickup.hasLift ? " (lift available)" : ""}`}
-            />
-          )}
-          {vals.pickup.flat && (
-            <SummaryLine label="Flat" value={vals.pickup.flat} />
-          )}
-          {vals.pickup.notes && (
-            <SummaryLine label="Notes" value={vals.pickup.notes} />
-          )}
-        </SummarySection>
-
-        <SummarySection title="Drop-off">
-          <SummaryLine
-            label="Address"
-            value={vals.dropoff.address}
-          />
-          {vals.dropoff.floor > 0 && (
-            <SummaryLine
-              label="Floor"
-              value={`Level ${vals.dropoff.floor}${vals.dropoff.hasLift ? " (lift available)" : ""}`}
-            />
-          )}
-          {vals.dropoff.flat && (
-            <SummaryLine label="Flat" value={vals.dropoff.flat} />
-          )}
-          {vals.dropoff.notes && (
-            <SummaryLine label="Notes" value={vals.dropoff.notes} />
-          )}
-        </SummarySection>
-
-        <SummarySection title="Items">
-          <Text fontSize="sm" color="gray.600">
-            {totalItems} item{totalItems !== 1 ? "s" : ""} ·{" "}
-            ~{totalWeight.toFixed(1)} kg total
-          </Text>
-          <VStack gap={1} mt={2} align="stretch">
-            {vals.items.map((item) => (
-              <Flex
-                key={item.id}
-                justify="space-between"
-                fontSize="sm"
+        {/* ── 2-COLUMN LAYOUT ───────────────────────────────────── */}
+        <Flex gap={6} direction={{ base: "column", lg: "row" }} align="start">
+          {/* ── LEFT PANEL: Summary ─────────────────────  */}
+          <Box flex={{ base: "1", lg: "1" }} w="full">
+            <VStack gap={4} align="stretch">
+              {/* 📍 Your Move */}
+              <Box
+                borderWidth="1px"
+                borderColor="gray.200"
+                borderRadius="lg"
+                p={4}
+                bg="gray.50"
               >
-                <Text color="gray.700">
-                  {item.name}
-                  {item.fragile && (
-                    <Badge
-                      ml={1}
-                      fontSize="2xs"
-                      colorPalette="red"
-                    >
-                      Fragile
-                    </Badge>
-                  )}
+                <Text fontSize="md" fontWeight="700" color="gray.800" mb={3}>
+                  📍 Your Move
                 </Text>
-                <Text color="gray.500">×{item.quantity}</Text>
-              </Flex>
-            ))}
-          </VStack>
-          {vals.needsPacking && (
-            <Badge mt={2} colorPalette="blue">
-              Packing service requested
-            </Badge>
-          )}
-        </SummarySection>
-
-        <SummarySection title="Schedule">
-          <SummaryLine
-            label="Date"
-            value={new Date(
-              vals.schedule.preferredDate
-            ).toLocaleDateString("en-GB", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          />
-          <SummaryLine label="Time" value={timeLabel} />
-          {vals.schedule.flexibleDates && (
-            <Badge colorPalette="green">Flexible dates</Badge>
-          )}
-        </SummarySection>
-
-        {/* Contact info — editable fields */}
-        <Box
-          borderWidth="1px"
-          borderColor="blue.200"
-          borderRadius="lg"
-          p={4}
-          bg="blue.50"
-        >
-          <Text fontSize="sm" fontWeight="700" color="gray.800" mb={3}>
-            Contact Details
-          </Text>
-          <VStack gap={3} align="stretch">
-            <Box>
-              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
-                Full Name *
-              </Text>
-              <input
-                type="text"
-                placeholder="e.g. John Smith"
-                {...form.register("contactName")}
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  background: "white",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
-                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
-              />
-            </Box>
-            <Box>
-              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
-                Email Address *
-              </Text>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                {...form.register("contactEmail")}
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  background: "white",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
-                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
-              />
-            </Box>
-            <Box>
-              <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
-                Phone Number *
-              </Text>
-              <input
-                type="tel"
-                placeholder="07XXX XXXXXX"
-                {...form.register("contactPhone")}
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  border: "1px solid #E5E7EB",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  background: "white",
-                  outline: "none",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
-                onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
-              />
-            </Box>
-            {contactError && (
-              <Text fontSize="xs" color="red.500" fontWeight="600">
-                {contactError}
-              </Text>
-            )}
-          </VStack>
-        </Box>
-
-        {/* Pricing — Detailed Breakdown */}
-        {(pricingEngine || jobResult) && (
-          <VStack gap={4} align="stretch">
-            {/* Price range banner — THE PRICE. FIRST. BIGGEST. */}
-            <Box
-              bg="#EBF1FF"
-              borderRadius="12px"
-              p={6}
-              borderWidth="1px"
-              borderColor="#D4E2FF"
-              textAlign="center"
-              className="price-reveal"
-            >
-              <Text fontSize="14px" color="#6B7280" mb={2}>
-                Estimated Price (incl. VAT)
-              </Text>
-              {pricingEngine ? (
-                <>
-                  <Text fontSize={{ base: "2.5rem", md: "3rem" }} fontWeight="800" color="#1D4ED8" lineHeight="1.1">
-                    {formatGBP(pricingEngine.priceMin)} – {formatGBP(pricingEngine.priceMax)}
-                  </Text>
-                  <Text fontSize="lg" fontWeight="700" color="#374151" mt={2}>
-                    Mid-point: {formatGBP(pricingEngine.totalPrice)}
-                  </Text>
-                </>
-              ) : jobResult ? (
-                <>
-                  <Text fontSize={{ base: "2.5rem", md: "3rem" }} fontWeight="800" color="#1D4ED8" lineHeight="1.1">
-                    {formatGBP(jobResult.priceRange.min)} – {formatGBP(jobResult.priceRange.max)}
-                  </Text>
-                  <Text fontSize="lg" fontWeight="700" color="#374151" mt={2}>
-                    {formatGBP(jobResult.estimatedPrice)}
-                  </Text>
-                </>
-              ) : null}
-            </Box>
-
-            {/* Info cards (from pricing engine) */}
-            {pricingEngine && (
-              <SimpleGrid columns={{ base: 2, md: 4 }} gap={3}>
-                <InfoCard label="Vehicle" value={pricingEngine.recommendedVehicle} />
-                <InfoCard
-                  label="Volume"
-                  value={`${pricingEngine.totalVolumeM3} m³`}
-                  sub={`${pricingEngine.totalWeightKg} kg`}
-                />
-                <InfoCard
-                  label="Duration"
-                  value={`${pricingEngine.estimatedDurationHours}h`}
-                />
-                <InfoCard
-                  label="Demand"
-                  value={`×${pricingEngine.demandMultiplier}`}
-                  sub={
-                    pricingEngine.demandMultiplier > 1.1
-                      ? "Peak period"
-                      : pricingEngine.demandMultiplier < 0.95
-                        ? "Off-peak"
-                        : "Standard"
-                  }
-                />
-              </SimpleGrid>
-            )}
-
-            {/* Breakdown list */}
-            {pricingEngine && pricingEngine.breakdown.length > 0 && (
-              <Box borderWidth="1px" borderColor="gray.100" borderRadius="lg" p={4}>
-                <Text fontSize="sm" fontWeight="700" color="gray.800" mb={3}>
-                  Price Breakdown
-                </Text>
-                <VStack gap={1} align="stretch">
-                  {pricingEngine.breakdown.map((line, i) => (
-                    <Flex key={i} justify="space-between" fontSize="sm">
-                      <Text color="gray.600">{line.label}</Text>
-                      <Text color="gray.800" fontWeight="500">
-                        {formatGBP(line.amount)}
+                <VStack gap={2} align="stretch" fontSize="sm">
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Pickup:</Text>
+                    <Text color="gray.800" fontWeight="600" textAlign="right">
+                      {vals.pickup.address}
+                    </Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Delivery:</Text>
+                    <Text color="gray.800" fontWeight="600" textAlign="right">
+                      {vals.dropoff.address}
+                    </Text>
+                  </Flex>
+                  {jobResult && (
+                    <Flex justify="space-between">
+                      <Text color="gray.600">Distance:</Text>
+                      <Text color="gray.800" fontWeight="600">
+                        {jobResult.distanceMiles.toFixed(1)} miles (~
+                        {jobResult.durationMinutes} min)
                       </Text>
                     </Flex>
-                  ))}
-                  <Box borderTopWidth="1px" borderColor="gray.200" pt={2} mt={1}>
-                    <Flex justify="space-between" fontWeight="700">
-                      <Text color="#111827">Total (incl. VAT)</Text>
-                      <Text color="#1D4ED8" fontSize="lg">{formatGBP(pricingEngine.totalPrice)}</Text>
-                    </Flex>
-                  </Box>
+                  )}
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Date:</Text>
+                    <Text color="gray.800" fontWeight="600">
+                      {new Date(vals.schedule.preferredDate).toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}{" "}
+                      ({timeLabel})
+                    </Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Pickup Floor:</Text>
+                    <Text color="gray.800" fontWeight="600">
+                      {vals.pickup.floor === 0
+                        ? "Ground"
+                        : `${vals.pickup.floor}${vals.pickup.floor === 1 ? "st" : vals.pickup.floor === 2 ? "nd" : vals.pickup.floor === 3 ? "rd" : "th"}`}
+                      {vals.pickup.hasLift ? " (Lift ✓)" : ""}
+                    </Text>
+                  </Flex>
+                  <Flex justify="space-between">
+                    <Text color="gray.600">Delivery Floor:</Text>
+                    <Text color="gray.800" fontWeight="600">
+                      {vals.dropoff.floor === 0
+                        ? "Ground"
+                        : `${vals.dropoff.floor}${vals.dropoff.floor === 1 ? "st" : vals.dropoff.floor === 2 ? "nd" : vals.dropoff.floor === 3 ? "rd" : "th"}`}
+                      {vals.dropoff.hasLift ? " (Lift ✓)" : ""}
+                    </Text>
+                  </Flex>
                 </VStack>
               </Box>
-            )}
 
-            {/* AI insights */}
-            {pricingEngine?.aiConfidence != null && (
-              <Box bg="green.50" borderRadius="lg" p={4} borderWidth="1px" borderColor="green.200">
-                <HStack gap={2} mb={1}>
-                  <Badge colorPalette="green">AI Verified</Badge>
-                  <Text fontSize="xs" color="gray.500">
-                    Confidence: {pricingEngine.aiConfidence}%
-                  </Text>
+              {/* 📦 Your Items */}
+              <Box
+                borderWidth="1px"
+                borderColor="gray.200"
+                borderRadius="lg"
+                p={4}
+                bg="gray.50"
+              >
+                <Text fontSize="md" fontWeight="700" color="gray.800" mb={3}>
+                  📦 Your Items
+                </Text>
+                <VStack gap={1} align="stretch" fontSize="sm" mb={3}>
+                  {vals.items.map((item) => (
+                    <Flex key={item.id} justify="space-between">
+                      <Text color="gray.700">
+                        {item.name}
+                        {item.fragile && (
+                          <Badge ml={1} fontSize="2xs" colorPalette="red">
+                            Fragile
+                          </Badge>
+                        )}
+                      </Text>
+                      <Text color="gray.500">×{item.quantity}</Text>
+                    </Flex>
+                  ))}
+                </VStack>
+                <HStack gap={4} pt={2} borderTop="1px solid" borderColor="gray.200">
+                  <Box>
+                    <Text fontSize="xs" color="gray.500">Total Items</Text>
+                    <Text fontSize="sm" fontWeight="700" color="gray.800">
+                      {totalItems}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text fontSize="xs" color="gray.500">Total Weight</Text>
+                    <Text fontSize="sm" fontWeight="700" color="gray.800">
+                      {totalWeight.toFixed(1)} kg
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Text fontSize="xs" color="gray.500">Total Volume</Text>
+                    <Text fontSize="sm" fontWeight="700" color="gray.800">
+                      {totalVolume.toFixed(2)} m³
+                    </Text>
+                  </Box>
                 </HStack>
-                {pricingEngine.aiExplanation && (
-                  <Text fontSize="sm" color="gray.700">{pricingEngine.aiExplanation}</Text>
+              </Box>
+
+              {/* Contact info */}
+              <Box
+                borderWidth="1px"
+                borderColor="blue.200"
+                borderRadius="lg"
+                p={4}
+                bg="blue.50"
+              >
+                <Text fontSize="sm" fontWeight="700" color="gray.800" mb={3}>
+                  📞 Contact Details
+                </Text>
+                <VStack gap={3} align="stretch">
+                  <Box>
+                    <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                      Full Name *
+                    </Text>
+                    <input
+                      type="text"
+                      placeholder="e.g. John Smith"
+                      {...form.register("contactName")}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "1px solid #E5E7EB",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        background: "white",
+                        outline: "none",
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                      onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                      Email Address *
+                    </Text>
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      {...form.register("contactEmail")}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "1px solid #E5E7EB",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        background: "white",
+                        outline: "none",
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                      onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+                    />
+                  </Box>
+                  <Box>
+                    <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                      Phone Number *
+                    </Text>
+                    <input
+                      type="tel"
+                      placeholder="07XXX XXXXXX"
+                      {...form.register("contactPhone")}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "1px solid #E5E7EB",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        background: "white",
+                        outline: "none",
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = "#1D4ED8")}
+                      onBlur={(e) => (e.target.style.borderColor = "#E5E7EB")}
+                    />
+                  </Box>
+                  {contactError && (
+                    <Text fontSize="xs" color="red.500" fontWeight="600">
+                      {contactError}
+                    </Text>
+                  )}
+                </VStack>
+              </Box>
+            </VStack>
+          </Box>
+
+          {/* ── RIGHT PANEL: Price Card ─────────────────  */}
+          <Box
+            flex={{ base: "1", lg: "1" }}
+            w="full"
+            position={{ base: "static", lg: "sticky" }}
+            top={{ lg: 4 }}
+          >
+            {(pricingEngine || jobResult) ? (
+              <VStack gap={4} align="stretch">
+                {/* Price Card with Gradient */}
+                <Box
+                  background="linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%)"
+                  borderRadius="lg"
+                  p={6}
+                  color="white"
+                  textAlign="center"
+                >
+                  <Text fontSize="sm" opacity={0.9} mb={2}>
+                    Estimated Price
+                  </Text>
+                  <Text fontSize="3xl" fontWeight="900" lineHeight="1.1" mb={1}>
+                    {formatGBP(finalMinPrice)} – {formatGBP(finalMaxPrice)}
+                  </Text>
+                  <Text fontSize="xs" opacity={0.8}>
+                    Including VAT
+                  </Text>
+
+                  {/* Collapsible breakdown */}
+                  <Box mt={4}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      color="white"
+                      _hover={{ bg: "rgba(255,255,255,0.1)" }}
+                      onClick={() => setShowBreakdown(!showBreakdown)}
+                      w="full"
+                    >
+                      {showBreakdown ? "Hide" : "Show"} Breakdown
+                    </Button>
+                    {showBreakdown && pricingEngine && (
+                      <VStack gap={1} align="stretch" mt={3} fontSize="sm">
+                        {pricingEngine.breakdown.map((line, i) => (
+                          <Flex key={i} justify="space-between">
+                            <Text opacity={0.9}>{line.label}</Text>
+                            <Text fontWeight="600">{formatGBP(line.amount)}</Text>
+                          </Flex>
+                        ))}
+                        {addOnsCost > 0 && (
+                          <Flex justify="space-between">
+                            <Text opacity={0.9}>Add-ons</Text>
+                            <Text fontWeight="600">{formatGBP(addOnsCost)}</Text>
+                          </Flex>
+                        )}
+                        <Box borderTop="1px solid rgba(255,255,255,0.3)" pt={2} mt={1}>
+                          <Flex justify="space-between" fontWeight="700">
+                            <Text>Total</Text>
+                            <Text>{formatGBP(finalMidPrice)}</Text>
+                          </Flex>
+                        </Box>
+                      </VStack>
+                    )}
+                  </Box>
+                </Box>
+
+                {/* UK Average Comparison */}
+                {ukAverageSaving && (
+                  <Text fontSize="sm" color="green.600" fontWeight="600" textAlign="center">
+                    💡 This is {ukAverageSaving}% cheaper than UK average
+                  </Text>
                 )}
+
+                {/* Add-ons Section */}
+                <Box>
+                  <Text fontSize="md" fontWeight="700" color="gray.800" mb={3}>
+                    Optional Add-ons
+                  </Text>
+                  <VStack gap={2} align="stretch">
+                    {/* Packing Service */}
+                    <Flex
+                      as="label"
+                      align="center"
+                      justify="space-between"
+                      p={3}
+                      borderWidth="2px"
+                      borderColor={packingAddon ? "blue.400" : "gray.200"}
+                      borderRadius="lg"
+                      cursor="pointer"
+                      bg={packingAddon ? "blue.50" : "white"}
+                      _hover={{ borderColor: "blue.300" }}
+                    >
+                      <HStack gap={2}>
+                        <input
+                          type="checkbox"
+                          checked={packingAddon}
+                          onChange={(e) => setPackingAddon(e.target.checked)}
+                          style={{ width: 18, height: 18, accentColor: "#1D4ED8" }}
+                        />
+                        <Box>
+                          <Text fontSize="sm" fontWeight="600" color="gray.800">
+                            📦 Packing Service
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            Professional packing materials & service
+                          </Text>
+                        </Box>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight="700" color="blue.600">
+                        +{formatGBP(totalItems > 20 ? 150 : 50)}
+                      </Text>
+                    </Flex>
+
+                    {/* Insurance Upgrade */}
+                    <Flex
+                      as="label"
+                      align="center"
+                      justify="space-between"
+                      p={3}
+                      borderWidth="2px"
+                      borderColor={insuranceAddon ? "blue.400" : "gray.200"}
+                      borderRadius="lg"
+                      cursor="pointer"
+                      bg={insuranceAddon ? "blue.50" : "white"}
+                      _hover={{ borderColor: "blue.300" }}
+                    >
+                      <HStack gap={2}>
+                        <input
+                          type="checkbox"
+                          checked={insuranceAddon}
+                          onChange={(e) => setInsuranceAddon(e.target.checked)}
+                          style={{ width: 18, height: 18, accentColor: "#1D4ED8" }}
+                        />
+                        <Box>
+                          <Text fontSize="sm" fontWeight="600" color="gray.800">
+                            🔒 Insurance Upgrade
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            £50,000 goods in transit cover
+                          </Text>
+                        </Box>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight="700" color="blue.600">
+                        +{formatGBP(25)}
+                      </Text>
+                    </Flex>
+
+                    {/* Furniture Assembly */}
+                    <Flex
+                      as="label"
+                      align="center"
+                      justify="space-between"
+                      p={3}
+                      borderWidth="2px"
+                      borderColor={assemblyAddon ? "blue.400" : "gray.200"}
+                      borderRadius="lg"
+                      cursor="pointer"
+                      bg={assemblyAddon ? "blue.50" : "white"}
+                      _hover={{ borderColor: "blue.300" }}
+                    >
+                      <HStack gap={2}>
+                        <input
+                          type="checkbox"
+                          checked={assemblyAddon}
+                          onChange={(e) => setAssemblyAddon(e.target.checked)}
+                          style={{ width: 18, height: 18, accentColor: "#1D4ED8" }}
+                        />
+                        <Box>
+                          <Text fontSize="sm" fontWeight="600" color="gray.800">
+                            🔧 Furniture Assembly
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            Disassembly & reassembly service
+                          </Text>
+                        </Box>
+                      </HStack>
+                      <Text fontSize="sm" fontWeight="700" color="blue.600">
+                        +{formatGBP(60)}
+                      </Text>
+                    </Flex>
+                  </VStack>
+                </Box>
+
+                {/* CTA Button */}
+                <Button
+                  bg="#F59E0B"
+                  color="#111827"
+                  size="lg"
+                  fontWeight="800"
+                  w="full"
+                  h="52px"
+                  borderRadius="lg"
+                  _hover={{ bg: "#D97706" }}
+                  _active={{ bg: "#B45309" }}
+                  onClick={onNext}
+                >
+                  Confirm & Find Drivers →
+                </Button>
+                <Text fontSize="xs" color="gray.500" textAlign="center">
+                  No payment taken yet. Review driver profiles before committing.
+                </Text>
+              </VStack>
+            ) : (
+              <Box textAlign="center" p={6}>
+                <Text fontSize="md" fontWeight="600" color="gray.600" mb={4}>
+                  Complete the contact details to get your instant quote
+                </Text>
+                <Button
+                  bg="#1D4ED8"
+                  color="white"
+                  size="lg"
+                  fontWeight="700"
+                  w="full"
+                  h="52px"
+                  borderRadius="lg"
+                  _hover={{ bg: "#1840B8" }}
+                  _active={{ bg: "#133498" }}
+                  onClick={fetchPricing}
+                  disabled={loading}
+                >
+                  {loading ? "Calculating..." : "Get Instant Price"}
+                </Button>
               </Box>
             )}
-
-            {/* AI Warnings */}
-            {pricingEngine?.aiWarnings && pricingEngine.aiWarnings.length > 0 && (
-              <Box bg="orange.50" borderRadius="lg" p={4} borderWidth="1px" borderColor="orange.200">
-                <Text fontSize="sm" fontWeight="700" color="orange.700" mb={1}>Notes</Text>
-                {pricingEngine.aiWarnings.map((w, i) => (
-                  <Text key={i} fontSize="sm" color="orange.800">• {w}</Text>
-                ))}
-              </Box>
-            )}
-
-            {/* Distance & drive time from job creation */}
-            {jobResult && (
-              <HStack gap={4}>
-                <Text fontSize="xs" color="gray.400">
-                  {jobResult.distanceMiles.toFixed(1)} mi
-                </Text>
-                <Text fontSize="xs" color="gray.400">
-                  ~{jobResult.durationMinutes} min drive
-                </Text>
-              </HStack>
-            )}
-          </VStack>
-        )}
+          </Box>
+        </Flex>
 
         {error && (
           <Text fontSize="sm" color="red.500" fontWeight="600">
@@ -509,118 +664,13 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
           </Text>
         )}
 
-        <HStack justify="space-between" pt={4}>
+        {/* ── NAVIGATION ──────────────────────────────────── */}
+        <HStack justify="space-between" pt={4} borderTop="1px solid" borderColor="gray.200">
           <Button variant="ghost" onClick={onBack} fontWeight="600">
-            Back
+            ← Back
           </Button>
-          {jobResult ? (
-            <Button
-              bg="#F59E0B"
-              color="#111827"
-              size="lg"
-              fontWeight="700"
-              borderRadius="8px"
-              h="48px"
-              _hover={{ bg: "#D97706" }}
-              _active={{ bg: "#B45309" }}
-              onClick={onNext}
-            >
-              Proceed to Payment →
-            </Button>
-          ) : (
-            <Button
-              bg="#1D4ED8"
-              color="white"
-              size="lg"
-              fontWeight="700"
-              borderRadius="8px"
-              h="48px"
-              _hover={{ bg: "#1840B8" }}
-              _active={{ bg: "#133498" }}
-              onClick={fetchPricing}
-              disabled={loading}
-            >
-              {loading ? "Calculating..." : "Get Instant Price"}
-            </Button>
-          )}
         </HStack>
       </VStack>
-    </Box>
-  );
-}
-
-function SummarySection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Box
-      borderWidth="1px"
-      borderColor="gray.100"
-      borderRadius="lg"
-      p={4}
-    >
-      <Text fontSize="sm" fontWeight="700" color="gray.800" mb={2}>
-        {title}
-      </Text>
-      {children}
-    </Box>
-  );
-}
-
-function SummaryLine({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <Flex justify="space-between" fontSize="sm" py={0.5}>
-      <Text color="gray.500">{label}</Text>
-      <Text
-        color="gray.700"
-        fontWeight="500"
-        textAlign="right"
-        maxW="60%"
-      >
-        {value}
-      </Text>
-    </Flex>
-  );
-}
-
-function InfoCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <Box
-      borderWidth="1px"
-      borderColor="gray.100"
-      borderRadius="lg"
-      p={3}
-      textAlign="center"
-    >
-      <Text fontSize="2xs" color="gray.400" textTransform="uppercase">
-        {label}
-      </Text>
-      <Text fontSize="sm" fontWeight="700" color="gray.800">
-        {value}
-      </Text>
-      {sub && (
-        <Text fontSize="2xs" color="gray.500">
-          {sub}
-        </Text>
-      )}
     </Box>
   );
 }
