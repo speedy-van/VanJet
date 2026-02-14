@@ -15,6 +15,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import type { BookingForm } from "./types";
 import { publicEnv } from "@/lib/env";
+import { getMapboxPrecision } from "@/lib/address-utils";
 
 interface StepAddressesProps {
   form: BookingForm;
@@ -291,9 +292,12 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
                 value={watch("pickup.address")}
                 onChange={(v) => setValue("pickup.address", v)}
                 onSelect={(r) => {
+                  const precision = getMapboxPrecision(r.featureType);
                   setValue("pickup.address", r.address);
                   setValue("pickup.lat", r.lat);
                   setValue("pickup.lng", r.lng);
+                  setValue("pickup.precision", precision);
+                  setValue("pickup.confirmed", precision === "full");
                   clearErrors("pickup.address");
                 }}
                 placeholder="Postcode or address"
@@ -378,9 +382,12 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
                 value={watch("dropoff.address")}
                 onChange={(v) => setValue("dropoff.address", v)}
                 onSelect={(r) => {
+                  const precision = getMapboxPrecision(r.featureType);
                   setValue("dropoff.address", r.address);
                   setValue("dropoff.lat", r.lat);
                   setValue("dropoff.lng", r.lng);
+                  setValue("dropoff.precision", precision);
+                  setValue("dropoff.confirmed", precision === "full");
                   clearErrors("dropoff.address");
                 }}
                 placeholder="Postcode or address"

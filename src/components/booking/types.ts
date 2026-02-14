@@ -9,6 +9,9 @@ export interface AddressData {
   flat: string;
   hasLift: boolean;
   notes: string;
+  // Address confirmation tracking
+  confirmed: boolean;
+  precision: "full" | "postcode" | "unknown";
 }
 
 export interface BookingItem {

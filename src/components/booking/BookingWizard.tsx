@@ -31,6 +31,8 @@ export function BookingWizard() {
         flat: "",
         hasLift: false,
         notes: "",
+        confirmed: false,
+        precision: "unknown" as const,
       },
       dropoff: {
         address: "",
@@ -40,6 +42,8 @@ export function BookingWizard() {
         flat: "",
         hasLift: false,
         notes: "",
+        confirmed: false,
+        precision: "unknown" as const,
       },
       contactName: "",
       contactPhone: "",

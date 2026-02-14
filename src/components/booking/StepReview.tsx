@@ -14,6 +14,7 @@ import {
 import { TIME_WINDOWS } from "./types";
 import type { BookingForm } from "./types";
 import { formatGBP } from "@/lib/money/format";
+import { ConfirmAddressModal } from "./ConfirmAddressModal";
 
 interface StepReviewProps {
   form: BookingForm;
@@ -61,6 +62,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   const [error, setError] = useState("");
   const [contactError, setContactError] = useState("");
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   
   // Add-ons state
   const [packingAddon, setPackingAddon] = useState(false);
@@ -94,6 +96,69 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
 
   // UK average comparison (mock calculation)
   const ukAverageSaving = pricingEngine ? Math.round(((pricingEngine.demandMultiplier < 1 ? 15 : 8))) : null;
+
+  /** Check if addresses need confirmation before proceeding */
+  const handleContinue = () => {
+    const currentVals = form.getValues();
+    
+    // Check pickup
+    const pickupNeedsConfirm = 
+      currentVals.pickup.precision === "postcode" &&
+      !currentVals.pickup.confirmed;
+    
+    // Check dropoff
+    const dropoffNeedsConfirm =
+      currentVals.dropoff.precision === "postcode" &&
+      !currentVals.dropoff.confirmed;
+    
+    // If either needs confirmation, show modal
+    if (pickupNeedsConfirm || dropoffNeedsConfirm) {
+      setShowConfirmModal(true);
+      return;
+    }
+    
+    // Otherwise proceed normally
+    onNext();
+  };
+
+  /** Handle address confirmation from modal */
+  const handleConfirmPickup = (data: {
+    address: string;
+    lat: number;
+    lng: number;
+  }) => {
+    form.setValue("pickup.address", data.address);
+    form.setValue("pickup.lat", data.lat);
+    form.setValue("pickup.lng", data.lng);
+    form.setValue("pickup.confirmed", true);
+    form.setValue("pickup.precision", "full");
+  };
+
+  const handleConfirmDropoff = (data: {
+    address: string;
+    lat: number;
+    lng: number;
+  }) => {
+    form.setValue("dropoff.address", data.address);
+    form.setValue("dropoff.lat", data.lat);
+    form.setValue("dropoff.lng", data.lng);
+    form.setValue("dropoff.confirmed", true);
+    form.setValue("dropoff.precision", "full");
+  };
+
+  const handleCloseModal = () => {
+    const currentVals = form.getValues();
+    const allConfirmed =
+      (!currentVals.pickup.precision || currentVals.pickup.precision !== "postcode" || currentVals.pickup.confirmed) &&
+      (!currentVals.dropoff.precision || currentVals.dropoff.precision !== "postcode" || currentVals.dropoff.confirmed);
+    
+    if (allConfirmed) {
+      setShowConfirmModal(false);
+      onNext(); // Proceed to payment
+    } else {
+      setShowConfirmModal(false);
+    }
+  };
 
   /** Step 1: Get detailed pricing breakdown from the pricing engine. */
   const fetchPricing = async () => {
@@ -669,7 +734,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
                   borderRadius="lg"
                   _hover={{ bg: "#D97706" }}
                   _active={{ bg: "#B45309" }}
-                  onClick={onNext}
+                  onClick={handleContinue}
                 >
                   Confirm & Find Drivers →
                 </Button>
@@ -715,6 +780,23 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
           </Button>
         </HStack>
       </VStack>
+
+      {/* ── ADDRESS CONFIRMATION MODAL ───────────────────── */}
+      {showConfirmModal && (
+        <ConfirmAddressModal
+          pickupAddress={vals.pickup.address}
+          pickupNeedsConfirm={
+            vals.pickup.precision === "postcode" && !vals.pickup.confirmed
+          }
+          dropoffAddress={vals.dropoff.address}
+          dropoffNeedsConfirm={
+            vals.dropoff.precision === "postcode" && !vals.dropoff.confirmed
+          }
+          onConfirmPickup={handleConfirmPickup}
+          onConfirmDropoff={handleConfirmDropoff}
+          onClose={handleCloseModal}
+        />
+      )}
     </Box>
   );
 }

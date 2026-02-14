@@ -8,12 +8,18 @@ interface Suggestion {
   placeName: string;
   lat: number;
   lng: number;
+  featureType: string; // "address", "postcode", "place", etc.
 }
 
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
-  onSelect: (result: { address: string; lat: number; lng: number }) => void;
+  onSelect: (result: { 
+    address: string; 
+    lat: number; 
+    lng: number;
+    featureType: string;
+  }) => void;
   placeholder?: string;
 }
 
@@ -46,10 +52,15 @@ export function AddressAutocomplete({
       if (!res.ok) return;
       const data = await res.json();
       const results: Suggestion[] = (data.features ?? []).map(
-        (f: { place_name: string; center: [number, number] }) => ({
+        (f: { 
+          place_name: string; 
+          center: [number, number];
+          place_type?: string[];
+        }) => ({
           placeName: f.place_name,
           lat: f.center[1],
           lng: f.center[0],
+          featureType: f.place_type?.[0] ?? "unknown",
         })
       );
       setSuggestions(results);
@@ -75,7 +86,12 @@ export function AddressAutocomplete({
 
   const handleSelect = (s: Suggestion) => {
     onChange(s.placeName);
-    onSelect({ address: s.placeName, lat: s.lat, lng: s.lng });
+    onSelect({ 
+      address: s.placeName, 
+      lat: s.lat, 
+      lng: s.lng,
+      featureType: s.featureType,
+    });
     setSuggestions([]);
     setOpen(false);
     setNoResults(false);
