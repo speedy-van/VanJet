@@ -15,6 +15,11 @@ import { TIME_WINDOWS } from "./types";
 import type { BookingForm } from "./types";
 import { formatGBP } from "@/lib/money/format";
 import { ConfirmAddressModal } from "./ConfirmAddressModal";
+import {
+  PriceCalculationOverlay,
+  usePriceTheater,
+  MIN_THEATER_MS,
+} from "./PriceCalculationOverlay";
 
 interface StepReviewProps {
   form: BookingForm;
@@ -68,6 +73,9 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   const [packingAddon, setPackingAddon] = useState(false);
   const [insuranceAddon, setInsuranceAddon] = useState(false);
   const [assemblyAddon, setAssemblyAddon] = useState(false);
+
+  // Price calculation theater
+  const priceTheater = usePriceTheater();
 
   const vals = form.getValues();
   const timeLabel =
@@ -216,6 +224,10 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
 
     setLoading(true);
     setError("");
+    
+    // Start the theater overlay
+    priceTheater.start();
+    const theaterStartTime = Date.now();
 
     try {
       // Use fresh values (currentVals) for all API calls
@@ -253,9 +265,11 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         }),
       });
 
+      let fetchedEngineData: PricingEngineResult | null = null;
+      
       if (pricingRes.ok) {
         const engineData: PricingEngineResult = await pricingRes.json();
-        setPricingEngine(engineData);
+        fetchedEngineData = engineData;
         
         // Debug logging when PRICING_DEBUG=true
         if ((engineData as any).debugVersion) {
@@ -339,6 +353,22 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       }
 
       const data: JobCreateResult = await res.json();
+      
+      // Wait for minimum theater duration before revealing results
+      const elapsed = Date.now() - theaterStartTime;
+      const remaining = Math.max(0, MIN_THEATER_MS - elapsed);
+      
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining));
+      }
+      
+      // Finish theater animation (progress to 100%)
+      await priceTheater.finish();
+      
+      // Now apply all results after theater completes
+      if (fetchedEngineData) {
+        setPricingEngine(fetchedEngineData);
+      }
       setJobResult(data);
       form.setValue("jobId", data.jobId);
       form.setValue("referenceNumber", data.referenceNumber);
@@ -347,6 +377,8 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       form.setValue("distanceMiles", data.distanceMiles);
       form.setValue("durationMinutes", data.durationMinutes);
     } catch (err) {
+      // Close theater immediately on error
+      priceTheater.closeImmediate();
       setError(
         err instanceof Error ? err.message : "Something went wrong."
       );
@@ -807,9 +839,9 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
                   _hover={{ bg: "#1840B8" }}
                   _active={{ bg: "#133498" }}
                   onClick={fetchPricing}
-                  disabled={loading}
+                  disabled={loading || priceTheater.isOpen}
                 >
-                  {loading ? "Calculating..." : "Get Instant Price"}
+                  {loading || priceTheater.isOpen ? "Calculating..." : "Get Instant Price"}
                 </Button>
               </Box>
             )}
@@ -846,6 +878,14 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
           onClose={handleCloseModal}
         />
       )}
+
+      {/* ── PRICE CALCULATION THEATER ───────────────────── */}
+      <PriceCalculationOverlay
+        isOpen={priceTheater.isOpen}
+        progress={priceTheater.progress}
+        statusIndex={priceTheater.statusIndex}
+        counterValue={priceTheater.counterValue}
+      />
     </Box>
   );
 }
