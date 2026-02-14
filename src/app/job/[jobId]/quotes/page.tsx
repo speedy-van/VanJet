@@ -106,9 +106,6 @@ export default function JobQuotesPage({
   const [sortBy, setSortBy] = useState<SortOption>("price-low");
   const [showDetails,setShowDetails] = useState(true);
 
-  // Pricing changeover date - jobs created before this used old expensive pricing
-  const PRICING_CHANGEOVER_DATE = new Date("2025-02-14T00:00:00Z");
-
   useEffect(() => {
     fetchQuotes();
     
@@ -129,13 +126,12 @@ export default function JobQuotesPage({
     const hasAcceptedQuote = quotes.some(q => q.status === "accepted");
     if (hasAcceptedQuote) return;
     
-    // Only reprice jobs created before the pricing hotfix
-    const jobCreated = job.createdAt ? new Date(job.createdAt) : null;
-    if (!jobCreated || jobCreated >= PRICING_CHANGEOVER_DATE) return;
-    
-    // Check if already repriced (updatedAt is after changeover)
-    const jobUpdated = job.updatedAt ? new Date(job.updatedAt) : null;
-    if (jobUpdated && jobUpdated >= PRICING_CHANGEOVER_DATE) return;
+    // Check if job has already been updated (repriced)
+    // If updatedAt differs from createdAt by more than 60 seconds, it's been repriced
+    const jobCreated = job.createdAt ? new Date(job.createdAt).getTime() : 0;
+    const jobUpdated = job.updatedAt ? new Date(job.updatedAt).getTime() : 0;
+    const timeDiff = Math.abs(jobUpdated - jobCreated);
+    if (timeDiff > 60000) return; // Already been updated (repriced)
     
     // Trigger auto-reprice
     setAutoRepriced(true);
