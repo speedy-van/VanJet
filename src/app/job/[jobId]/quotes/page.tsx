@@ -72,6 +72,8 @@ interface JobSummary {
   needsPacking: boolean;
   contactName: string | null;
   contactPhone: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 type SortOption = "price-low" | "price-high" | "rating" | "recent";
@@ -99,9 +101,13 @@ export default function JobQuotesPage({
     oldPrice: number;
     newPrice: number;
   } | null>(null);
+  const [autoRepriced, setAutoRepriced] = useState(false);
   
   const [sortBy, setSortBy] = useState<SortOption>("price-low");
   const [showDetails,setShowDetails] = useState(true);
+
+  // Pricing changeover date - jobs created before this used old expensive pricing
+  const PRICING_CHANGEOVER_DATE = new Date("2025-02-14T00:00:00Z");
 
   useEffect(() => {
     fetchQuotes();
@@ -110,6 +116,31 @@ export default function JobQuotesPage({
     const interval = setInterval(fetchQuotes, 30000);
     return () => clearInterval(interval);
   }, [jobId]);
+
+  // Auto-reprice old jobs on page load (runs once when job data loads)
+  useEffect(() => {
+    if (!job || autoRepriced || loading) return;
+    
+    // Only reprice pending/quoted jobs that haven't been accepted
+    const eligibleStatuses = ["pending", "quoted"];
+    if (!eligibleStatuses.includes(job.status)) return;
+    
+    // Check if any quote has been accepted
+    const hasAcceptedQuote = quotes.some(q => q.status === "accepted");
+    if (hasAcceptedQuote) return;
+    
+    // Only reprice jobs created before the pricing hotfix
+    const jobCreated = job.createdAt ? new Date(job.createdAt) : null;
+    if (!jobCreated || jobCreated >= PRICING_CHANGEOVER_DATE) return;
+    
+    // Check if already repriced (updatedAt is after changeover)
+    const jobUpdated = job.updatedAt ? new Date(job.updatedAt) : null;
+    if (jobUpdated && jobUpdated >= PRICING_CHANGEOVER_DATE) return;
+    
+    // Trigger auto-reprice
+    setAutoRepriced(true);
+    handleRecalculatePrice();
+  }, [job, quotes, loading, autoRepriced]);
 
   async function fetchQuotes() {
     try {
@@ -414,15 +445,11 @@ export default function JobQuotesPage({
                             <Text fontSize="xs" color="blue.600">
                               Estimated Price
                             </Text>
-                            <Button
-                              size="xs"
-                              variant="ghost"
-                              colorPalette="blue"
-                              onClick={handleRecalculatePrice}
-                              loading={recalculating}
-                            >
-                              Recalculate
-                            </Button>
+                            {recalculating && (
+                              <Text fontSize="xs" color="blue.500">
+                                Updating...
+                              </Text>
+                            )}
                           </HStack>
                           <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
                             {formatGBP(job.estimatedPrice)}

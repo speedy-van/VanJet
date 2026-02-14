@@ -71,6 +71,7 @@ export async function PATCH(
       .update(jobs)
       .set({
         estimatedPrice: String(result.totalPrice),
+        updatedAt: new Date(),
       })
       .where(eq(jobs.id, jobId));
 

@@ -123,6 +123,8 @@ export async function GET(
         needsPacking: job.needsPacking,
         contactName: job.contactName,
         contactPhone: job.contactPhone,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt,
       },
       items: items.map((item) => ({
         id: item.id,
