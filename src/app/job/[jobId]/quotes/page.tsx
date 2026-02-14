@@ -364,8 +364,12 @@ export default function JobQuotesPage({
             templateColumns={{ base: "1fr", lg: "400px 1fr" }}
             gap={5}
           >
-            {/* LEFT: Job Details */}
-            <VStack gap={5} align="stretch">
+            {/* LEFT: Job Details - on mobile appears SECOND */}
+            <VStack 
+              gap={5} 
+              align="stretch"
+              order={{ base: 2, lg: 1 }}
+            >
               {/* Job Summary Card */}
               {job && (
                 <Box
@@ -527,8 +531,12 @@ export default function JobQuotesPage({
               )}
             </VStack>
 
-            {/* RIGHT: Quotes List */}
-            <VStack gap={4} align="stretch">
+            {/* RIGHT: Quotes List - on mobile appears FIRST */}
+            <VStack 
+              gap={4} 
+              align="stretch"
+              order={{ base: 1, lg: 2 }}
+            >
               {/* Sort Controls */}
               <Box
                 bg="white"
