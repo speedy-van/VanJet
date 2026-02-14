@@ -94,6 +94,11 @@ export default function JobQuotesPage({
     price?: number;
     error?: string;
   } | null>(null);
+  const [recalculating, setRecalculating] = useState(false);
+  const [recalculateResult, setRecalculateResult] = useState<{
+    oldPrice: number;
+    newPrice: number;
+  } | null>(null);
   
   const [sortBy, setSortBy] = useState<SortOption>("price-low");
   const [showDetails,setShowDetails] = useState(true);
@@ -155,6 +160,30 @@ export default function JobQuotesPage({
       });
     } finally {
       setAccepting(null);
+    }
+  }
+
+  async function handleRecalculatePrice() {
+    setRecalculating(true);
+    setRecalculateResult(null);
+    
+    try {
+      const res = await fetch(`/api/jobs/${jobId}/recalculate-price`, {
+        method: "PATCH",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to recalculate.");
+      
+      setRecalculateResult({
+        oldPrice: data.oldPrice,
+        newPrice: data.newPrice,
+      });
+      
+      await fetchQuotes(); // Refresh to show new price
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to recalculate.");
+    } finally {
+      setRecalculating(false);
     }
   }
 
@@ -381,12 +410,28 @@ export default function JobQuotesPage({
 
                       {job.estimatedPrice && (
                         <Box bg="blue.50" p={3} borderRadius="md">
-                          <Text fontSize="xs" color="blue.600" mb={1}>
-                            Estimated Price
-                          </Text>
+                          <HStack justify="space-between" mb={1}>
+                            <Text fontSize="xs" color="blue.600">
+                              Estimated Price
+                            </Text>
+                            <Button
+                              size="xs"
+                              variant="ghost"
+                              colorPalette="blue"
+                              onClick={handleRecalculatePrice}
+                              loading={recalculating}
+                            >
+                              Recalculate
+                            </Button>
+                          </HStack>
                           <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
                             {formatGBP(job.estimatedPrice)}
                           </Text>
+                          {recalculateResult && (
+                            <Text fontSize="xs" color="green.600" mt={1}>
+                              Updated: {formatGBP(recalculateResult.oldPrice)} → {formatGBP(recalculateResult.newPrice)}
+                            </Text>
+                          )}
                         </Box>
                       )}
                     </VStack>

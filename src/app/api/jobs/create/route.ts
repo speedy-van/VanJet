@@ -10,6 +10,11 @@ import { sendDriverNewJobSMS } from "@/lib/sms";
 import { eq } from "drizzle-orm";
 import { generateReferenceNumber } from "@/lib/reference-number";
 
+// ── Pricing Profile Configuration ──────────────────────────────────────
+const PRICING_PROFILE = process.env.PRICING_PROFILE ?? "competitive";
+const ENABLE_VAT = process.env.ENABLE_VAT === "true";
+const PRICING_DEBUG = process.env.PRICING_DEBUG === "true";
+
 interface CreateJobBody {
   // Auth: provide customerId OR contactEmail (guest checkout)
   customerId?: string;
@@ -178,7 +183,29 @@ export async function POST(req: NextRequest) {
       requestedAt: new Date(),
     };
 
-    const engineResult = calculatePrice(pricingInput);
+    // ── Apply pricing profile ─────────────────────────────────────
+    const useCompetitiveRates = PRICING_PROFILE === "competitive";
+    const engineResult = calculatePrice(pricingInput, { 
+      useCompetitiveRates, 
+      enableVat: ENABLE_VAT 
+    });
+
+    if (PRICING_DEBUG) {
+      console.log("[JOB_CREATE_DEBUG] =====================================");
+      console.log(`[JOB_CREATE_DEBUG] Profile: ${PRICING_PROFILE} | VAT: ${ENABLE_VAT}`);
+      console.log(`[JOB_CREATE_DEBUG] Distance: ${directions.distanceMiles.toFixed(1)} miles`);
+      console.log(`[JOB_CREATE_DEBUG] Engine result:`, {
+        basePrice: engineResult.basePrice,
+        distanceCost: engineResult.distanceCost,
+        vehicleMultiplier: engineResult.vehicleMultiplier,
+        demandMultiplier: engineResult.demandMultiplier,
+        subtotal: engineResult.subtotal,
+        vatAmount: engineResult.vatAmount,
+        totalPrice: engineResult.totalPrice,
+        priceRange: `£${engineResult.priceMin} - £${engineResult.priceMax}`,
+      });
+      console.log("[JOB_CREATE_DEBUG] =====================================");
+    }
 
     // Optional AI validation + blending
     let finalTotal = engineResult.totalPrice;

@@ -186,6 +186,10 @@ export async function POST(req: Request) {
 
     // Include debug breakdown if enabled (sanitized)
     if (PRICING_DEBUG) {
+      response.debugVersion = "pricing-hotfix-v1";
+      response.debugDistanceCost = result.distanceCost;
+      response.debugVatAmount = result.vatAmount;
+      response.debugRoundTripMultiplier = useCompetitiveRates ? 1.0 : 1.4;
       response.debugBreakdown = {
         profile: PRICING_PROFILE,
         vatEnabled: ENABLE_VAT,

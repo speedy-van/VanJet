@@ -256,6 +256,17 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       if (pricingRes.ok) {
         const engineData: PricingEngineResult = await pricingRes.json();
         setPricingEngine(engineData);
+        
+        // Debug logging when PRICING_DEBUG=true
+        if ((engineData as any).debugVersion) {
+          console.log("[PRICING_DEBUG] StepReview received pricing response:");
+          console.log(`  debugVersion: ${(engineData as any).debugVersion}`);
+          console.log(`  debugDistanceCost: £${(engineData as any).debugDistanceCost?.toFixed(2) || 'N/A'}`);
+          console.log(`  debugVatAmount: £${(engineData as any).debugVatAmount?.toFixed(2) || 'N/A'}`);
+          console.log(`  debugRoundTripMultiplier: ${(engineData as any).debugRoundTripMultiplier || 'N/A'}`);
+          console.log(`  totalPrice: £${engineData.totalPrice?.toFixed(2)}`);
+          console.log(`  priceRange: £${engineData.priceMin} - £${engineData.priceMax}`);
+        }
       }
 
       // Update existing draft job or create new one
