@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   VStack,
@@ -9,8 +10,11 @@ import {
   Flex,
   Stack,
 } from "@chakra-ui/react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import type { BookingForm } from "./types";
+import { publicEnv } from "@/lib/env";
 
 interface StepAddressesProps {
   form: BookingForm;
@@ -50,6 +54,131 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
     setError,
     clearErrors,
   } = form;
+
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
+
+  const pickupLat = watch("pickup.lat");
+  const pickupLng = watch("pickup.lng");
+  const pickupAddress = watch("pickup.address");
+  const dropoffLat = watch("dropoff.lat");
+  const dropoffLng = watch("dropoff.lng");
+  const dropoffAddress = watch("dropoff.address");
+
+  const bothAddressesValid =
+    pickupLat && pickupLng && dropoffLat && dropoffLng;
+
+  // Initialize map when both addresses are filled
+  useEffect(() => {
+    if (!bothAddressesValid || !mapContainerRef.current) {
+      return;
+    }
+
+    const token = publicEnv.MAPBOX_TOKEN;
+    if (!token) return;
+
+    mapboxgl.accessToken = token;
+
+    // Destroy previous map if exists
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    // Calculate bounds
+    const bounds = new mapboxgl.LngLatBounds();
+    bounds.extend([pickupLng, pickupLat]);
+    bounds.extend([dropoffLng, dropoffLat]);
+
+    // Initialize map
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      bounds,
+      fitBoundsOptions: { padding: 50 },
+    });
+
+    // Add markers
+    new mapboxgl.Marker({ color: "#059669" })
+      .setLngLat([pickupLng, pickupLat])
+      .setPopup(
+        new mapboxgl.Popup().setHTML(
+          `<strong>Pickup</strong><br/><small>${pickupAddress}</small>`
+        )
+      )
+      .addTo(map);
+
+    new mapboxgl.Marker({ color: "#DC2626" })
+      .setLngLat([dropoffLng, dropoffLat])
+      .setPopup(
+        new mapboxgl.Popup().setHTML(
+          `<strong>Delivery</strong><br/><small>${dropoffAddress}</small>`
+        )
+      )
+      .addTo(map);
+
+    // Fetch route
+    const fetchRoute = async () => {
+      try {
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${pickupLng},${pickupLat};${dropoffLng},${dropoffLat}?geometries=geojson&access_token=${token}`;
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0];
+          const distanceKm = (route.distance / 1000).toFixed(1);
+          setDistance(parseFloat(distanceKm));
+
+          // Draw route line
+          map.on("load", () => {
+            if (map.getSource("route")) return;
+            map.addSource("route", {
+              type: "geojson",
+              data: {
+                type: "Feature",
+                properties: {},
+                geometry: route.geometry,
+              },
+            });
+            map.addLayer({
+              id: "route",
+              type: "line",
+              source: "route",
+              layout: {
+                "line-join": "round",
+                "line-cap": "round",
+              },
+              paint: {
+                "line-color": "#1D4ED8",
+                "line-width": 4,
+              },
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch route:", err);
+      }
+    };
+
+    fetchRoute();
+    mapRef.current = map;
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [
+    bothAddressesValid,
+    pickupLat,
+    pickupLng,
+    dropoffLat,
+    dropoffLng,
+    pickupAddress,
+    dropoffAddress,
+  ]);
 
   const handleNext = () => {
     let valid = true;
@@ -129,17 +258,34 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
                 }}
                 placeholder="Postcode or address"
               />
+              {pickupLat && pickupLng && (
+                <Text fontSize="sm" color="green.600" mt={2} fontWeight="600">
+                  ✓ {pickupAddress}
+                </Text>
+              )}
             </Field>
 
             <Stack direction={{ base: "column", sm: "row" }} gap={4}>
               <Field label="Floor level">
-                <Input
-                  type="number"
-                  min={0}
-                  defaultValue={0}
+                <select
                   {...register("pickup.floor", { valueAsNumber: true })}
-                  bg="white"
-                />
+                  defaultValue={0}
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #E5E7EB",
+                    fontSize: "14px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <option value={0}>Ground</option>
+                  <option value={1}>1st Floor</option>
+                  <option value={2}>2nd Floor</option>
+                  <option value={3}>3rd Floor</option>
+                  <option value={4}>4th Floor</option>
+                  <option value={5}>5th+ Floor</option>
+                </select>
               </Field>
               <Field label="Flat / unit number">
                 <Input
@@ -199,17 +345,34 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
                 }}
                 placeholder="Postcode or address"
               />
+              {dropoffLat && dropoffLng && (
+                <Text fontSize="sm" color="green.600" mt={2} fontWeight="600">
+                  ✓ {dropoffAddress}
+                </Text>
+              )}
             </Field>
 
             <Stack direction={{ base: "column", sm: "row" }} gap={4}>
               <Field label="Floor level">
-                <Input
-                  type="number"
-                  min={0}
-                  defaultValue={0}
+                <select
                   {...register("dropoff.floor", { valueAsNumber: true })}
-                  bg="white"
-                />
+                  defaultValue={0}
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid #E5E7EB",
+                    fontSize: "14px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <option value={0}>Ground</option>
+                  <option value={1}>1st Floor</option>
+                  <option value={2}>2nd Floor</option>
+                  <option value={3}>3rd Floor</option>
+                  <option value={4}>4th Floor</option>
+                  <option value={5}>5th+ Floor</option>
+                </select>
               </Field>
               <Field label="Flat / unit number">
                 <Input
@@ -242,6 +405,38 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
           </VStack>
         </Box>
 
+        {/* ── Map Preview ────────────────────────────────── */}
+        {bothAddressesValid && (
+          <Box
+            borderWidth="1px"
+            borderColor="gray.200"
+            borderRadius="lg"
+            overflow="hidden"
+            bg="gray.50"
+          >
+            <Box
+              ref={mapContainerRef}
+              h="300px"
+              w="100%"
+              borderRadius="lg"
+            />
+            {distance !== null && (
+              <Flex
+                p={3}
+                bg="white"
+                borderTop="1px solid"
+                borderColor="gray.200"
+                align="center"
+                gap={2}
+              >
+                <Text fontSize="sm" fontWeight="600" color="gray.700">
+                  📏 Estimated distance: {distance} km
+                </Text>
+              </Flex>
+            )}
+          </Box>
+        )}
+
         <Button
           colorPalette="blue"
           size="lg"
@@ -249,6 +444,9 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
           w={{ base: "full", md: "auto" }}
           alignSelf={{ md: "flex-end" }}
           onClick={handleNext}
+          disabled={!bothAddressesValid}
+          opacity={bothAddressesValid ? 1 : 0.5}
+          cursor={bothAddressesValid ? "pointer" : "not-allowed"}
         >
           Next: Items →
         </Button>
