@@ -28,11 +28,11 @@ const VAN_SIZES = [
 ];
 
 const COVERAGE_OPTIONS = [
-  { value: 25, label: "25 km" },
-  { value: 50, label: "50 km" },
-  { value: 100, label: "100 km" },
-  { value: 150, label: "150 km" },
-  { value: 200, label: "200+ km" },
+  { value: 15, label: "15 mi" },
+  { value: 30, label: "30 mi" },
+  { value: 60, label: "60 mi" },
+  { value: 100, label: "100 mi" },
+  { value: 150, label: "150+ mi" },
 ];
 
 export default function DriverRegisterPage() {

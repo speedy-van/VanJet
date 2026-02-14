@@ -1,7 +1,7 @@
 // ─── VanJet · Admin Booking Reprice API ───────────────────────
 // POST /api/admin/bookings/[id]/reprice
 // Recalculates the price using the existing pricing engine.
-// Uses stored distanceKm; falls back to Mapbox if missing.
+// Uses stored distance (miles); falls back to Mapbox if missing.
 // Requires admin session. Writes audit log entry.
 
 import { NextRequest, NextResponse } from "next/server";
@@ -61,10 +61,10 @@ export async function POST(
     .from(jobItems)
     .where(eq(jobItems.jobId, booking.jobId));
 
-  // Resolve distance
-  let distanceKm = job.distanceKm ? Number(job.distanceKm) : 0;
+  // Resolve distance (stored in miles despite legacy column name)
+  let distanceMiles = job.distanceKm ? Number(job.distanceKm) : 0;
 
-  if (distanceKm <= 0) {
+  if (distanceMiles <= 0) {
     // Try to recalculate from stored coordinates
     const hasCoords =
       job.pickupLat &&
@@ -78,19 +78,19 @@ export async function POST(
           { lat: Number(job.pickupLat), lng: Number(job.pickupLng) },
           { lat: Number(job.deliveryLat), lng: Number(job.deliveryLng) }
         );
-        distanceKm = directions.distanceKm;
+        distanceMiles = directions.distanceMiles;
 
-        // Store recalculated distance on job
+        // Store recalculated distance on job (miles, legacy column name)
         await db
           .update(jobs)
-          .set({ distanceKm: String(distanceKm), updatedAt: new Date() })
+          .set({ distanceKm: String(distanceMiles), updatedAt: new Date() })
           .where(eq(jobs.id, job.id));
       } catch {
         // Fallback: use a default distance if Mapbox fails
-        distanceKm = 10;
+        distanceMiles = 10;
       }
     } else {
-      distanceKm = 10; // Default fallback
+      distanceMiles = 10; // Default fallback
     }
   }
 
@@ -114,7 +114,7 @@ export async function POST(
 
   const pricingInput: PricingInput = {
     jobType: job.jobType,
-    distanceKm,
+    distanceMiles,
     items: pricingItems,
     pickupFloor: job.pickupFloor ?? 0,
     pickupHasElevator: job.pickupHasLift ?? false,

@@ -14,6 +14,7 @@ import {
   PLATFORM_FEE_RATE,
   JOB_TYPE_LABELS,
 } from "./rates";
+import { formatMiles } from "@/lib/utils/distance";
 import type { VehicleType } from "./rates";
 
 // ── Types ──────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ export interface PricingItemInput {
 
 export interface PricingInput {
   jobType: string;
-  distanceKm: number;
+  distanceMiles: number;
   items: PricingItemInput[];
   pickupFloor: number;
   pickupHasElevator: boolean;
@@ -71,19 +72,19 @@ export interface PricingBreakdown {
 
 // ── Helpers ────────────────────────────────────────────────────
 
-/** Calculate tiered distance cost (one-way km, then apply round-trip multiplier). */
-export function calculateDistanceCost(distanceKm: number): number {
+/** Calculate tiered distance cost (one-way miles, then apply round-trip multiplier). */
+export function calculateDistanceCost(distanceMiles: number): number {
   let cost = 0;
-  let remaining = distanceKm;
+  let remaining = distanceMiles;
 
   for (const tier of DISTANCE_RATES.tiers) {
     if (remaining <= 0) break;
     const prevLimit =
       DISTANCE_RATES.tiers.indexOf(tier) > 0
-        ? DISTANCE_RATES.tiers[DISTANCE_RATES.tiers.indexOf(tier) - 1].upToKm
+        ? DISTANCE_RATES.tiers[DISTANCE_RATES.tiers.indexOf(tier) - 1].upToMiles
         : 0;
-    const tierRange = Math.min(remaining, tier.upToKm - prevLimit);
-    cost += tierRange * tier.ratePerKm;
+    const tierRange = Math.min(remaining, tier.upToMiles - prevLimit);
+    cost += tierRange * tier.ratePerMile;
     remaining -= tierRange;
   }
 
@@ -175,12 +176,12 @@ export function estimateDuration(
   totalItems: number,
   pickupFloor: number,
   deliveryFloor: number,
-  distanceKm: number
+  distanceMiles: number
 ): number {
   const loadingMinutes = Math.max(totalItems * 5, 20); // 5 min per item, min 20
   const unloadingMinutes = Math.max(totalItems * 4, 15);
   const floorTime = (pickupFloor + deliveryFloor) * 3; // 3 min per floor level
-  const drivingMinutes = (distanceKm / 40) * 60; // average 40 km/h in UK
+  const drivingMinutes = (distanceMiles / 25) * 60; // average 25 mph in UK
   const totalMinutes =
     loadingMinutes + unloadingMinutes + floorTime + drivingMinutes;
   return Math.round((totalMinutes / 60) * 10) / 10; // 1 decimal
@@ -253,7 +254,7 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
   const basePrice = BASE_PRICES[input.jobType] ?? BASE_PRICES.man_and_van;
 
   // Distance
-  const distanceCost = calculateDistanceCost(input.distanceKm);
+  const distanceCost = calculateDistanceCost(input.distanceMiles);
 
   // Floor
   const floorCost = calculateFloorCost(
@@ -296,7 +297,7 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
     totalItems,
     input.pickupFloor,
     input.deliveryFloor,
-    input.distanceKm
+    input.distanceMiles
   );
 
   // Build breakdown
@@ -305,7 +306,7 @@ export function calculatePrice(input: PricingInput): PricingBreakdown {
       label: `Base price (${JOB_TYPE_LABELS[input.jobType] ?? input.jobType})`,
       amount: basePrice,
     },
-    { label: `Distance (${input.distanceKm.toFixed(1)} km)`, amount: distanceCost },
+    { label: `Distance (${formatMiles(input.distanceMiles)})`, amount: distanceCost },
   ];
   if (floorCost > 0) {
     breakdown.push({ label: "Floor access surcharge", amount: floorCost });

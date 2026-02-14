@@ -53,14 +53,14 @@ export const JOB_TYPE_LABELS: Record<string, string> = {
   storage: "Storage & Collection",
 };
 
-/** Distance pricing tiers (per km, one-way — round trip applied in engine). */
+/** Distance pricing tiers (per mile, one-way — round trip applied in engine). */
 export const DISTANCE_RATES = {
   tiers: [
-    { upToKm: 10, ratePerKm: 2.0 },
-    { upToKm: 30, ratePerKm: 1.5 },
-    { upToKm: 80, ratePerKm: 1.2 },
-    { upToKm: 200, ratePerKm: 1.0 },
-    { upToKm: Infinity, ratePerKm: 0.85 },
+    { upToMiles: 6, ratePerMile: 4.00 },
+    { upToMiles: 31, ratePerMile: 2.90 },
+    { upToMiles: 62, ratePerMile: 2.25 },
+    { upToMiles: 186, ratePerMile: 1.75 },
+    { upToMiles: Infinity, ratePerMile: 1.45 },
   ],
   minimumCharge: 15,
   roundTripMultiplier: 1.4, // driver returns partially loaded or empty

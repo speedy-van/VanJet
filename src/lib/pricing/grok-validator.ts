@@ -55,7 +55,7 @@ All text must be in English.`;
 
   const userPrompt = `Validate this UK removal job price:
 - Job type: ${input.jobType}
-- Distance: ${input.distanceKm} km
+- Distance: ${input.distanceMiles} miles
 - Items: ${itemSummary}
 - Total weight: ${engineResult.totalWeightKg} kg
 - Total volume: ${engineResult.totalVolumeM3} m³
@@ -118,7 +118,7 @@ Is this price fair for the UK market? If not, suggest an adjusted total (includi
  */
 export async function quickEstimate(
   jobType: string,
-  distanceKm: number,
+  distanceMiles: number,
   itemCount: number,
   totalWeightKg: number
 ): Promise<{ min: number; max: number; explanation: string } | null> {
@@ -127,7 +127,7 @@ export async function quickEstimate(
   const apiKey = serverEnv.GROK_API_KEY;
 
   const prompt = `Give a quick price estimate in GBP for a UK ${jobType} job:
-- Distance: ${distanceKm} km
+- Distance: ${distanceMiles} miles
 - Items: ${itemCount}
 - Weight: ${totalWeightKg} kg
 Respond with JSON only: { "min": number, "max": number, "explanation": "short English text" }`;

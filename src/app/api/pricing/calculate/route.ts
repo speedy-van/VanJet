@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     // ── Validate required fields ──────────────────────────────
     const missing: string[] = [];
     if (!body.jobType) missing.push("jobType");
-    if (body.distanceKm == null) missing.push("distanceKm");
+    if (body.distanceMiles == null && body.distanceKm == null) missing.push("distanceMiles");
     if (!Array.isArray(body.items) || body.items.length === 0)
       missing.push("items (non-empty array)");
     if (!body.preferredDate) missing.push("preferredDate");
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     const input: PricingInput = {
       jobType: body.jobType,
-      distanceKm: Number(body.distanceKm),
+      distanceMiles: Number(body.distanceMiles ?? body.distanceKm ?? 0),
       items: body.items.map(
         (i: { name?: string; quantity?: number; weightKg?: number; volumeM3?: number }) => ({
           name: i.name ?? "Item",

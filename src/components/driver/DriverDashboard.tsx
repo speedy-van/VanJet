@@ -126,7 +126,7 @@ export function DriverDashboardClient({ user, profile, bookings }: Props) {
                   Coverage
                 </Text>
                 <Text fontSize="sm" fontWeight="600" color="#374151">
-                  {profile.coverageRadius ?? 50} km
+                  {profile.coverageRadius ?? 30} mi
                 </Text>
               </Box>
               <Box>

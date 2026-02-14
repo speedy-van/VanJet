@@ -323,7 +323,7 @@ export function BookingManagement({
             label="Distance"
             value={
               job.distanceKm
-                ? `${Number(job.distanceKm).toFixed(1)} km`
+                ? `${Number(job.distanceKm).toFixed(1)} mi`
                 : "—"
             }
           />

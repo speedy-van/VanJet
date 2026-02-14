@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
     // ── Pricing via hybrid engine ────────────────────────────────
     const pricingInput: PricingInput = {
       jobType: body.jobType,
-      distanceKm: directions.distanceKm,
+      distanceMiles: directions.distanceMiles,
       items: itemsArr.map((i) => ({
         name: i.name,
         quantity: i.quantity ?? 1,
@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
     let finalTotal = engineResult.totalPrice;
     let finalMin = engineResult.priceMin;
     let finalMax = engineResult.priceMax;
-    let explanation = `Estimated based on ${directions.distanceKm.toFixed(1)} km distance, ${totalWeightKg.toFixed(1)} kg total weight, and ${itemsArr.reduce((s, i) => s + (i.quantity ?? 1), 0)} items.`;
+    let explanation = `Estimated based on ${directions.distanceMiles.toFixed(1)} mile distance, ${totalWeightKg.toFixed(1)} kg total weight, and ${itemsArr.reduce((s, i) => s + (i.quantity ?? 1), 0)} items.`;
 
     const aiResult = await validatePriceWithGrok(pricingInput, engineResult);
     if (aiResult?.adjustedPrice != null && aiResult.adjustedPrice > 0) {
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
         deliveryAddress: delivery.placeName,
         deliveryLat: String(delivery.lat),
         deliveryLng: String(delivery.lng),
-        distanceKm: String(directions.distanceKm),
+        distanceKm: String(directions.distanceMiles), // stored in miles (not km)
         moveDate,
         description: body.description ?? null,
         estimatedPrice: String(estimatedPrice),
@@ -284,7 +284,7 @@ export async function POST(req: NextRequest) {
       explanation,
       pickup: pickup.placeName,
       delivery: delivery.placeName,
-      distanceKm: directions.distanceKm,
+      distanceMiles: directions.distanceMiles,
       durationMinutes: directions.durationMinutes,
     });
   } catch (err) {

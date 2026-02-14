@@ -42,7 +42,7 @@ export default function DriverTrackingTestPage() {
         setLat(String(pos.coords.latitude));
         setLng(String(pos.coords.longitude));
         if (pos.coords.heading != null) setHeading(String(Math.round(pos.coords.heading)));
-        if (pos.coords.speed != null) setSpeed(String(Math.round(pos.coords.speed * 3.6))); // m/s -> km/h
+        if (pos.coords.speed != null) setSpeed(String(Math.round(pos.coords.speed * 2.237))); // m/s -> mph
         setResult("Location acquired from GPS.");
       },
       (err) => {
@@ -174,7 +174,7 @@ export default function DriverTrackingTestPage() {
             </Box>
             <Box flex={1}>
               <Text fontSize="sm" fontWeight="600" mb={1}>
-                Speed (km/h)
+                Speed (mph)
               </Text>
               <Input
                 placeholder="40"

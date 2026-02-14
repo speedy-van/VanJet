@@ -90,7 +90,7 @@ const EMPTY_ITEM: ItemRow = { name: "", quantity: 1, weightKg: 10, volumeM3: 0.1
 export function PriceCalculator() {
   // Form state
   const [jobType, setJobType] = useState("house_move");
-  const [distanceKm, setDistanceKm] = useState(15);
+  const [distanceMiles, setDistanceMiles] = useState(10);
   const [pickupFloor, setPickupFloor] = useState(0);
   const [pickupHasElevator, setPickupHasElevator] = useState(false);
   const [deliveryFloor, setDeliveryFloor] = useState(0);
@@ -129,7 +129,7 @@ export function PriceCalculator() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobType,
-          distanceKm,
+          distanceMiles,
           items: items.filter((i) => i.name.trim()),
           pickupFloor,
           pickupHasElevator,
@@ -199,12 +199,12 @@ export function PriceCalculator() {
         </FormField>
 
         {/* Distance */}
-        <FormField label="Distance (km)">
+        <FormField label="Distance (miles)">
           <Input
             type="number"
             min={1}
-            value={distanceKm}
-            onChange={(e) => setDistanceKm(Number(e.target.value))}
+            value={distanceMiles}
+            onChange={(e) => setDistanceMiles(Number(e.target.value))}
             size="sm"
           />
         </FormField>

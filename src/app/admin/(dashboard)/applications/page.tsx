@@ -204,7 +204,7 @@ export default async function AdminApplicationsPage({ searchParams }: Props) {
                 <DetailItem label="Company" value={app.companyName || "—"} />
                 <DetailItem
                   label="Coverage"
-                  value={app.coverageRadius ? `${app.coverageRadius} km` : "—"}
+                  value={app.coverageRadius ? `${app.coverageRadius} mi` : "—"}
                 />
                 <DetailItem
                   label="Applied"

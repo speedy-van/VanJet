@@ -50,7 +50,7 @@ interface LocationEvent {
 }
 
 interface ETAInfo {
-  distanceKm: number;
+  distanceMiles: number;
   durationMinutes: number;
 }
 
@@ -174,7 +174,7 @@ export function LiveTracking({ data }: { data: TrackingData }) {
         const json = await res.json();
         if (json.routes?.[0]) {
           setEta({
-            distanceKm: Math.round((json.routes[0].distance / 1000) * 10) / 10,
+            distanceMiles: Math.round((json.routes[0].distance / 1609.344) * 10) / 10,
             durationMinutes: Math.round(json.routes[0].duration / 60),
           });
         }
@@ -341,7 +341,7 @@ export function LiveTracking({ data }: { data: TrackingData }) {
                   Distance
                 </Text>
                 <Text fontSize="2xl" fontWeight="800" color="blue.700">
-                  {eta.distanceKm} km
+                  {eta.distanceMiles} mi
                 </Text>
               </VStack>
             </HStack>

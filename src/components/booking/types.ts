@@ -47,7 +47,7 @@ export interface BookingFormData {
   jobId?: string;
   estimatedPrice?: number;
   priceRange?: { min: number; max: number };
-  distanceKm?: number;
+  distanceMiles?: number;
   durationMinutes?: number;
   bookingId?: string;
   trackingToken?: string;

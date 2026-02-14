@@ -49,7 +49,7 @@ interface JobCreateResult {
   estimatedPrice: number;
   priceRange: { min: number; max: number };
   explanation: string;
-  distanceKm: number;
+  distanceMiles: number;
   durationMinutes: number;
 }
 
@@ -107,7 +107,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           jobType,
-          distanceKm: currentVals.distanceKm ?? 15,
+          distanceMiles: currentVals.distanceMiles ?? 10,
           items: currentVals.items.map((i) => ({
             name: i.name,
             quantity: i.quantity,
@@ -180,7 +180,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       form.setValue("jobId", data.jobId);
       form.setValue("estimatedPrice", data.estimatedPrice);
       form.setValue("priceRange", data.priceRange);
-      form.setValue("distanceKm", data.distanceKm);
+      form.setValue("distanceMiles", data.distanceMiles);
       form.setValue("durationMinutes", data.durationMinutes);
     } catch (err) {
       setError(
@@ -493,7 +493,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
             {jobResult && (
               <HStack gap={4}>
                 <Text fontSize="xs" color="gray.400">
-                  {jobResult.distanceKm.toFixed(1)} km
+                  {jobResult.distanceMiles.toFixed(1)} mi
                 </Text>
                 <Text fontSize="xs" color="gray.400">
                   ~{jobResult.durationMinutes} min drive

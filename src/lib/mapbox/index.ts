@@ -37,7 +37,7 @@ export async function geocodeAddress(
 }
 
 export interface DirectionsResult {
-  distanceKm: number;
+  distanceMiles: number;
   durationMinutes: number;
 }
 
@@ -60,8 +60,10 @@ export async function getDirections(
   const route = data.routes?.[0];
   if (!route) throw new Error("No route found between these addresses.");
 
+  // Mapbox returns distance in metres — convert to miles (UK standard)
+  const { metersToMiles } = await import("@/lib/utils/distance");
   return {
-    distanceKm: Math.round((route.distance / 1000) * 100) / 100,
+    distanceMiles: metersToMiles(route.distance),
     durationMinutes: Math.round(route.duration / 60),
   };
 }

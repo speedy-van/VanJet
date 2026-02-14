@@ -4,7 +4,7 @@ import { serverEnv } from "@/lib/env";
 const GROK_BASE_URL = "https://api.x.ai/v1";
 
 interface GrokPricingInput {
-  distanceKm: number;
+  distanceMiles: number;
   totalWeightKg: number;
   totalVolumeM3: number;
   itemCount: number;
@@ -40,7 +40,7 @@ Respond ONLY with strict JSON: { "minPrice": number, "maxPrice": number, "explan
 Do not include markdown, code fences, or any text outside the JSON object.`;
 
   const userPrompt = `Estimate the price for this UK removal job:
-- Distance: ${input.distanceKm} km
+- Distance: ${input.distanceMiles} miles
 - Total weight: ${input.totalWeightKg} kg
 - Total volume: ${input.totalVolumeM3} m³
 - Number of items: ${input.itemCount}
@@ -90,11 +90,11 @@ Do not include markdown, code fences, or any text outside the JSON object.`;
 
 /**
  * Simple formula-based pricing fallback (no AI required).
- * Base £40 + £1.20/km + £0.50/kg + £15/m³ + floor surcharge.
+ * Base £40 + £1.90/mile + £0.50/kg + £15/m³ + floor surcharge.
  */
 function fallbackPricing(input: GrokPricingInput): GrokPricingResult {
   const base = 40;
-  const distanceCost = input.distanceKm * 1.2;
+  const distanceCost = input.distanceMiles * 1.9;
   const weightCost = input.totalWeightKg * 0.5;
   const volumeCost = input.totalVolumeM3 * 15;
   const floorSurcharge =
@@ -110,7 +110,7 @@ function fallbackPricing(input: GrokPricingInput): GrokPricingResult {
   return {
     minPrice,
     maxPrice,
-    explanation: `Estimated based on ${input.distanceKm.toFixed(1)} km distance, ${input.totalWeightKg.toFixed(1)} kg total weight, and ${input.itemCount} items.`,
+    explanation: `Estimated based on ${input.distanceMiles.toFixed(1)} mile distance, ${input.totalWeightKg.toFixed(1)} kg total weight, and ${input.itemCount} items.`,
   };
 }
 

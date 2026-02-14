@@ -81,7 +81,7 @@ export const jobs = pgTable(
     deliveryAddress: text("delivery_address").notNull(),
     deliveryLat: numeric("delivery_lat", { precision: 10, scale: 7 }),
     deliveryLng: numeric("delivery_lng", { precision: 10, scale: 7 }),
-    distanceKm: numeric("distance_km", { precision: 8, scale: 2 }),
+    distanceKm: numeric("distance_km", { precision: 8, scale: 2 }), // stored in miles (column name kept for migration safety)
     moveDate: timestamp("move_date", { withTimezone: true }).notNull(),
     description: text("description"),
     estimatedPrice: numeric("estimated_price", { precision: 10, scale: 2 }),
