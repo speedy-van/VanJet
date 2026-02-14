@@ -95,13 +95,13 @@ export function ServiceCards() {
             fontSize={{ base: "1.75rem", md: "2.25rem" }}
             fontWeight="800"
             textAlign="center"
-            color="#111827"
+            color="#0F172A"
             letterSpacing="-0.01em"
           >
             Our Services
           </Text>
           <Text
-            color="#6B7280"
+            color="#64748B"
             textAlign="center"
             maxW="580px"
             fontSize={{ base: "15px", md: "16px" }}
@@ -137,14 +137,14 @@ export function ServiceCards() {
                 minH="380px"
                 borderRadius="2xl"
                 overflow="hidden"
-                border="1px solid rgba(0,153,255,0.35)"
-                boxShadow="0 0 0 1px rgba(0,153,255,0.35), 0 0 30px rgba(0,153,255,0.18)"
+                border="1px solid rgba(59, 130, 246, 0.35)"
+                boxShadow="0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 30px rgba(59, 130, 246, 0.18)"
                 cursor="pointer"
                 transition="all 0.25s ease"
                 _hover={{
                   transform: "translateY(-4px) scale(1.02)",
                   boxShadow:
-                    "0 0 0 1px rgba(0,153,255,0.5), 0 0 50px rgba(0,153,255,0.3), 0 20px 40px rgba(0,0,0,0.25)",
+                    "0 0 0 1px rgba(59, 130, 246, 0.5), 0 0 50px rgba(59, 130, 246, 0.3), 0 20px 40px rgba(0,0,0,0.25)",
                 }}
               >
                 {/* Background image */}
@@ -205,7 +205,7 @@ export function ServiceCards() {
                     width="fit-content"
                     borderBottom="2px solid transparent"
                     transition="border-color 0.25s ease"
-                    _groupHover={{ borderColor: "#F59E0B" }}
+                    _groupHover={{ borderColor: "#F97316" }}
                   >
                     Get Quotes &rarr;
                   </Text>

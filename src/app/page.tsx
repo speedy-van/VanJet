@@ -20,7 +20,6 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { RecentMoves } from "@/components/RecentMoves";
 import { PricingBanner } from "@/components/PricingBanner";
 import { Footer } from "@/components/Footer";
-import { useCountUp } from "@/hooks/useCountUp";
 import { SpringHover } from "@/components/animations/Motion";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -48,30 +47,36 @@ const HERO_IMAGES: HeroImage[] = [
 
 const HERO_CHIPS = ["Verified drivers", "Live tracking", "Instant quotes"];
 
-const NEON_BORDER = "1px solid rgba(0,153,255,0.35)";
+const NEON_BORDER = "1px solid rgba(59, 130, 246, 0.35)";
 const NEON_SHADOW =
-  "0 0 0 1px rgba(0,153,255,0.35), 0 0 30px rgba(0,153,255,0.18)";
+  "0 0 0 1px rgba(59, 130, 246, 0.35), 0 0 30px rgba(59, 130, 246, 0.18)";
 const NEON_SHADOW_HOVER =
-  "0 0 0 1px rgba(0,153,255,0.5), 0 0 50px rgba(0,153,255,0.3), 0 20px 40px rgba(0,0,0,0.25)";
+  "0 0 0 1px rgba(59, 130, 246, 0.5), 0 0 50px rgba(59, 130, 246, 0.3), 0 20px 40px rgba(0,0,0,0.25)";
 
 export default function HomePage() {
-  const moves = useCountUp({ end: 10000, duration: 2200, suffix: "+", separator: "," });
-  const rating = useCountUp({ end: 4.8, duration: 1800, suffix: "★", decimals: 1 });
-  const drivers = useCountUp({ end: 500, duration: 2000, suffix: "+" });
-
   return (
-    <Box>
+    <Box pb={{ base: "80px", lg: "0" }}>
       <Navbar />
 
-      {/* ── Hero Section — Trust Blue ────────────────────────── */}
+      {/* ── Hero Section — Navy to Blue Gradient ────────────── */}
       <Box
-        bg="#1D4ED8"
+        bg="linear-gradient(135deg, #0F2D5E 0%, #1E40AF 100%)"
         color="white"
         py={{ base: 14, md: 20, lg: 24 }}
         px={{ base: 4, md: 8 }}
         overflow="hidden"
+        position="relative"
       >
-        <Container maxW="1360px">
+        {/* Subtle pattern overlay */}
+        <Box
+          position="absolute"
+          inset={0}
+          opacity={0.05}
+          bgImage="radial-gradient(circle at 2px 2px, white 1px, transparent 1px)"
+          bgSize="48px 48px"
+          pointerEvents="none"
+        />
+        <Container maxW="1360px" position="relative" zIndex={1}>
           <Flex
             direction={{ base: "column", lg: "row" }}
             align={{ base: "center", lg: "center" }}
@@ -124,13 +129,15 @@ export default function HomePage() {
                 style={{ marginTop: "2rem" }}
               >
                 <Box
-                  bg="white"
+                  bg="rgba(255, 255, 255, 0.12)"
+                  backdropFilter="blur(16px)"
                   borderRadius="12px"
+                  border="1px solid rgba(255, 255, 255, 0.2)"
                   p={{ base: 5, md: 7 }}
                   w="100%"
                   maxW={{ base: "640px", lg: "100%" }}
                   mx={{ base: "auto", lg: 0 }}
-                  shadow="0 8px 32px rgba(0,0,0,0.18)"
+                  shadow="0 8px 32px rgba(0,0,0,0.24)"
                 >
                   <VStack gap={4}>
                     <Stack
@@ -141,10 +148,10 @@ export default function HomePage() {
                       <Input
                         placeholder="Pickup postcode or address"
                         size="lg"
-                        bg="#F9FAFB"
-                        color="#111827"
-                        _placeholder={{ color: "#9CA3AF" }}
-                        borderColor="#E5E7EB"
+                        bg="rgba(255, 255, 255, 0.95)"
+                        color="#0F172A"
+                        _placeholder={{ color: "#64748B" }}
+                        borderColor="rgba(255, 255, 255, 0.3)"
                         borderRadius="8px"
                         fontSize="15px"
                         h="48px"
@@ -152,10 +159,10 @@ export default function HomePage() {
                       <Input
                         placeholder="Delivery postcode or address"
                         size="lg"
-                        bg="#F9FAFB"
-                        color="#111827"
-                        _placeholder={{ color: "#9CA3AF" }}
-                        borderColor="#E5E7EB"
+                        bg="rgba(255, 255, 255, 0.95)"
+                        color="#0F172A"
+                        _placeholder={{ color: "#64748B" }}
+                        borderColor="rgba(255, 255, 255, 0.3)"
                         borderRadius="8px"
                         fontSize="15px"
                         h="48px"
@@ -166,14 +173,14 @@ export default function HomePage() {
                         <Button
                           w="100%"
                           size="lg"
-                          bg="#F59E0B"
-                          color="#111827"
+                          bg="#F97316"
+                          color="white"
                           fontWeight="700"
                           fontSize="16px"
                           h="52px"
                           borderRadius="8px"
-                          _hover={{ bg: "#D97706" }}
-                          _active={{ bg: "#B45309" }}
+                          _hover={{ bg: "#EA580C" }}
+                          _active={{ bg: "#C2410C" }}
                         >
                           Get Instant Quote →
                         </Button>
@@ -183,42 +190,54 @@ export default function HomePage() {
                 </Box>
               </motion.div>
 
-              {/* Social proof stats */}
+              {/* Trust bullets */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8, ease: EASE }}
               >
                 <HStack
-                  gap={{ base: 6, md: 10 }}
+                  gap={{ base: 3, md: 4 }}
                   mt={{ base: 6, md: 8 }}
                   flexWrap="wrap"
                   justify={{ base: "center", lg: "flex-start" }}
                 >
-                  <VStack gap={0}>
-                    <Text ref={moves.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {moves.display}
+                  <Box
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                    bg="rgba(255, 255, 255, 0.15)"
+                    backdropFilter="blur(8px)"
+                    border="1px solid rgba(255, 255, 255, 0.2)"
+                  >
+                    <Text fontSize="14px" fontWeight="600">
+                      🇬🇧 UK-wide coverage
                     </Text>
-                    <Text fontSize="sm" opacity={0.8}>
-                      Moves completed
+                  </Box>
+                  <Box
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                    bg="rgba(255, 255, 255, 0.15)"
+                    backdropFilter="blur(8px)"
+                    border="1px solid rgba(255, 255, 255, 0.2)"
+                  >
+                    <Text fontSize="14px" fontWeight="600">
+                      ✓ Verified drivers
                     </Text>
-                  </VStack>
-                  <VStack gap={0}>
-                    <Text ref={rating.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {rating.display}
+                  </Box>
+                  <Box
+                    px={4}
+                    py={2}
+                    borderRadius="full"
+                    bg="rgba(255, 255, 255, 0.15)"
+                    backdropFilter="blur(8px)"
+                    border="1px solid rgba(255, 255, 255, 0.2)"
+                  >
+                    <Text fontSize="14px" fontWeight="600">
+                      🔐 Secure payments
                     </Text>
-                    <Text fontSize="sm" opacity={0.8}>
-                      Average rating
-                    </Text>
-                  </VStack>
-                  <VStack gap={0}>
-                    <Text ref={drivers.ref as React.Ref<HTMLParagraphElement>} fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {drivers.display}
-                    </Text>
-                    <Text fontSize="sm" opacity={0.8}>
-                      Verified drivers
-                    </Text>
-                  </VStack>
+                  </Box>
                 </HStack>
               </motion.div>
             </Box>
@@ -338,6 +357,39 @@ export default function HomePage() {
       <RecentMoves />
       <PricingBanner />
       <Footer />
+
+      {/* Mobile Sticky CTA Bar — bottom of viewport */}
+      <Box
+        display={{ base: "block", lg: "none" }}
+        position="fixed"
+        bottom="0"
+        left="0"
+        right="0"
+        zIndex="999"
+        bg="white"
+        borderTop="1px solid #E5E7EB"
+        px={4}
+        py={3}
+        pb="calc(12px + env(safe-area-inset-bottom))"
+        boxShadow="0 -4px 12px rgba(0, 0, 0, 0.08)"
+      >
+        <Link href="/book">
+          <Button
+            w="100%"
+            size="lg"
+            bg="#F97316"
+            color="white"
+            fontWeight="700"
+            fontSize="16px"
+            h="52px"
+            borderRadius="10px"
+            _hover={{ bg: "#EA580C" }}
+            _active={{ bg: "#C2410C" }}
+          >
+            Get Free Quote →
+          </Button>
+        </Link>
+      </Box>
     </Box>
   );
 }

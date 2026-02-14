@@ -30,7 +30,7 @@ export function HowItWorks() {
       id="how-it-works"
       py={{ base: 12, md: 24 }}
       px={{ base: 4, md: 8 }}
-      bg="#F9FAFB"
+      bg="#F8FAFC"
     >
       <BlurIn>
         <VStack gap={3} mb={{ base: 8, md: 12 }}>
@@ -38,13 +38,13 @@ export function HowItWorks() {
             fontSize={{ base: "1.75rem", md: "2.25rem" }}
             fontWeight="800"
             textAlign="center"
-            color="#111827"
+            color="#0F172A"
             letterSpacing="-0.01em"
           >
             How It Works
           </Text>
           <Text
-            color="#6B7280"
+            color="#64748B"
             textAlign="center"
             maxW="500px"
             fontSize={{ base: "15px", md: "16px" }}
@@ -60,33 +60,48 @@ export function HowItWorks() {
         gap={{ base: 6, md: 8 }}
         maxW="1000px"
         mx="auto"
+        position="relative"
       >
+        {/* Dashed connector line (desktop only) */}
+        <Box
+          display={{ base: "none", md: "block" }}
+          position="absolute"
+          top="28px"
+          left="calc(16.67% + 28px)"
+          right="calc(16.67% + 28px)"
+          h="2px"
+          borderTop="2px dashed"
+          borderColor="rgba(15, 45, 94, 0.2)"
+          zIndex={0}
+        />
+
         {steps.map((step, i) => (
           <FadeUp key={step.number} delay={0.15 * i} y={30}>
-            <VStack gap={4} textAlign="center">
+            <VStack gap={4} textAlign="center" position="relative" zIndex={1}>
               <Flex
                 w="56px"
                 h="56px"
                 borderRadius="full"
-                bg="#1D4ED8"
+                bg="#0F2D5E"
                 color="white"
                 align="center"
                 justify="center"
                 fontWeight="800"
                 fontSize="xl"
                 flexShrink={0}
+                border="4px solid #F8FAFC"
               >
                 {step.number}
               </Flex>
               <Text
                 fontWeight="700"
                 fontSize={{ base: "1.125rem", md: "1.25rem" }}
-                color="#111827"
+                color="#0F172A"
               >
                 {step.title}
               </Text>
               <Text
-                color="#6B7280"
+                color="#64748B"
                 fontSize={{ base: "14px", md: "15px" }}
                 lineHeight="1.65"
               >

@@ -1,11 +1,11 @@
 "use client";
 
-import { Box, Text, VStack, SimpleGrid } from "@chakra-ui/react";
+import { Box, Text, VStack, SimpleGrid, HStack } from "@chakra-ui/react";
 import Link from "next/link";
 
 export function Footer() {
   return (
-    <Box bg="#111827" color="#9CA3AF" px={{ base: 4, md: 8 }} py={{ base: 10, md: 14 }}>
+    <Box bg="#0F172A" color="#94A3B8" px={{ base: 4, md: 8 }} py={{ base: 10, md: 14 }}>
       <SimpleGrid
         columns={{ base: 1, md: 4 }}
         gap={{ base: 8, md: 10 }}
@@ -16,7 +16,7 @@ export function Footer() {
         {/* Brand */}
         <VStack align={{ base: "center", md: "flex-start" }} gap={3}>
           <Text fontSize="xl" fontWeight="800" color="white">
-            Van<Text as="span" color="#F59E0B">Jet</Text>
+            Van<Text as="span" color="#F97316">Jet</Text>
           </Text>
           <Text fontSize="14px" lineHeight="1.65">
             The UK&apos;s smartest removal &amp; delivery marketplace.
@@ -52,21 +52,66 @@ export function Footer() {
             Contact
           </Text>
           <Link href="tel:+4402012345678">
-            <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">
-              📞 020 1234 5678
+            <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms" fontWeight="600">
+              020 1234 5678
             </Text>
           </Link>
           <Link href="mailto:hello@van-jet.com">
             <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">
-              ✉️ hello@van-jet.com
+              hello@van-jet.com
             </Text>
           </Link>
           <Text fontSize="14px">London, United Kingdom</Text>
         </VStack>
       </SimpleGrid>
 
-      <Box borderTopWidth="1px" borderColor="#374151" pt={5}>
-        <Text textAlign="center" fontSize="13px" color="#6B7280">
+      {/* Trust badges */}
+      <Box borderTopWidth="1px" borderColor="#1E293B" pt={8} pb={6}>
+        <HStack
+          justify="center"
+          gap={{ base: 4, md: 8 }}
+          flexWrap="wrap"
+          maxW="800px"
+          mx="auto"
+        >
+          <Box
+            px={4}
+            py={2}
+            borderRadius="md"
+            bg="rgba(255, 255, 255, 0.05)"
+            border="1px solid rgba(255, 255, 255, 0.1)"
+          >
+            <Text fontSize="13px" fontWeight="600" color="#94A3B8">
+              🔒 SSL Secure
+            </Text>
+          </Box>
+          <Box
+            px={4}
+            py={2}
+            borderRadius="md"
+            bg="rgba(255, 255, 255, 0.05)"
+            border="1px solid rgba(255, 255, 255, 0.1)"
+          >
+            <Text fontSize="13px" fontWeight="600" color="#94A3B8">
+              ✓ Companies House Registered
+            </Text>
+          </Box>
+          <Box
+            px={4}
+            py={2}
+            borderRadius="md"
+            bg="rgba(255, 255, 255, 0.05)"
+            border="1px solid rgba(255, 255, 255, 0.1)"
+          >
+            <Text fontSize="13px" fontWeight="600" color="#94A3B8">
+              ⭐ Verified by Stripe
+            </Text>
+          </Box>
+        </HStack>
+      </Box>
+
+      <Box borderTopWidth="1px" borderColor="#1E293B" pt={5}>
+        <Text textAlign="center" fontSize="13px" color="#64748B">
           &copy; {new Date().getFullYear()} VanJet Ltd. All rights reserved. Registered in England &amp; Wales.
         </Text>
       </Box>

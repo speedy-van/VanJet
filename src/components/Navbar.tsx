@@ -42,11 +42,11 @@ export function Navbar() {
             <Text
               fontSize={{ base: "xl", md: "2xl" }}
               fontWeight="800"
-              color="#1D4ED8"
+              color="#0F2D5E"
               letterSpacing="-0.02em"
             >
               Van
-              <Text as="span" color="#111827">
+              <Text as="span" color="#0F172A">
                 Jet
               </Text>
             </Text>
@@ -65,8 +65,8 @@ export function Navbar() {
                 <Text
                   fontSize="15px"
                   fontWeight="500"
-                  color="#374151"
-                  _hover={{ color: "#1D4ED8" }}
+                  color="#334155"
+                  _hover={{ color: "#0F2D5E" }}
                   transition="color 150ms ease"
                 >
                   {link.label}
@@ -80,12 +80,12 @@ export function Navbar() {
             <Link href="/book">
               <Button
                 size={{ base: "sm", md: "md" }}
-                bg="#F59E0B"
-                color="#111827"
+                bg="#F97316"
+                color="white"
                 fontWeight="700"
                 borderRadius="8px"
-                _hover={{ bg: "#D97706" }}
-                _active={{ bg: "#B45309" }}
+                _hover={{ bg: "#EA580C" }}
+                _active={{ bg: "#C2410C" }}
               >
                 Get Quote
               </Button>
@@ -139,7 +139,7 @@ export function Navbar() {
             <Text
               fontSize="lg"
               fontWeight="700"
-              color="#1D4ED8"
+              color="#0F2D5E"
               mb={8}
             >
               📞 020 1234 5678
@@ -166,12 +166,12 @@ export function Navbar() {
               <Button
                 w="100%"
                 size="lg"
-                bg="#F59E0B"
-                color="#111827"
+                bg="#F97316"
+                color="white"
                 fontWeight="700"
                 borderRadius="8px"
                 h="52px"
-                _hover={{ bg: "#D97706" }}
+                _hover={{ bg: "#EA580C" }}
               >
                 Get Instant Quote →
               </Button>
