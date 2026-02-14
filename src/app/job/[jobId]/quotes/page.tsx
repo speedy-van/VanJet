@@ -496,6 +496,9 @@ export default function JobQuotesPage({
                               Updated: {formatGBP(recalculateResult.oldPrice)} → {formatGBP(recalculateResult.newPrice)}
                             </Text>
                           )}
+                          <Text fontSize="xs" color="gray.500" mt={2}>
+                            This is a guide price. Final price is the driver quote you accept.
+                          </Text>
                         </Box>
                       )}
                     </VStack>
@@ -617,6 +620,13 @@ export default function JobQuotesPage({
                   </Button>
                 </HStack>
               </Box>
+
+              {/* Marketplace Trust Line */}
+              {quotes.length > 0 && (
+                <Text fontSize="xs" color="gray.500" textAlign="center" mb={-2}>
+                  🔒 Secure payment processed via VanJet platform
+                </Text>
+              )}
 
               {/* Quotes Grid */}
               {quotes.length === 0 && (
@@ -773,9 +783,16 @@ export default function JobQuotesPage({
                         Rejected
                       </Badge>
                     ) : !hasAcceptedQuote && !q.driver.stripeOnboarded ? (
-                      <Text fontSize="sm" color="orange.600" fontWeight="600">
-                        This driver hasn&apos;t completed payment setup yet
-                      </Text>
+                      <Button
+                        size="lg"
+                        bg="gray.300"
+                        color="gray.600"
+                        fontWeight="700"
+                        disabled
+                        cursor="not-allowed"
+                      >
+                        Unavailable
+                      </Button>
                     ) : !hasAcceptedQuote ? (
                       <Button
                         size="lg"
