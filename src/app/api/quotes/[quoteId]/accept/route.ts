@@ -15,6 +15,7 @@ export async function POST(
 ) {
   try {
     const { quoteId } = await params;
+    const body = await req.json().catch(() => ({}));
 
     if (!quoteId) {
       return NextResponse.json({ error: "Quote ID is required." }, { status: 400 });
@@ -29,6 +30,11 @@ export async function POST(
 
     if (!quote) {
       return NextResponse.json({ error: "Quote not found." }, { status: 404 });
+    }
+
+    // ── Security: Validate job ownership via jobId token ────
+    if (body.jobId && body.jobId !== quote.jobId) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 403 });
     }
 
     if (quote.status !== "pending") {

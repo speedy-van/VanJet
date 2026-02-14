@@ -170,22 +170,18 @@ export default function JobQuotesPage({
     try {
       const res = await fetch(`/api/quotes/${quoteId}/accept`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to accept quote.");
 
-      setAcceptResult({
-        bookingId: data.bookingId,
-        quoteId: data.quoteId,
-        price: data.price,
-      });
-
-      fetchQuotes();
+      // Auto-redirect to payment page
+      window.location.href = `/job/${jobId}/pay?bookingId=${data.bookingId}&quoteId=${data.quoteId}`;
     } catch (err) {
       setAcceptResult({
         error: err instanceof Error ? err.message : "Failed to accept.",
       });
-    } finally {
       setAccepting(null);
     }
   }
@@ -805,8 +801,8 @@ export default function JobQuotesPage({
                         _disabled={{ opacity: 0.6 }}
                       >
                         {accepting === q.id
-                          ? "Accepting..."
-                          : `Accept • ${formatGBP(q.price)}`}
+                          ? "Processing..."
+                          : "Accept & Pay"}
                       </Button>
                     ) : null}
 
