@@ -4,9 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { Box, Text, VStack, Flex, Portal } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const MotionBox = motion.create(Box);
-const MotionText = motion.create(Text);
-
 /** Status messages shown sequentially during the calculation theater */
 const STATUS_LINES = [
   "Analyzing your move details…",
@@ -45,26 +42,47 @@ export function PriceCalculationOverlay({
 }: PriceCalculationOverlayProps) {
   const currentStatus = STATUS_LINES[Math.min(statusIndex, STATUS_LINES.length - 1)];
 
+  // TEMP DEBUG: Log when isOpen changes
+  useEffect(() => {
+    console.log("[Theater] isOpen changed to:", isOpen);
+    if (isOpen) {
+      console.log("[Theater] Overlay MOUNTED");
+    }
+    return () => {
+      if (isOpen) {
+        console.log("[Theater] Overlay UNMOUNTING");
+      }
+    };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <Portal>
-          <MotionBox
-            position="fixed"
-            inset="0"
-            bg="rgba(0, 0, 0, 0.85)"
-            zIndex="9999"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
+          <motion.div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.85)",
+              zIndex: 20000,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              pointerEvents: "auto",
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+            onAnimationStart={() => console.log("[Theater] Animation START")}
+            onAnimationComplete={() => console.log("[Theater] Animation COMPLETE")}
           >
             <VStack gap={8} maxW="400px" px={6} textAlign="center">
               {/* Animated Calculator Icon */}
-              <MotionBox
+              <motion.div
                 animate={{
                   rotate: [0, 360],
                   scale: [1, 1.1, 1],
@@ -101,32 +119,37 @@ export function PriceCalculationOverlay({
                   <circle cx="8" cy="19" r="1" fill="#60A5FA" />
                   <rect x="11" y="18" width="6" height="2" rx="0.5" fill="#60A5FA" />
                 </svg>
-              </MotionBox>
+              </motion.div>
 
               {/* Status Line with aria-live for accessibility */}
               <Box minH="28px" aria-live="polite" aria-atomic="true">
                 <AnimatePresence mode="wait">
-                  <MotionText
+                  <motion.p
                     key={statusIndex}
-                    color="white"
-                    fontSize="lg"
-                    fontWeight="600"
+                    style={{
+                      color: "white",
+                      fontSize: "1.125rem",
+                      fontWeight: 600,
+                      margin: 0,
+                    }}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.3 }}
                   >
                     {currentStatus}
-                  </MotionText>
+                  </motion.p>
                 </AnimatePresence>
               </Box>
 
               {/* Progress Bar */}
               <Box w="full" bg="gray.700" borderRadius="full" h="8px" overflow="hidden">
-                <MotionBox
-                  h="full"
-                  bg="linear-gradient(90deg, #3B82F6, #60A5FA)"
-                  borderRadius="full"
+                <motion.div
+                  style={{
+                    height: "100%",
+                    background: "linear-gradient(90deg, #3B82F6, #60A5FA)",
+                    borderRadius: "9999px",
+                  }}
                   initial={{ width: "5%" }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
@@ -156,7 +179,7 @@ export function PriceCalculationOverlay({
                 This only takes a moment...
               </Text>
             </VStack>
-          </MotionBox>
+          </motion.div>
         </Portal>
       )}
     </AnimatePresence>

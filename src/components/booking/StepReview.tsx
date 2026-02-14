@@ -226,7 +226,9 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
     setError("");
     
     // Start the theater overlay
+    console.log("[StepReview] STARTING price theater");
     priceTheater.start();
+    console.log("[StepReview] priceTheater.isOpen after start():", priceTheater.isOpen);
     const theaterStartTime = Date.now();
 
     try {
@@ -363,7 +365,9 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       }
       
       // Finish theater animation (progress to 100%)
+      console.log("[StepReview] FINISHING price theater");
       await priceTheater.finish();
+      console.log("[StepReview] Theater finished, applying results");
       
       // Now apply all results after theater completes
       if (fetchedEngineData) {
@@ -378,6 +382,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       form.setValue("durationMinutes", data.durationMinutes);
     } catch (err) {
       // Close theater immediately on error
+      console.log("[StepReview] ERROR - closing theater immediately");
       priceTheater.closeImmediate();
       setError(
         err instanceof Error ? err.message : "Something went wrong."
