@@ -180,7 +180,7 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
     dropoffAddress,
   ]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     let valid = true;
     const vals = form.getValues();
 
@@ -216,7 +216,36 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
       valid = false;
     }
 
-    if (valid) onNext();
+    if (!valid) return;
+
+    // Create draft job if not already created
+    if (!vals.jobId) {
+      try {
+        const res = await fetch("/api/jobs/draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            pickupAddress: vals.pickup.address,
+            deliveryAddress: vals.dropoff.address,
+            moveDate: vals.schedule.preferredDate || new Date().toISOString(),
+            jobType: vals.jobType || "house_move",
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to create draft job");
+        }
+
+        const data = await res.json();
+        form.setValue("jobId", data.jobId);
+        form.setValue("referenceNumber", data.referenceNumber);
+      } catch (err) {
+        console.error("Draft job creation error:", err);
+        // Continue anyway - job will be created in Step 4
+      }
+    }
+
+    onNext();
   };
 
   return (

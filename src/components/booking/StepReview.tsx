@@ -157,7 +157,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         setPricingEngine(engineData);
       }
 
-      // Then create the job (which also gets distance via Mapbox)
+      // Update existing draft job or create new one
       const itemsPayload = currentVals.items.map((i) => ({
         name: i.name,
         category: i.category,
@@ -169,31 +169,57 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         specialHandling: i.fragile ? "Handle with care" : undefined,
       }));
 
-      const res = await fetch("/api/jobs/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contactEmail: email,
-          contactName: name,
-          contactPhone: phone,
-          jobType,
-          pickupAddress: currentVals.pickup.address,
-          deliveryAddress: currentVals.dropoff.address,
-          moveDate: new Date(currentVals.schedule.preferredDate).toISOString(),
-          needsPacking: currentVals.needsPacking,
-          pickupFloor: currentVals.pickup.floor,
-          pickupFlat: currentVals.pickup.flat,
-          pickupHasLift: currentVals.pickup.hasLift,
-          pickupNotes: currentVals.pickup.notes,
-          deliveryFloor: currentVals.dropoff.floor,
-          deliveryFlat: currentVals.dropoff.flat,
-          deliveryHasLift: currentVals.dropoff.hasLift,
-          deliveryNotes: currentVals.dropoff.notes,
-          preferredTimeWindow: currentVals.schedule.timeWindow,
-          flexibleDates: currentVals.schedule.flexibleDates,
-          items: itemsPayload,
-        }),
-      });
+      const existingJobId = currentVals.jobId;
+      const res = existingJobId
+        ? // Update existing draft job created at Step 1
+          await fetch(`/api/jobs/${existingJobId}/update`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contactEmail: email,
+              contactName: name,
+              contactPhone: phone,
+              description: "",
+              needsPacking: currentVals.needsPacking,
+              pickupFloor: currentVals.pickup.floor,
+              pickupFlat: currentVals.pickup.flat,
+              pickupHasLift: currentVals.pickup.hasLift,
+              pickupNotes: currentVals.pickup.notes,
+              deliveryFloor: currentVals.dropoff.floor,
+              deliveryFlat: currentVals.dropoff.flat,
+              deliveryHasLift: currentVals.dropoff.hasLift,
+              deliveryNotes: currentVals.dropoff.notes,
+              preferredTimeWindow: currentVals.schedule.timeWindow,
+              flexibleDates: currentVals.schedule.flexibleDates,
+              items: itemsPayload,
+            }),
+          })
+        : // Fallback: create new job if draft creation failed
+          await fetch("/api/jobs/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contactEmail: email,
+              contactName: name,
+              contactPhone: phone,
+              jobType,
+              pickupAddress: currentVals.pickup.address,
+              deliveryAddress: currentVals.dropoff.address,
+              moveDate: new Date(currentVals.schedule.preferredDate).toISOString(),
+              needsPacking: currentVals.needsPacking,
+              pickupFloor: currentVals.pickup.floor,
+              pickupFlat: currentVals.pickup.flat,
+              pickupHasLift: currentVals.pickup.hasLift,
+              pickupNotes: currentVals.pickup.notes,
+              deliveryFloor: currentVals.dropoff.floor,
+              deliveryFlat: currentVals.dropoff.flat,
+              deliveryHasLift: currentVals.dropoff.hasLift,
+              deliveryNotes: currentVals.dropoff.notes,
+              preferredTimeWindow: currentVals.schedule.timeWindow,
+              flexibleDates: currentVals.schedule.flexibleDates,
+              items: itemsPayload,
+            }),
+          });
 
       if (!res.ok) {
         const data = await res.json();
