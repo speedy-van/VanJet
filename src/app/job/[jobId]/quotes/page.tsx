@@ -10,13 +10,31 @@ import {
   Flex,
   Badge,
   Spinner,
+  Input,
+  Tabs,
+  Grid,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { formatGBP } from "@/lib/money/format";
 import Link from "next/link";
 
+interface JobItem {
+  id: string;
+  name: string;
+  category: string | null;
+  quantity: number;
+  weightKg: number | null;
+  volumeM3: number | null;
+  fragile: boolean;
+  requiresDismantling: boolean;
+  notes: string | null;
+}
+
 interface QuoteDriver {
   id: string;
   name: string;
+  email: string | null;
+  phone: string | null;
   companyName: string | null;
   vanSize: string | null;
   rating: number;
@@ -38,6 +56,7 @@ interface Quote {
 
 interface JobSummary {
   id: string;
+  referenceNumber: string;
   jobType: string;
   status: string;
   pickupAddress: string;
@@ -45,7 +64,17 @@ interface JobSummary {
   moveDate: string;
   estimatedPrice: number | null;
   distanceMiles: number | null;
+  description: string | null;
+  pickupFloor: number | null;
+  deliveryFloor: number | null;
+  pickupHasLift: boolean | null;
+  deliveryHasLift: boolean | null;
+  needsPacking: boolean;
+  contactName: string | null;
+  contactPhone: string | null;
 }
+
+type SortOption = "price-low" | "price-high" | "rating" | "recent";
 
 export default function JobQuotesPage({
   params,
@@ -54,6 +83,7 @@ export default function JobQuotesPage({
 }) {
   const { jobId } = use(params);
   const [job, setJob] = useState<JobSummary | null>(null);
+  const [items, setItems] = useState<JobItem[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -64,14 +94,26 @@ export default function JobQuotesPage({
     price?: number;
     error?: string;
   } | null>(null);
+  
+  const [sortBy, setSortBy] = useState<SortOption>("price-low");
+  const [showDetails, setShowDetails] = useState(true);
 
   useEffect(() => {
     fetchQuotes();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchQuotes, 30000);
+    return () => clearInterval(interval);
   }, [jobId]);
 
   async function fetchQuotes() {
     try {
-      setLoading(true);
+      if (!loading && quotes.length > 0) {
+        // Silent refresh - don't show loading spinner
+      } else {
+        setLoading(true);
+      }
+      
       const res = await fetch(`/api/jobs/${jobId}/quotes`);
       if (!res.ok) {
         const data = await res.json();
@@ -79,7 +121,9 @@ export default function JobQuotesPage({
       }
       const data = await res.json();
       setJob(data.job);
+      setItems(data.items || []);
       setQuotes(data.quotes);
+      setError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load.");
     } finally {
@@ -104,7 +148,6 @@ export default function JobQuotesPage({
         price: data.price,
       });
 
-      // Refresh quotes
       fetchQuotes();
     } catch (err) {
       setAcceptResult({
@@ -115,266 +158,548 @@ export default function JobQuotesPage({
     }
   }
 
-  if (loading) {
+  // Sort quotes
+  const sortedQuotes = [...quotes].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "rating":
+        return b.driver.rating - a.driver.rating;
+      case "recent":
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      default:
+        return 0;
+    }
+  });
+
+  if (loading && quotes.length === 0) {
     return (
       <Flex minH="60vh" align="center" justify="center">
-        <Spinner size="lg" color="blue.500" />
+        <VStack gap={3}>
+          <Spinner size="lg" color="blue.500" />
+          <Text color="gray.500">œºœ∫œ¶+Ë œ∫+‰œ¨œ°+‡+Ë+‰... Loading quotes...</Text>
+        </VStack>
       </Flex>
     );
   }
 
-  if (error) {
+  if (error && !job) {
     return (
       <Box maxW="600px" mx="auto" p={6}>
         <Box bg="red.50" p={4} borderRadius="lg">
           <Text color="red.600" fontWeight="600">{error}</Text>
+          <Button mt={3} onClick={() => window.location.reload()}>
+            œ—œ¶œ∫œªœÆ œ∫+‰+‡œ°œ∫+Í+‰œÆ Retry
+          </Button>
         </Box>
       </Box>
     );
   }
 
   const hasAcceptedQuote = quotes.some((q) => q.status === "accepted");
+  const totalWeight = items.reduce((sum, i) => sum + (i.weightKg || 0) * i.quantity, 0);
+  const totalVolume = items.reduce((sum, i) => sum + (i.volumeM3 || 0) * i.quantity, 0);
 
   return (
     <Box
-      maxW="800px"
-      mx="auto"
-      px={{ base: 4, md: 6 }}
-      py={{ base: 6, md: 10 }}
+      minH="100vh"
+      bg="#F9FAFB"
+      py={{ base: 4, md: 8 }}
+      px={{ base: 3, md: 6 }}
     >
-      <VStack gap={6} align="stretch">
-        {/* Job Summary */}
-        {job && (
-          <Box
-            bg="white"
-            borderRadius="xl"
-            shadow="sm"
-            p={{ base: 4, md: 6 }}
-            border="1px solid"
-            borderColor="gray.100"
-          >
-            <HStack justify="space-between" mb={3} flexWrap="wrap">
-              <Text fontSize="lg" fontWeight="800" color="gray.800">
-                Your Job
-              </Text>
-              <Badge
-                colorPalette={
-                  job.status === "accepted"
-                    ? "green"
-                    : job.status === "quoted"
-                      ? "blue"
-                      : "gray"
-                }
-                px={2}
-                py={0.5}
-                borderRadius="md"
-                fontSize="xs"
-              >
-                {job.status}
-              </Badge>
-            </HStack>
-            <VStack gap={2} align="stretch" fontSize="sm" color="gray.600">
-              <HStack gap={2}>
-                <Text fontWeight="600" minW="50px">From:</Text>
-                <Text>{job.pickupAddress}</Text>
-              </HStack>
-              <HStack gap={2}>
-                <Text fontWeight="600" minW="50px">To:</Text>
-                <Text>{job.deliveryAddress}</Text>
-              </HStack>
-              <HStack gap={4}>
-                <Text>
-                  üìÖ{" "}
-                  {new Date(job.moveDate).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </Text>
-                {job.distanceMiles && <Text>üìè {job.distanceMiles} mi</Text>}
-                {job.estimatedPrice && (
-                  <Text fontWeight="700" color="#1D4ED8">
-                    Est. {formatGBP(job.estimatedPrice)}
-                  </Text>
-                )}
-              </HStack>
-            </VStack>
-          </Box>
-        )}
-
-        {/* Accept result banner */}
-        {acceptResult && !acceptResult.error && (
-          <Box bg="green.50" p={4} borderRadius="lg" border="1px solid" borderColor="green.200">
-            <Text fontWeight="700" color="green.700">
-              ‚úì Quote accepted ‚Äî {formatGBP(acceptResult.price ?? 0)}
-            </Text>
-            <Text fontSize="sm" color="green.600" mt={1}>
-              Proceed to payment to confirm your booking.
-            </Text>
-            <Link
-              href={`/job/${jobId}/pay?bookingId=${acceptResult.bookingId}&quoteId=${acceptResult.quoteId}`}
+      <Box maxW="1200px" mx="auto">
+        <VStack gap={5} align="stretch">
+          {/* Header with Reference Number */}
+          {job && (
+            <Box
+              bg="white"
+              borderRadius="xl"
+              shadow="md"
+              p={{ base: 4, md: 6 }}
+              border="2px solid"
+              borderColor="blue.100"
             >
-              <Button
-                mt={3}
-                bg="#1D4ED8"
-                color="white"
-                fontWeight="700"
-                _hover={{ bg: "#1840B8" }}
-              >
-                Pay Now
-              </Button>
-            </Link>
-          </Box>
-        )}
-        {acceptResult?.error && (
-          <Box bg="red.50" p={4} borderRadius="lg">
-            <Text color="red.600" fontWeight="600">{acceptResult.error}</Text>
-          </Box>
-        )}
-
-        {/* Quotes */}
-        <Text fontSize="xl" fontWeight="800" color="gray.800">
-          Driver Quotes ({quotes.length})
-        </Text>
-
-        {quotes.length === 0 && (
-          <Box
-            bg="white"
-            borderRadius="xl"
-            shadow="sm"
-            p={8}
-            textAlign="center"
-          >
-            <Text fontSize="lg" color="gray.500">
-              No quotes yet.
-            </Text>
-            <Text fontSize="sm" color="gray.400" mt={2}>
-              Drivers in your area will start sending quotes shortly.
-            </Text>
-          </Box>
-        )}
-
-        {quotes.map((q) => (
-          <Box
-            key={q.id}
-            bg="white"
-            borderRadius="xl"
-            shadow="sm"
-            border="1px solid"
-            borderColor={
-              q.status === "accepted"
-                ? "green.300"
-                : q.status === "rejected"
-                  ? "gray.200"
-                  : "gray.100"
-            }
-            p={{ base: 4, md: 6 }}
-            opacity={q.status === "rejected" ? 0.5 : 1}
-          >
-            <VStack gap={3} align="stretch">
-              <HStack justify="space-between" flexWrap="wrap">
-                <HStack gap={2}>
-                  <Flex
-                    w="40px"
-                    h="40px"
-                    borderRadius="full"
-                    bg="blue.50"
+              <Flex justify="space-between" align="center" flexWrap="wrap" gap={3}>
+                <Box>
+                  <Text fontSize="xs" color="gray.500" mb={1}>
+                    œ¶+È+‡ œ∫+‰+‡œ¶œºœ¶ BOOKING REFERENCE
+                  </Text>
+                  <Text
+                    fontSize={{ base: "xl", md: "2xl" }}
+                    fontWeight="900"
                     color="#1D4ED8"
-                    align="center"
-                    justify="center"
-                    fontWeight="800"
-                    fontSize="sm"
+                    fontFamily="mono"
+                    letterSpacing="wider"
                   >
-                    {q.driver.name.charAt(0).toUpperCase()}
-                  </Flex>
-                  <Box>
-                    <Text fontWeight="700" fontSize="sm" color="gray.800">
-                      {q.driver.name}
+                    {job.referenceNumber}
+                  </Text>
+                </Box>
+                <VStack align="flex-end" gap={1}>
+                  <Badge
+                    colorPalette={
+                      job.status === "accepted"
+                        ? "green"
+                        : job.status === "quoted"
+                          ? "blue"
+                          : "gray"
+                    }
+                    px={3}
+                    py={1}
+                    borderRadius="full"
+                    fontSize="sm"
+                    fontWeight="700"
+                  >
+                    {job.status === "accepted" ? "‘£Ù +‡+Èœø+Í+‰ Accepted" : 
+                     job.status === "quoted" ? "≠É∆º œ¶œ¶+Íœ¬ Quoted" : job.status}
+                  </Badge>
+                  <Text fontSize="xs" color="gray.500">
+                    {quotes.length} {quotes.length === 1 ? "œ¶œ¶œ¬ Quote" : "œ¶œ¶+Íœ¬ Quotes"}
+                  </Text>
+                </VStack>
+              </Flex>
+            </Box>
+          )}
+
+          {/* Accept Result Banner */}
+          {acceptResult && !acceptResult.error && (
+            <Box
+              bg="green.50"
+              p={4}
+              borderRadius="xl"
+              border="2px solid"
+              borderColor="green.200"
+              shadow="sm"
+            >
+              <HStack justify="space-between" flexWrap="wrap" gap={3}>
+                <Box>
+                  <Text fontWeight="800" color="green.700" fontSize="lg">
+                    ‘£Ù œ¨+‡ +Èœø+Í+‰ œ∫+‰œ¶œ¶œ¬ Quote Accepted
+                  </Text>
+                  <Text fontSize="sm" color="green.600" mt={1}>
+                    œ∫+‰œ¶œ¶œ¶ œ∫+‰+Â+Áœ∫œ™+Ë: Final Price: {formatGBP(acceptResult.price ?? 0)}
+                  </Text>
+                </Box>
+                <Link
+                  href={`/job/${jobId}/pay?bookingId=${acceptResult.bookingId}&quoteId=${acceptResult.quoteId}`}
+                >
+                  <Button
+                    bg="#059669"
+                    color="white"
+                    fontWeight="700"
+                    size="lg"
+                    _hover={{ bg: "#047857" }}
+                  >
+                    ≠É∆¶ œ∫œª+¸œ¶ œ∫+‰œÛ+Â Pay Now
+                  </Button>
+                </Link>
+              </HStack>
+            </Box>
+          )}
+          {acceptResult?.error && (
+            <Box bg="red.50" p={4} borderRadius="lg" border="1px solid" borderColor="red.200">
+              <Text color="red.600" fontWeight="600">{acceptResult.error}</Text>
+            </Box>
+          )}
+
+          {/* Main Grid: Job Details | Quotes */}
+          <Grid
+            templateColumns={{ base: "1fr", lg: "400px 1fr" }}
+            gap={5}
+          >
+            {/* LEFT: Job Details */}
+            <VStack gap={5} align="stretch">
+              {/* Job Summary Card */}
+              {job && (
+                <Box
+                  bg="white"
+                  borderRadius="xl"
+                  shadow="sm"
+                  p={5}
+                  border="1px solid"
+                  borderColor="gray.100"
+                >
+                  <HStack justify="space-between" mb={4}>
+                    <Text fontSize="lg" fontWeight="800" color="gray.800">
+                      ≠ÉÙ™ œ¨+¸œ∫œ¡+Ë+‰ œ∫+‰+Â+È+‰ Job Details
                     </Text>
-                    {q.driver.companyName && (
-                      <Text fontSize="xs" color="gray.500">
-                        {q.driver.companyName}
-                      </Text>
-                    )}
-                  </Box>
-                </HStack>
-                <Text fontSize="xl" fontWeight="800" color="#1D4ED8">
-                  {formatGBP(q.price)}
-                </Text>
-              </HStack>
+                    <Button
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => setShowDetails(!showDetails)}
+                    >
+                      {showDetails ? "œ—œ´+¸œ∫œÌ Hide" : "œ¶œ¶œ¬ Show"}
+                    </Button>
+                  </HStack>
 
-              {/* Driver details */}
-              <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.500">
-                {q.driver.vanSize && (
-                  <Badge colorPalette="gray" px={2} py={0.5} borderRadius="md">
-                    {q.driver.vanSize}
-                  </Badge>
-                )}
-                <Text>‚≠ê {q.driver.rating.toFixed(1)}</Text>
-                <Text>{q.driver.totalJobs} jobs</Text>
-                {q.driver.verified && (
-                  <Badge colorPalette="green" px={2} py={0.5} borderRadius="md">
-                    ‚úì Verified
-                  </Badge>
-                )}
-                {q.estimatedDuration && (
-                  <Text>‚è± {q.estimatedDuration}</Text>
-                )}
-              </HStack>
+                  {showDetails && (
+                    <VStack gap={3} align="stretch" fontSize="sm">
+                      <Box>
+                        <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
+                          +‡+Â FROM
+                        </Text>
+                        <Text color="gray.800">{job.pickupAddress}</Text>
+                        {job.pickupFloor !== null && (
+                          <Text fontSize="xs" color="gray.500">
+                            œ∫+‰œ¿œ∫œø+È {job.pickupFloor} ‘«Û {job.pickupHasLift ? "‘£Ù +‡œ¡œ¶œª Lift" : "‘‹· œøœª+Í+Â +‡œ¡œ¶œª No Lift"}
+                          </Text>
+                        )}
+                      </Box>
 
-              {q.message && (
-                <Text fontSize="sm" color="gray.600" bg="gray.50" p={3} borderRadius="md">
-                  &ldquo;{q.message}&rdquo;
-                </Text>
+                      <Box>
+                        <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
+                          œ—+‰+Î TO
+                        </Text>
+                        <Text color="gray.800">{job.deliveryAddress}</Text>
+                        {job.deliveryFloor !== null && (
+                          <Text fontSize="xs" color="gray.500">
+                            œ∫+‰œ¿œ∫œø+È {job.deliveryFloor} ‘«Û {job.deliveryHasLift ? "‘£Ù +‡œ¡œ¶œª Lift" : "‘‹· œøœª+Í+Â +‡œ¡œ¶œª No Lift"}
+                          </Text>
+                        )}
+                      </Box>
+
+                      <Flex gap={3} flexWrap="wrap" fontSize="xs">
+                        <Badge colorPalette="blue" px={2} py={1}>
+                          ≠ÉÙ‡ {new Date(job.moveDate).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </Badge>
+                        {job.distanceMiles && (
+                          <Badge colorPalette="gray" px={2} py={1}>
+                            ≠ÉÙ≈ {job.distanceMiles} mi
+                          </Badge>
+                        )}
+                        {job.needsPacking && (
+                          <Badge colorPalette="orange" px={2} py={1}>
+                            ≠ÉÙ™ +Ëœ°œ¨œ∫œº œ¨œ¶+‰+Ë+¸ Needs Packing
+                          </Badge>
+                        )}
+                      </Flex>
+
+                      {job.estimatedPrice && (
+                        <Box bg="blue.50" p={3} borderRadius="md">
+                          <Text fontSize="xs" color="blue.600" mb={1}>
+                            œ∫+‰œ¶œ¶œ¶ œ∫+‰œ¨+Èœª+Ëœ¶+Ë Estimated Price
+                          </Text>
+                          <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
+                            {formatGBP(job.estimatedPrice)}
+                          </Text>
+                        </Box>
+                      )}
+                    </VStack>
+                  )}
+                </Box>
               )}
 
-              {/* Status / Actions */}
-              {q.status === "accepted" ? (
-                <Badge
-                  colorPalette="green"
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  alignSelf="flex-start"
-                  fontSize="sm"
+              {/* Items Card */}
+              {items.length > 0 && (
+                <Box
+                  bg="white"
+                  borderRadius="xl"
+                  shadow="sm"
+                  p={5}
+                  border="1px solid"
+                  borderColor="gray.100"
                 >
-                  ‚úì Accepted
-                </Badge>
-              ) : q.status === "rejected" ? (
-                <Badge
-                  colorPalette="gray"
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  alignSelf="flex-start"
-                  fontSize="sm"
-                >
-                  Declined
-                </Badge>
-              ) : !hasAcceptedQuote && !q.driver.stripeOnboarded ? (
-                <Text fontSize="xs" color="orange.500" fontWeight="600">
-                  ‚ö† This driver hasn&apos;t completed payment setup yet
-                </Text>
-              ) : !hasAcceptedQuote ? (
-                <Button
-                  size="sm"
-                  bg="#059669"
-                  color="white"
-                  fontWeight="700"
-                  alignSelf="flex-start"
-                  onClick={() => handleAcceptQuote(q.id)}
-                  disabled={accepting !== null}
-                  _hover={{ bg: "#047857" }}
-                >
-                  {accepting === q.id
-                    ? "Accepting..."
-                    : `Accept ‚Äî ${formatGBP(q.price)}`}
-                </Button>
-              ) : null}
+                  <Text fontSize="lg" fontWeight="800" color="gray.800" mb={3}>
+                    ≠ÉÙÔ œ∫+‰œ¶+¸œ¶ Items ({items.reduce((s, i) => s + i.quantity, 0)})
+                  </Text>
+                  
+                  <VStack gap={2} align="stretch" maxH="400px" overflowY="auto">
+                    {items.map((item) => (
+                      <Box
+                        key={item.id}
+                        bg="gray.50"
+                        p={3}
+                        borderRadius="md"
+                        fontSize="sm"
+                      >
+                        <HStack justify="space-between" mb={1}>
+                          <Text fontWeight="700" color="gray.800">
+                            {item.name}
+                          </Text>
+                          <Badge colorPalette="blue" px={2} py={0.5}>
+                            +˘{item.quantity}
+                          </Badge>
+                        </HStack>
+                        {item.category && (
+                          <Text fontSize="xs" color="gray.500">
+                            {item.category}
+                          </Text>
+                        )}
+                        <Flex gap={2} mt={1} flexWrap="wrap" fontSize="xs" color="gray.500">
+                          {item.weightKg && <Text>‘‹˚¥©≈ {item.weightKg}kg</Text>}
+                          {item.volumeM3 && <Text>≠ÉÙ™ {item.volumeM3}m-¶</Text>}
+                          {item.fragile && <Text>‘‹·¥©≈ +Èœ∫œø+‰ +‰+‰+‚œ¶œ¶ Fragile</Text>}
+                          {item.requiresDismantling && <Text>≠Éˆ∫ +Ëœ°œ¨œ∫œº +¸+‚ Dismantling</Text>}
+                        </Flex>
+                        {item.notes && (
+                          <Text fontSize="xs" color="gray.600" mt={2} fontStyle="italic">
+                            {item.notes}
+                          </Text>
+                        )}
+                      </Box>
+                    ))}
+                  </VStack>
+
+                  <Box mt={3} pt={3} borderTop="1px solid" borderColor="gray.200">
+                    <HStack justify="space-between" fontSize="sm">
+                      <Text color="gray.600">œ∫+‰+Íœ¶+Â œ∫+‰+‚+‰+Ë Total Weight:</Text>
+                      <Text fontWeight="700">{totalWeight.toFixed(1)} kg</Text>
+                    </HStack>
+                    <HStack justify="space-between" fontSize="sm">
+                      <Text color="gray.600">œ∫+‰œ°œº+‡ œ∫+‰+‚+‰+Ë Total Volume:</Text>
+                      <Text fontWeight="700">{totalVolume.toFixed(2)} m-¶</Text>
+                    </HStack>
+                  </Box>
+                </Box>
+              )}
             </VStack>
-          </Box>
-        ))}
-      </VStack>
+
+            {/* RIGHT: Quotes List */}
+            <VStack gap={4} align="stretch">
+              {/* Sort Controls */}
+              <Box
+                bg="white"
+                borderRadius="lg"
+                shadow="sm"
+                p={3}
+                border="1px solid"
+                borderColor="gray.100"
+              >
+                <HStack gap={3} flexWrap="wrap">
+                  <Text fontSize="sm" fontWeight="600" color="gray.600">
+                    œ¨œ¶œ¨+Ëœø Sort:
+                  </Text>
+                  <Box>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as SortOption)}
+                      style={{
+                        padding: "8px 32px 8px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid #E2E8F0",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        backgroundColor: "white",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <option value="price-low">œ˙+È+‰ œ¶œ¶œ¶ Price: Low ‘Â∆ High</option>
+                      <option value="price-high">œ˙œ¶+‰+Î œ¶œ¶œ¶ Price: High ‘Â∆ Low</option>
+                      <option value="rating">œ˙œ¶+‰+Î œ¨+È+Ë+Ë+‡ Rating: High ‘Â∆ Low</option>
+                      <option value="recent">œ∫+‰œ˙œ°œªœΩ Most Recent</option>
+                    </select>
+                  </Box>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={fetchQuotes}
+                    ml="auto"
+                  >
+                    ≠Éˆ‰ œ¨œ°œª+ËœΩ Refresh
+                  </Button>
+                </HStack>
+              </Box>
+
+              {/* Quotes Grid */}
+              {quotes.length === 0 && (
+                <Box
+                  bg="white"
+                  borderRadius="xl"
+                  shadow="sm"
+                  p={12}
+                  textAlign="center"
+                  border="2px dashed"
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="3xl" mb={2}>≠ÉÙ°</Text>
+                  <Text fontSize="lg" fontWeight="700" color="gray.600">
+                    +‰œ∫ œ¨+Íœºœª œ¶œ¶+Íœ¬ œøœ¶œª No Quotes Yet
+                  </Text>
+                  <Text fontSize="sm" color="gray.400" mt={2}>
+                    œ∫+‰œ¶œ∫œ™+È+Í+Â +¸+Ë +‡+Âœ¿+Èœ¨+‚ œ¶+Ëœøœªœ˙+Í+Â œøœ—œ¶œ¶œ∫+‰ œ¶œ¶+Íœ¬+Á+‡ +Èœ¶+Ëœøœ∫+Ô
+                  </Text>
+                  <Text fontSize="sm" color="gray.400">
+                    Drivers in your area will start sending quotes shortly
+                  </Text>
+                </Box>
+              )}
+
+              {sortedQuotes.map((q) => (
+                <Box
+                  key={q.id}
+                  bg="white"
+                  borderRadius="xl"
+                  shadow="md"
+                  border="2px solid"
+                  borderColor={
+                    q.status === "accepted"
+                      ? "green.300"
+                      : q.status === "rejected"
+                        ? "gray.200"
+                        : "blue.100"
+                  }
+                  p={{ base: 4, md: 6 }}
+                  opacity={q.status === "rejected" ? 0.5 : 1}
+                  transition="all 0.2s"
+                  _hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+                >
+                  <VStack gap={4} align="stretch">
+                    {/* Driver Header */}
+                    <Flex justify="space-between" align="flex-start" gap={3}>
+                      <HStack gap={3}>
+                        <Flex
+                          w="50px"
+                          h="50px"
+                          borderRadius="full"
+                          bg="gradient-to-r from-blue-400 to-blue-600"
+                          color="white"
+                          align="center"
+                          justify="center"
+                          fontWeight="900"
+                          fontSize="xl"
+                        >
+                          {q.driver.name.charAt(0).toUpperCase()}
+                        </Flex>
+                        <Box>
+                          <HStack gap={2}>
+                            <Text fontWeight="800" fontSize="md" color="gray.800">
+                              {q.driver.name}
+                            </Text>
+                            {q.driver.verified && (
+                              <Badge colorPalette="green" px={2} py={0.5} fontSize="xs">
+                                ‘£Ù +‡+ÍœΩ+È Verified
+                              </Badge>
+                            )}
+                          </HStack>
+                          {q.driver.companyName && (
+                            <Text fontSize="sm" color="gray.500">
+                              {q.driver.companyName}
+                            </Text>
+                          )}
+                          <HStack gap={2} mt={1} fontSize="xs" color="gray.500">
+                            <Text>‘°… {q.driver.rating.toFixed(1)}</Text>
+                            <Text>‘«Û</Text>
+                            <Text>{q.driver.totalJobs} +Íœ©+Ë+¸œÆ jobs</Text>
+                          </HStack>
+                        </Box>
+                      </HStack>
+
+                      <VStack align="flex-end" gap={1}>
+                        <Text fontSize="2xl" fontWeight="900" color="#1D4ED8">
+                          {formatGBP(q.price)}
+                        </Text>
+                        {job?.estimatedPrice && (
+                          <Text fontSize="xs" color={
+                            q.price < job.estimatedPrice ? "green.600" : "orange.600"
+                          }>
+                            {q.price < job.estimatedPrice 
+                              ? `œ˙+È+‰ œø+« ${formatGBP(job.estimatedPrice - q.price)}`
+                              : `œ˙œ¶+‰+Î œø+« ${formatGBP(q.price - job.estimatedPrice)}`}
+                          </Text>
+                        )}
+                      </VStack>
+                    </Flex>
+
+                    {/* Driver Details */}
+                    <Flex gap={2} flexWrap="wrap" fontSize="xs">
+                      {q.driver.vanSize && (
+                        <Badge colorPalette="gray" px={2} py={1}>
+                          ≠É‹… {q.driver.vanSize}
+                        </Badge>
+                      )}
+                      {q.estimatedDuration && (
+                        <Badge colorPalette="blue" px={2} py={1}>
+                          ‘≈¶ {q.estimatedDuration}
+                        </Badge>
+                      )}
+                      {q.driver.email && (
+                        <Badge colorPalette="gray" px={2} py={1}>
+                          ‘£Î¥©≈ {q.driver.email}
+                        </Badge>
+                      )}
+                      {q.driver.phone && (
+                        <Badge colorPalette="gray" px={2} py={1}>
+                          ≠ÉÙ◊ {q.driver.phone}
+                        </Badge>
+                      )}
+                    </Flex>
+
+                    {/* Driver Message */}
+                    {q.message && (
+                      <Box bg="blue.50" p={3} borderRadius="md">
+                        <Text fontSize="sm" color="gray.700">
+                          ≠É∆º &ldquo;{q.message}&rdquo;
+                        </Text>
+                      </Box>
+                    )}
+
+                    {/* Actions */}
+                    {q.status === "accepted" ? (
+                      <Badge
+                        colorPalette="green"
+                        px={4}
+                        py={2}
+                        borderRadius="lg"
+                        alignSelf="flex-start"
+                        fontSize="md"
+                        fontWeight="700"
+                      >
+                        ‘£Ù œ¨+‡ œ∫+‰+Èœø+Í+‰ Accepted
+                      </Badge>
+                    ) : q.status === "rejected" ? (
+                      <Badge
+                        colorPalette="gray"
+                        px={4}
+                        py={2}
+                        borderRadius="lg"
+                        alignSelf="flex-start"
+                        fontSize="md"
+                      >
+                        ‘£˘ +‡œ¶+¸+Íœ¬ Rejected
+                      </Badge>
+                    ) : !hasAcceptedQuote && !q.driver.stripeOnboarded ? (
+                      <Text fontSize="sm" color="orange.600" fontWeight="600">
+                        ‘‹· +Áœ¶œ∫ œ∫+‰œ¶œ∫œ™+È +‰+‡ +Ë+‚+‡+‰ œ—œ¶œªœ∫œª œ∫+‰œª+¸œ¶ œøœ¶œª
+                        <br />
+                        This driver hasn&apos;t completed payment setup yet
+                      </Text>
+                    ) : !hasAcceptedQuote ? (
+                      <Button
+                        size="lg"
+                        bg="#059669"
+                        color="white"
+                        fontWeight="700"
+                        onClick={() => handleAcceptQuote(q.id)}
+                        disabled={accepting !== null}
+                        _hover={{ bg: "#047857" }}
+                        _disabled={{ opacity: 0.6 }}
+                      >
+                        {accepting === q.id
+                          ? "œºœ∫œ¶+Ë œ∫+‰+Èœø+Í+‰... Accepting..."
+                          : `‘£Ù +Èœø+Í+‰ Accept ‘«ˆ ${formatGBP(q.price)}`}
+                      </Button>
+                    ) : null}
+
+                    <Text fontSize="xs" color="gray.400" textAlign="right">
+                      œ¨+‡ œ∫+‰œ—œ¶œ¶œ∫+‰ Submitted: {new Date(q.createdAt).toLocaleString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </VStack>
+                </Box>
+              ))}
+            </VStack>
+          </Grid>
+        </VStack>
+      </Box>
     </Box>
   );
 }
