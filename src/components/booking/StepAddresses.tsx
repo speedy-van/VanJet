@@ -233,7 +233,9 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
         });
 
         if (!res.ok) {
-          throw new Error("Failed to create draft job");
+          const errorData = await res.json();
+          console.error("Draft job API error:", errorData);
+          throw new Error(errorData.error || "Failed to create draft job");
         }
 
         const data = await res.json();

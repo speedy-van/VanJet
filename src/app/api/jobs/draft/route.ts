@@ -57,10 +57,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Geocode addresses
-    const [pickup, delivery] = await Promise.all([
-      geocodeAddress(body.pickupAddress),
-      geocodeAddress(body.deliveryAddress),
-    ]);
+    let pickup, delivery;
+    try {
+      [pickup, delivery] = await Promise.all([
+        geocodeAddress(body.pickupAddress),
+        geocodeAddress(body.deliveryAddress),
+      ]);
+    } catch (geoErr) {
+      console.error("[VanJet] Geocoding error:", geoErr);
+      return NextResponse.json(
+        { error: `Address geocoding failed: ${geoErr instanceof Error ? geoErr.message : "Unknown error"}` },
+        { status: 400 }
+      );
+    }
 
     // Generate unique reference number with retry logic
     const MAX_RETRIES = 20;
@@ -91,6 +100,7 @@ export async function POST(req: NextRequest) {
         newJob = job;
         break;
       } catch (err) {
+        console.error(`[VanJet] DB insert attempt ${attempt + 1}:`, err);
         if (err instanceof Error && err.message.includes("unique")) {
           if (attempt === MAX_RETRIES - 1) {
             throw new Error(
