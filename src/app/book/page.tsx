@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { BookingWizard } from "@/components/booking/BookingWizard";
 import { Navbar } from "@/components/Navbar";
 
@@ -11,7 +12,9 @@ export default function BookPage() {
   return (
     <div>
       <Navbar />
-      <BookingWizard />
+      <Suspense fallback={<div style={{ minHeight: "100vh", background: "#F9FAFB" }} />}>
+        <BookingWizard />
+      </Suspense>
     </div>
   );
 }

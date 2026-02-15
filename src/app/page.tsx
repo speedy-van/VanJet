@@ -87,6 +87,13 @@ export default function HomePage() {
   const rating = useCountUp(48, 1500); // 4.8 * 10
   const drivers = useCountUp(94, 1500);
 
+  // Hero address inputs state
+  const [heroPickup, setHeroPickup] = useState("");
+  const [heroDelivery, setHeroDelivery] = useState("");
+
+  // Build quote URL with addresses as query params
+  const quoteUrl = `/book${heroPickup || heroDelivery ? `?pickup=${encodeURIComponent(heroPickup)}&delivery=${encodeURIComponent(heroDelivery)}` : ""}`;
+
   return (
     <Box pb={{ base: "80px", lg: "0" }}>
       <Navbar />
@@ -180,6 +187,8 @@ export default function HomePage() {
                     >
                       <Input
                         placeholder="Pickup postcode or address"
+                        value={heroPickup}
+                        onChange={(e) => setHeroPickup(e.target.value)}
                         size="lg"
                         bg="rgba(255, 255, 255, 0.95)"
                         color="#0F172A"
@@ -191,6 +200,8 @@ export default function HomePage() {
                       />
                       <Input
                         placeholder="Delivery postcode or address"
+                        value={heroDelivery}
+                        onChange={(e) => setHeroDelivery(e.target.value)}
                         size="lg"
                         bg="rgba(255, 255, 255, 0.95)"
                         color="#0F172A"
@@ -202,7 +213,7 @@ export default function HomePage() {
                       />
                     </Stack>
                     <HStack gap={3} w="100%">
-                      <Link href="/book" style={{ flex: 1 }}>
+                      <Link href={quoteUrl} style={{ flex: 1 }}>
                         <SpringHover>
                           <Button
                             w="100%"

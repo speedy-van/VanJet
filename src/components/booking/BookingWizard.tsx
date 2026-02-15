@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, Fragment } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
   Box,
@@ -19,12 +20,16 @@ import { StepReview } from "./StepReview";
 import { StepSuccess } from "./StepSuccess";
 
 export function BookingWizard() {
+  const searchParams = useSearchParams();
+  const initialPickup = searchParams.get("pickup") || "";
+  const initialDelivery = searchParams.get("delivery") || "";
+
   const [step, setStep] = useState(0);
   const form = useForm<BookingFormData>({
     mode: "onTouched",
     defaultValues: {
       pickup: {
-        address: "",
+        address: initialPickup,
         lat: 0,
         lng: 0,
         floor: 0,
@@ -35,7 +40,7 @@ export function BookingWizard() {
         precision: "unknown" as const,
       },
       dropoff: {
-        address: "",
+        address: initialDelivery,
         lat: 0,
         lng: 0,
         floor: 0,
