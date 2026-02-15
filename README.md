@@ -20,7 +20,7 @@ VanJet is a full-stack marketplace connecting customers who need removal service
 
 - **7-Step Booking Wizard** — addresses (Mapbox autocomplete), date/time, items picker (666 real items with images), review, payment, confirmation
 - **Hybrid Pricing Engine** — deterministic rules-based calculation + optional Grok AI price validation
-- **Stripe Connect** — customer payments, 15% platform fee, driver payouts
+- **Stripe Connect** — customer payments, zero platform fees (drivers keep 100%), direct payouts
 - **Admin Dashboard** — manage jobs, bookings, quotes, drivers, users; edit/cancel/reprice bookings with full audit trail
 - **40 SEO Landing Pages** — programmatic `/[service]/[city]` pages with JSON-LD structured data
 - **Blog** — 4 SEO-optimised articles with rich content

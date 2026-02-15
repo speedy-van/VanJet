@@ -12,7 +12,6 @@ import {
   EXTRA_SERVICES,
   DEMAND_MULTIPLIERS,
   VAT_RATE,
-  PLATFORM_FEE_RATE,
   JOB_TYPE_LABELS,
 } from "./rates";
 import { formatMiles } from "@/lib/utils/distance";
@@ -296,8 +295,8 @@ export function calculatePrice(
   const vatAmount = enableVat ? subtotal * VAT_RATE : 0;
   const totalPrice = subtotal + vatAmount;
 
-  // Platform fee (hidden, taken from driver)
-  const platformFee = subtotal * PLATFORM_FEE_RATE;
+  // Platform fee: 0 in zero commission mode (drivers keep 100%)
+  const platformFee = 0;
 
   // Price range (±15%, rounded to nearest £5)
   const priceMin = roundTo5(totalPrice * 0.85);

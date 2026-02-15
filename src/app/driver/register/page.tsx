@@ -395,7 +395,7 @@ export default function DriverRegisterPage() {
             </Text>
             <VStack gap={3} alignItems="stretch">
               {[
-                { icon: "💷", text: "Competitive earnings — keep 85% of every job" },
+                { icon: "💷", text: "Keep 100% of every job — zero platform fees" },
                 { icon: "📱", text: "Get job alerts in your coverage area" },
                 { icon: "🔒", text: "Secure payments via Stripe" },
                 { icon: "⭐", text: "Build your reputation with customer reviews" },

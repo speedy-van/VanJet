@@ -190,8 +190,13 @@ function QuotePaymentForm({
 
         if (markRes.ok) {
           const data = await markRes.json();
-          setTrackingToken(data.trackingToken ?? "");
+          const token = data.trackingToken ?? "";
+          setTrackingToken(token);
           setSuccess(true);
+          // Auto-redirect to tracking page after successful payment
+          if (token) {
+            window.location.href = `/track/${token}`;
+          }
         } else {
           setError("Payment succeeded but booking confirmation failed. Contact support.");
         }

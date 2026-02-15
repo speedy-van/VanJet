@@ -11,10 +11,12 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
+import { ZERO_COMMISSION_MODE } from "@/lib/env";
+
 /**
- * Platform fee percentage applied on every booking payment.
+ * Platform fee percentage. Returns 0 when ZERO_COMMISSION_MODE is enabled.
  */
-export const PLATFORM_FEE_PERCENT = 15;
+export const PLATFORM_FEE_PERCENT = ZERO_COMMISSION_MODE ? 0 : 15;
 
 /**
  * Create a Stripe Connect Express account for a new driver.
@@ -72,10 +74,13 @@ export async function createPaymentIntent({
   };
 
   if (driverStripeAccountId) {
-    const feeAmount = Math.round(
-      amountPence * (PLATFORM_FEE_PERCENT / 100)
-    );
-    params.application_fee_amount = feeAmount;
+    // Zero commission mode: no application_fee_amount, driver gets 100%
+    if (!ZERO_COMMISSION_MODE && PLATFORM_FEE_PERCENT > 0) {
+      const feeAmount = Math.round(
+        amountPence * (PLATFORM_FEE_PERCENT / 100)
+      );
+      params.application_fee_amount = feeAmount;
+    }
     params.transfer_data = { destination: driverStripeAccountId };
   }
 

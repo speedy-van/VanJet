@@ -100,9 +100,6 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
               <Box as="th" textAlign="right" px={4} py={3} fontWeight="600" color="gray.600">
                 Final Price
               </Box>
-              <Box as="th" textAlign="right" px={4} py={3} fontWeight="600" color="gray.600">
-                Platform Fee (15%)
-              </Box>
               <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">
                 Payment
               </Box>
@@ -119,14 +116,13 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
           <Box as="tbody">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
+                <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
                   No bookings found.
                 </td>
               </tr>
             ) : (
               rows.map((b) => {
                 const price = Number(b.finalPrice);
-                const fee = price * 0.15;
                 return (
                   <Box
                     as="tr"
@@ -151,9 +147,6 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                     </Box>
                     <Box as="td" px={4} py={3} textAlign="right" fontWeight="500">
                       £{price.toFixed(2)}
-                    </Box>
-                    <Box as="td" px={4} py={3} textAlign="right" color="green.600" fontWeight="500">
-                      £{fee.toFixed(2)}
                     </Box>
                     <Box as="td" px={4} py={3}>
                       <PaymentBadge status={b.paymentStatus} />

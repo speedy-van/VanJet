@@ -17,12 +17,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.baseUrl),
   title: {
-    default: "VanJet UK — Instant Removal Quotes | Man & Van | House Removals",
+    default: "Free UK Moving Marketplace – Pay Drivers Directly | VanJet",
     template: "%s | VanJet UK",
   },
   description:
-    "Get instant quotes from verified drivers and removal companies across the UK. House moves, office relocations, furniture delivery, man and van — all in one place.",
+    "Get instant moving quotes from verified UK drivers. No platform fees. No hidden charges. You pay only the driver price.",
   keywords: [
+    "free moving marketplace",
+    "no platform fees",
     "man and van",
     "house removals",
     "removal company UK",
@@ -33,6 +35,7 @@ export const metadata: Metadata = {
     "van hire with driver",
     "instant removal quotes",
     "cheap removals UK",
+    "zero commission",
     "VanJet",
   ],
   applicationName: SITE.name,
@@ -48,9 +51,9 @@ export const metadata: Metadata = {
     locale: SITE.locale,
     url: SITE.baseUrl,
     siteName: SITE.name,
-    title: "VanJet UK — Instant Removal Quotes",
+    title: "Free UK Moving Marketplace – No Platform Fees",
     description:
-      "Compare prices from verified UK removal drivers. Book online in minutes.",
+      "Get instant quotes from verified UK drivers. No fees. Pay drivers directly.",
     images: [
       {
         url: "/og-image.jpg",
@@ -63,9 +66,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: SITE.twitter,
-    title: "VanJet UK — Instant Removal Quotes",
+    title: "Free UK Moving Marketplace – No Platform Fees",
     description:
-      "Compare prices from verified UK removal drivers. Book online in minutes.",
+      "Get instant quotes from verified UK drivers. No fees. Pay drivers directly.",
     images: ["/og-image.jpg"],
   },
   icons: {

@@ -45,3 +45,10 @@ export const publicEnv = {
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "",
   APP_URL: process.env.NEXT_PUBLIC_URL ?? "http://localhost:3000",
 } as const;
+
+/**
+ * Zero Commission Mode: When true, platform takes 0% fee.
+ * Customer pays Y (driver quote), driver receives Y.
+ */
+export const ZERO_COMMISSION_MODE =
+  process.env.ZERO_COMMISSION_MODE === "true";

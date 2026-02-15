@@ -228,9 +228,9 @@ export function BookingManagement({
             </Text>
           </Flex>
           <Flex justify="space-between" py={1.5} borderBottomWidth="1px" borderColor="gray.50">
-            <Text fontSize="sm" color="gray.500">Platform Fee (15%)</Text>
+            <Text fontSize="sm" color="gray.500">Platform Fee</Text>
             <Text fontSize="sm" fontWeight="500" color="green.600">
-              £{(Number(booking.finalPrice) * 0.15).toFixed(2)}
+              £0.00 (Zero Commission)
             </Text>
           </Flex>
           <Flex justify="space-between" py={1.5} borderBottomWidth="1px" borderColor="gray.50">
