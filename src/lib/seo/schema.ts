@@ -187,3 +187,37 @@ export function generateHowItWorksSchema() {
     ],
   };
 }
+
+/**
+ * Generate Offer schema for quote/payment pages.
+ * Shows the driver's quoted price with zero platform fees.
+ */
+export function generateOfferSchema(opts: {
+  price: number;
+  description?: string;
+  itemOffered?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Offer",
+    price: opts.price.toFixed(2),
+    priceCurrency: "GBP",
+    availability: "https://schema.org/InStock",
+    seller: {
+      "@type": "MovingCompany",
+      name: SITE.name,
+      url: SITE.baseUrl,
+    },
+    description: opts.description ?? "Removal quote — no platform fees, pay driver directly",
+    itemOffered: opts.itemOffered ? {
+      "@type": "Service",
+      name: opts.itemOffered,
+    } : undefined,
+    priceSpecification: {
+      "@type": "PriceSpecification",
+      price: opts.price.toFixed(2),
+      priceCurrency: "GBP",
+      valueAddedTaxIncluded: false,
+    },
+  };
+}

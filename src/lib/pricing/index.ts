@@ -31,7 +31,5 @@ export {
   DEMAND_MULTIPLIERS,
   STANDARD_ITEMS,
   VAT_RATE,
-  PLATFORM_FEE_RATE,
-  getPlatformFeeRate,
 } from "./rates";
 export type { VehicleType } from "./rates";

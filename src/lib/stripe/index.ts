@@ -1,6 +1,6 @@
 // ─── VanJet · Stripe Connect Helpers ──────────────────────────
 import Stripe from "stripe";
-import { serverEnv, publicEnv } from "@/lib/env";
+import { serverEnv, publicEnv, ZERO_COMMISSION_MODE } from "@/lib/env";
 
 let _stripe: Stripe | null = null;
 
@@ -10,13 +10,6 @@ export function getStripe(): Stripe {
   }
   return _stripe;
 }
-
-import { ZERO_COMMISSION_MODE } from "@/lib/env";
-
-/**
- * Platform fee percentage. Returns 0 when ZERO_COMMISSION_MODE is enabled.
- */
-export const PLATFORM_FEE_PERCENT = ZERO_COMMISSION_MODE ? 0 : 15;
 
 /**
  * Create a Stripe Connect Express account for a new driver.
@@ -74,12 +67,10 @@ export async function createPaymentIntent({
   };
 
   if (driverStripeAccountId) {
-    // Zero commission mode: no application_fee_amount, driver gets 100%
-    if (!ZERO_COMMISSION_MODE && PLATFORM_FEE_PERCENT > 0) {
-      const feeAmount = Math.round(
-        amountPence * (PLATFORM_FEE_PERCENT / 100)
-      );
-      params.application_fee_amount = feeAmount;
+    // Zero commission mode: full amount transfers to driver, no application_fee
+    if (!ZERO_COMMISSION_MODE) {
+      // Fallback for non-zero commission mode (not currently active)
+      console.warn("[VanJet] ZERO_COMMISSION_MODE is disabled - this is unexpected in production.");
     }
     params.transfer_data = { destination: driverStripeAccountId };
   }

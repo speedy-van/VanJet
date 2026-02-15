@@ -57,7 +57,6 @@ export interface PricingBreakdown {
   demandMultiplier: number;
   vehicleMultiplier: number;
   subtotal: number;
-  platformFee: number; // hidden from customer
   vatAmount: number;
   totalPrice: number;
   recommendedVehicle: string;
@@ -295,9 +294,6 @@ export function calculatePrice(
   const vatAmount = enableVat ? subtotal * VAT_RATE : 0;
   const totalPrice = subtotal + vatAmount;
 
-  // Platform fee: 0 in zero commission mode (drivers keep 100%)
-  const platformFee = 0;
-
   // Price range (±15%, rounded to nearest £5)
   const priceMin = roundTo5(totalPrice * 0.85);
   const priceMax = roundTo5(totalPrice * 1.15);
@@ -346,7 +342,6 @@ export function calculatePrice(
     demandMultiplier: Math.round(demandMult * 100) / 100,
     vehicleMultiplier: Math.round(vehicleMult * 100) / 100,
     subtotal: round2(subtotal),
-    platformFee: round2(platformFee),
     vatAmount: round2(vatAmount),
     totalPrice: round2(totalPrice),
     recommendedVehicle: VEHICLE_CAPACITY[vehicle].label,

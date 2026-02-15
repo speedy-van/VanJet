@@ -233,15 +233,3 @@ export const STANDARD_ITEMS: Record<
 
 /** VAT rate for UK removals sector. */
 export const VAT_RATE = 0.2;
-
-/**
- * Platform fee rate. Returns 0 when ZERO_COMMISSION_MODE is enabled.
- * @deprecated Use getPlatformFeeRate() for runtime value.
- */
-export const PLATFORM_FEE_RATE = 0;
-
-/** Get current platform fee rate (0 in zero commission mode). */
-export function getPlatformFeeRate(): number {
-  // Zero commission mode: drivers keep 100%
-  return 0;
-}
