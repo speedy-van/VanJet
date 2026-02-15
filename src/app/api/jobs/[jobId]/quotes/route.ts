@@ -110,19 +110,32 @@ export async function GET(
         referenceNumber: job.referenceNumber,
         jobType: job.jobType,
         status: job.status,
+        // Pickup details
         pickupAddress: job.pickupAddress,
-        deliveryAddress: job.deliveryAddress,
-        moveDate: job.moveDate,
-        estimatedPrice: job.estimatedPrice ? Number(job.estimatedPrice) : null,
-        distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
-        description: job.description,
         pickupFloor: job.pickupFloor,
-        deliveryFloor: job.deliveryFloor,
+        pickupFlat: job.pickupFlat,
         pickupHasLift: job.pickupHasLift,
+        pickupNotes: job.pickupNotes,
+        // Delivery details
+        deliveryAddress: job.deliveryAddress,
+        deliveryFloor: job.deliveryFloor,
+        deliveryFlat: job.deliveryFlat,
         deliveryHasLift: job.deliveryHasLift,
+        deliveryNotes: job.deliveryNotes,
+        // Route
+        distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        // Schedule
+        moveDate: job.moveDate,
+        preferredTimeWindow: job.preferredTimeWindow,
+        flexibleDates: job.flexibleDates,
+        // Details
+        estimatedPrice: job.estimatedPrice ? Number(job.estimatedPrice) : null,
+        description: job.description,
         needsPacking: job.needsPacking,
+        // Contact
         contactName: job.contactName,
         contactPhone: job.contactPhone,
+        // Timestamps
         createdAt: job.createdAt,
         updatedAt: job.updatedAt,
       },

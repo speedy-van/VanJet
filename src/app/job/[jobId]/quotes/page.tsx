@@ -59,19 +59,32 @@ interface JobSummary {
   referenceNumber: string;
   jobType: string;
   status: string;
+  // Pickup details
   pickupAddress: string;
-  deliveryAddress: string;
-  moveDate: string;
-  estimatedPrice: number | null;
-  distanceMiles: number | null;
-  description: string | null;
   pickupFloor: number | null;
-  deliveryFloor: number | null;
+  pickupFlat: string | null;
   pickupHasLift: boolean | null;
+  pickupNotes: string | null;
+  // Delivery details
+  deliveryAddress: string;
+  deliveryFloor: number | null;
+  deliveryFlat: string | null;
   deliveryHasLift: boolean | null;
+  deliveryNotes: string | null;
+  // Route
+  distanceMiles: number | null;
+  // Schedule
+  moveDate: string;
+  preferredTimeWindow: string | null;
+  flexibleDates: boolean | null;
+  // Details
+  estimatedPrice: number | null;
+  description: string | null;
   needsPacking: boolean;
+  // Contact
   contactName: string | null;
   contactPhone: string | null;
+  // Timestamps
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -427,51 +440,116 @@ export default function JobQuotesPage({
                   </HStack>
 
                   {showDetails && (
-                    <VStack gap={3} align="stretch" fontSize="sm">
-                      <Box>
-                        <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
-                          FROM
+                    <VStack gap={4} align="stretch" fontSize="sm">
+                      {/* Pickup Details */}
+                      <Box bg="green.50" p={3} borderRadius="md">
+                        <Text fontWeight="700" color="green.600" fontSize="xs" mb={1.5}>
+                          PICKUP
                         </Text>
-                        <Text color="gray.800">{job.pickupAddress}</Text>
-                        {job.pickupFloor !== null && (
-                          <Text fontSize="xs" color="gray.500">
-                            Floor {job.pickupFloor} • {job.pickupHasLift ? "Lift Available" : "No Lift"}
+                        <Text color="gray.800" mb={1}>{job.pickupAddress}</Text>
+                        <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
+                          <Text>
+                            Floor: {job.pickupFloor === 0 || job.pickupFloor === null ? "Ground" : job.pickupFloor}
+                          </Text>
+                          {job.pickupFlat && <Text>Unit: {job.pickupFlat}</Text>}
+                          <Text>Lift: {job.pickupHasLift ? "Yes" : "No"}</Text>
+                        </HStack>
+                        {job.pickupNotes && (
+                          <Text fontSize="xs" color="gray.500" mt={1.5} fontStyle="italic">
+                            📝 {job.pickupNotes}
                           </Text>
                         )}
                       </Box>
 
-                      <Box>
-                        <Text fontWeight="600" color="gray.500" fontSize="xs" mb={1}>
-                          TO
+                      {/* Delivery Details */}
+                      <Box bg="red.50" p={3} borderRadius="md">
+                        <Text fontWeight="700" color="red.600" fontSize="xs" mb={1.5}>
+                          DROP-OFF
                         </Text>
-                        <Text color="gray.800">{job.deliveryAddress}</Text>
-                        {job.deliveryFloor !== null && (
-                          <Text fontSize="xs" color="gray.500">
-                            Floor {job.deliveryFloor} • {job.deliveryHasLift ? "Lift Available" : "No Lift"}
+                        <Text color="gray.800" mb={1}>{job.deliveryAddress}</Text>
+                        <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
+                          <Text>
+                            Floor: {job.deliveryFloor === 0 || job.deliveryFloor === null ? "Ground" : job.deliveryFloor}
+                          </Text>
+                          {job.deliveryFlat && <Text>Unit: {job.deliveryFlat}</Text>}
+                          <Text>Lift: {job.deliveryHasLift ? "Yes" : "No"}</Text>
+                        </HStack>
+                        {job.deliveryNotes && (
+                          <Text fontSize="xs" color="gray.500" mt={1.5} fontStyle="italic">
+                            📝 {job.deliveryNotes}
                           </Text>
                         )}
                       </Box>
 
-                      <Flex gap={3} flexWrap="wrap" fontSize="xs">
-                        <Badge colorPalette="blue" px={2} py={1}>
-                          {new Date(job.moveDate).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </Badge>
-                        {job.distanceMiles && (
-                          <Badge colorPalette="gray" px={2} py={1}>
-                            {job.distanceMiles} mi
+                      {/* Schedule */}
+                      <Box>
+                        <Text fontWeight="600" color="gray.500" fontSize="xs" mb={2}>
+                          SCHEDULE
+                        </Text>
+                        <Flex gap={2} flexWrap="wrap" fontSize="xs">
+                          <Badge colorPalette="blue" px={2} py={1}>
+                            📅 {new Date(job.moveDate).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
                           </Badge>
-                        )}
-                        {job.needsPacking && (
-                          <Badge colorPalette="orange" px={2} py={1}>
-                            Needs Packing
-                          </Badge>
-                        )}
-                      </Flex>
+                          {job.preferredTimeWindow && (
+                            <Badge colorPalette="blue" px={2} py={1}>
+                              🕐{" "}
+                              {job.preferredTimeWindow === "morning"
+                                ? "Morning (7am–12pm)"
+                                : job.preferredTimeWindow === "afternoon"
+                                  ? "Afternoon (12pm–5pm)"
+                                  : job.preferredTimeWindow === "evening"
+                                    ? "Evening (5pm–8pm)"
+                                    : job.preferredTimeWindow}
+                            </Badge>
+                          )}
+                          {job.flexibleDates && (
+                            <Badge colorPalette="purple" px={2} py={1}>
+                              Flexible (±2 days)
+                            </Badge>
+                          )}
+                          {job.distanceMiles && (
+                            <Badge colorPalette="gray" px={2} py={1}>
+                              📏 {job.distanceMiles} mi
+                            </Badge>
+                          )}
+                          {job.needsPacking && (
+                            <Badge colorPalette="orange" px={2} py={1}>
+                              Needs Packing
+                            </Badge>
+                          )}
+                        </Flex>
+                      </Box>
 
+                      {/* Special Instructions */}
+                      {job.description && (
+                        <Box bg="yellow.50" p={3} borderRadius="md">
+                          <Text fontWeight="600" color="yellow.700" fontSize="xs" mb={1}>
+                            Special Instructions
+                          </Text>
+                          <Text fontSize="sm" color="gray.700">
+                            {job.description}
+                          </Text>
+                        </Box>
+                      )}
+
+                      {/* Contact Details */}
+                      {(job.contactName || job.contactPhone) && (
+                        <Box bg="gray.50" p={3} borderRadius="md">
+                          <Text fontWeight="600" color="gray.600" fontSize="xs" mb={1}>
+                            Contact
+                          </Text>
+                          <HStack gap={4} fontSize="sm" color="gray.700" flexWrap="wrap">
+                            {job.contactName && <Text>👤 {job.contactName}</Text>}
+                            {job.contactPhone && <Text>📞 {job.contactPhone}</Text>}
+                          </HStack>
+                        </Box>
+                      )}
+
+                      {/* Estimated Price */}
                       {job.estimatedPrice && (
                         <Box bg="blue.50" p={3} borderRadius="md">
                           <HStack justify="space-between" mb={1}>

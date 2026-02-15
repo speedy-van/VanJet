@@ -17,15 +17,32 @@ interface AvailableJob {
   id: string;
   jobType: string;
   status: string;
+  // Pickup details
   pickupAddress: string;
+  pickupFloor: number | null;
+  pickupFlat: string | null;
+  pickupHasLift: boolean | null;
+  pickupNotes: string | null;
+  // Delivery details
   deliveryAddress: string;
+  deliveryFloor: number | null;
+  deliveryFlat: string | null;
+  deliveryHasLift: boolean | null;
+  deliveryNotes: string | null;
+  // Route
   distanceMiles: number | null;
+  // Schedule
   moveDate: string;
+  preferredTimeWindow: string | null;
+  flexibleDates: boolean | null;
+  // Details
   estimatedPrice: number | null;
   description: string | null;
-  pickupFloor: number | null;
-  deliveryFloor: number | null;
   needsPacking: boolean | null;
+  // Contact
+  contactName: string | null;
+  contactPhone: string | null;
+  // Computed
   itemCount: number;
   distanceFromDriver: number | null;
   alreadyQuoted: boolean;
@@ -215,6 +232,17 @@ export default function DriverJobsPage() {
                       Packing needed
                     </Badge>
                   )}
+                  {job.flexibleDates && (
+                    <Badge
+                      colorPalette="purple"
+                      px={2}
+                      py={0.5}
+                      borderRadius="md"
+                      fontSize="xs"
+                    >
+                      Flexible (±2 days)
+                    </Badge>
+                  )}
                 </HStack>
                 {job.estimatedPrice && (
                   <Text fontSize="lg" fontWeight="800" color="#1D4ED8">
@@ -223,27 +251,51 @@ export default function DriverJobsPage() {
                 )}
               </HStack>
 
-              {/* Addresses */}
-              <Box>
-                <HStack gap={2} mb={1}>
-                  <Text fontSize="xs" color="green.500" fontWeight="700">
-                    FROM
+              {/* Pickup Details */}
+              <Box bg="green.50" p={3} borderRadius="md">
+                <Text fontSize="xs" fontWeight="700" color="green.600" mb={1.5}>
+                  PICKUP
+                </Text>
+                <Text fontSize="sm" color="gray.800" mb={1}>
+                  {job.pickupAddress}
+                </Text>
+                <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
+                  <Text>
+                    Floor: {job.pickupFloor === 0 || job.pickupFloor === null ? "Ground" : job.pickupFloor}
                   </Text>
-                  <Text fontSize="sm" color="gray.700" lineClamp={1}>
-                    {job.pickupAddress}
-                  </Text>
+                  {job.pickupFlat && <Text>Unit: {job.pickupFlat}</Text>}
+                  <Text>Lift: {job.pickupHasLift ? "Yes" : "No"}</Text>
                 </HStack>
-                <HStack gap={2}>
-                  <Text fontSize="xs" color="red.500" fontWeight="700">
-                    TO
+                {job.pickupNotes && (
+                  <Text fontSize="xs" color="gray.500" mt={1.5} fontStyle="italic">
+                    📝 {job.pickupNotes}
                   </Text>
-                  <Text fontSize="sm" color="gray.700" lineClamp={1}>
-                    {job.deliveryAddress}
-                  </Text>
-                </HStack>
+                )}
               </Box>
 
-              {/* Details */}
+              {/* Delivery Details */}
+              <Box bg="red.50" p={3} borderRadius="md">
+                <Text fontSize="xs" fontWeight="700" color="red.600" mb={1.5}>
+                  DROP-OFF
+                </Text>
+                <Text fontSize="sm" color="gray.800" mb={1}>
+                  {job.deliveryAddress}
+                </Text>
+                <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
+                  <Text>
+                    Floor: {job.deliveryFloor === 0 || job.deliveryFloor === null ? "Ground" : job.deliveryFloor}
+                  </Text>
+                  {job.deliveryFlat && <Text>Unit: {job.deliveryFlat}</Text>}
+                  <Text>Lift: {job.deliveryHasLift ? "Yes" : "No"}</Text>
+                </HStack>
+                {job.deliveryNotes && (
+                  <Text fontSize="xs" color="gray.500" mt={1.5} fontStyle="italic">
+                    📝 {job.deliveryNotes}
+                  </Text>
+                )}
+              </Box>
+
+              {/* Schedule Details */}
               <HStack gap={4} fontSize="xs" color="gray.500" flexWrap="wrap">
                 <Text>
                   📅{" "}
@@ -253,17 +305,45 @@ export default function DriverJobsPage() {
                     year: "numeric",
                   })}
                 </Text>
+                {job.preferredTimeWindow && (
+                  <Text>
+                    🕐{" "}
+                    {job.preferredTimeWindow === "morning"
+                      ? "Morning (7am–12pm)"
+                      : job.preferredTimeWindow === "afternoon"
+                        ? "Afternoon (12pm–5pm)"
+                        : job.preferredTimeWindow === "evening"
+                          ? "Evening (5pm–8pm)"
+                          : job.preferredTimeWindow}
+                  </Text>
+                )}
                 {job.distanceMiles && <Text>📏 {job.distanceMiles} mi</Text>}
                 <Text>📦 {job.itemCount} item{job.itemCount !== 1 ? "s" : ""}</Text>
-                {job.pickupFloor != null && job.pickupFloor > 0 && (
-                  <Text>🏢 Floor {job.pickupFloor}</Text>
-                )}
               </HStack>
 
+              {/* Special Instructions */}
               {job.description && (
-                <Text fontSize="sm" color="gray.500" lineClamp={2}>
-                  {job.description}
-                </Text>
+                <Box bg="yellow.50" p={2.5} borderRadius="md">
+                  <Text fontSize="xs" fontWeight="600" color="yellow.700" mb={1}>
+                    Special Instructions
+                  </Text>
+                  <Text fontSize="sm" color="gray.700">
+                    {job.description}
+                  </Text>
+                </Box>
+              )}
+
+              {/* Contact Details */}
+              {(job.contactName || job.contactPhone) && (
+                <Box bg="gray.50" p={2.5} borderRadius="md">
+                  <Text fontSize="xs" fontWeight="600" color="gray.600" mb={1}>
+                    Contact
+                  </Text>
+                  <HStack gap={4} fontSize="sm" color="gray.700" flexWrap="wrap">
+                    {job.contactName && <Text>👤 {job.contactName}</Text>}
+                    {job.contactPhone && <Text>📞 {job.contactPhone}</Text>}
+                  </HStack>
+                </Box>
               )}
 
               {/* Action */}

@@ -108,15 +108,32 @@ export async function GET(req: NextRequest) {
         id: job.id,
         jobType: job.jobType,
         status: job.status,
+        // Pickup details
         pickupAddress: job.pickupAddress,
+        pickupFloor: job.pickupFloor,
+        pickupFlat: job.pickupFlat,
+        pickupHasLift: job.pickupHasLift,
+        pickupNotes: job.pickupNotes,
+        // Delivery details
         deliveryAddress: job.deliveryAddress,
+        deliveryFloor: job.deliveryFloor,
+        deliveryFlat: job.deliveryFlat,
+        deliveryHasLift: job.deliveryHasLift,
+        deliveryNotes: job.deliveryNotes,
+        // Route
         distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        // Schedule
         moveDate: job.moveDate,
+        preferredTimeWindow: job.preferredTimeWindow,
+        flexibleDates: job.flexibleDates,
+        // Details
         estimatedPrice: job.estimatedPrice ? Number(job.estimatedPrice) : null,
         description: job.description,
-        pickupFloor: job.pickupFloor,
-        deliveryFloor: job.deliveryFloor,
         needsPacking: job.needsPacking,
+        // Contact
+        contactName: job.contactName,
+        contactPhone: job.contactPhone,
+        // Computed
         itemCount: itemCountMap.get(job.id) ?? 0,
         distanceFromDriver,
         alreadyQuoted: quotedJobIds.has(job.id),
