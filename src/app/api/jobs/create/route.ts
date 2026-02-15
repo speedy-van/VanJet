@@ -248,6 +248,7 @@ export async function POST(req: NextRequest) {
             deliveryLat: String(delivery.lat),
             deliveryLng: String(delivery.lng),
             distanceKm: String(directions.distanceMiles), // stored in miles (not km)
+            durationMinutes: directions.durationMinutes,
             moveDate,
             description: body.description ?? null,
             estimatedPrice: String(estimatedPrice),

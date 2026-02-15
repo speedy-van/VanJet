@@ -14,9 +14,53 @@ import {
   Tabs,
   Grid,
   SimpleGrid,
+  IconButton,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/ui/toaster";
 import { formatGBP } from "@/lib/money/format";
 import Link from "next/link";
+
+// ── Copy + Maps helpers ─────────────────────────────────────────
+async function copyToClipboard(text: string, label: string) {
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    toaster.create({
+      title: `${label} copied`,
+      type: "success",
+      duration: 2000,
+    });
+  } catch {
+    toaster.create({
+      title: "Failed to copy",
+      type: "error",
+      duration: 2000,
+    });
+  }
+}
+
+function openInGoogleMaps(address: string) {
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function formatDuration(minutes: number | null): string {
+  if (!minutes) return "";
+  if (minutes < 60) return `${minutes} mins`;
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hrs} hr ${mins} mins` : `${hrs} hr`;
+}
 
 interface JobItem {
   id: string;
@@ -73,6 +117,7 @@ interface JobSummary {
   deliveryNotes: string | null;
   // Route
   distanceMiles: number | null;
+  durationMinutes: number | null;
   // Schedule
   moveDate: string;
   preferredTimeWindow: string | null;
@@ -443,10 +488,30 @@ export default function JobQuotesPage({
                     <VStack gap={4} align="stretch" fontSize="sm">
                       {/* Pickup Details */}
                       <Box bg="green.50" p={3} borderRadius="md">
-                        <Text fontWeight="700" color="green.600" fontSize="xs" mb={1.5}>
-                          PICKUP
-                        </Text>
-                        <Text color="gray.800" mb={1}>{job.pickupAddress}</Text>
+                        <HStack justify="space-between" mb={1.5}>
+                          <Text fontWeight="700" color="green.600" fontSize="xs">
+                            PICKUP
+                          </Text>
+                          <HStack gap={1}>
+                            <IconButton
+                              aria-label="Copy pickup address"
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => copyToClipboard(job.pickupAddress, "Pickup address")}
+                            >
+                              📋
+                            </IconButton>
+                            <IconButton
+                              aria-label="Open pickup in Google Maps"
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => openInGoogleMaps(job.pickupAddress)}
+                            >
+                              🗺️
+                            </IconButton>
+                          </HStack>
+                        </HStack>
+                        <Text color="gray.800" mb={1} wordBreak="break-word">{job.pickupAddress}</Text>
                         <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
                           <Text>
                             Floor: {job.pickupFloor === 0 || job.pickupFloor === null ? "Ground" : job.pickupFloor}
@@ -463,10 +528,30 @@ export default function JobQuotesPage({
 
                       {/* Delivery Details */}
                       <Box bg="red.50" p={3} borderRadius="md">
-                        <Text fontWeight="700" color="red.600" fontSize="xs" mb={1.5}>
-                          DROP-OFF
-                        </Text>
-                        <Text color="gray.800" mb={1}>{job.deliveryAddress}</Text>
+                        <HStack justify="space-between" mb={1.5}>
+                          <Text fontWeight="700" color="red.600" fontSize="xs">
+                            DROP-OFF
+                          </Text>
+                          <HStack gap={1}>
+                            <IconButton
+                              aria-label="Copy drop-off address"
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => copyToClipboard(job.deliveryAddress, "Drop-off address")}
+                            >
+                              📋
+                            </IconButton>
+                            <IconButton
+                              aria-label="Open drop-off in Google Maps"
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => openInGoogleMaps(job.deliveryAddress)}
+                            >
+                              🗺️
+                            </IconButton>
+                          </HStack>
+                        </HStack>
+                        <Text color="gray.800" mb={1} wordBreak="break-word">{job.deliveryAddress}</Text>
                         <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
                           <Text>
                             Floor: {job.deliveryFloor === 0 || job.deliveryFloor === null ? "Ground" : job.deliveryFloor}
@@ -481,12 +566,22 @@ export default function JobQuotesPage({
                         )}
                       </Box>
 
-                      {/* Schedule */}
+                      {/* Route + Schedule */}
                       <Box>
                         <Text fontWeight="600" color="gray.500" fontSize="xs" mb={2}>
-                          SCHEDULE
+                          ROUTE &amp; SCHEDULE
                         </Text>
                         <Flex gap={2} flexWrap="wrap" fontSize="xs">
+                          {job.distanceMiles && (
+                            <Badge colorPalette="gray" px={2} py={1}>
+                              📏 {job.distanceMiles} mi
+                            </Badge>
+                          )}
+                          {job.durationMinutes && (
+                            <Badge colorPalette="gray" px={2} py={1}>
+                              ⏱️ {formatDuration(job.durationMinutes)}
+                            </Badge>
+                          )}
                           <Badge colorPalette="blue" px={2} py={1}>
                             📅 {new Date(job.moveDate).toLocaleDateString("en-GB", {
                               day: "numeric",
@@ -511,11 +606,6 @@ export default function JobQuotesPage({
                               Flexible (±2 days)
                             </Badge>
                           )}
-                          {job.distanceMiles && (
-                            <Badge colorPalette="gray" px={2} py={1}>
-                              📏 {job.distanceMiles} mi
-                            </Badge>
-                          )}
                           {job.needsPacking && (
                             <Badge colorPalette="orange" px={2} py={1}>
                               Needs Packing
@@ -530,7 +620,7 @@ export default function JobQuotesPage({
                           <Text fontWeight="600" color="yellow.700" fontSize="xs" mb={1}>
                             Special Instructions
                           </Text>
-                          <Text fontSize="sm" color="gray.700">
+                          <Text fontSize="sm" color="gray.700" wordBreak="break-word">
                             {job.description}
                           </Text>
                         </Box>

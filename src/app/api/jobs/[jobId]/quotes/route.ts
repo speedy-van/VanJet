@@ -124,6 +124,7 @@ export async function GET(
         deliveryNotes: job.deliveryNotes,
         // Route
         distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        durationMinutes: job.durationMinutes,
         // Schedule
         moveDate: job.moveDate,
         preferredTimeWindow: job.preferredTimeWindow,

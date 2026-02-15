@@ -10,8 +10,53 @@ import {
   Flex,
   Badge,
   Spinner,
+  IconButton,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/ui/toaster";
 import { formatGBP } from "@/lib/money/format";
+
+// ── Copy + Maps helpers ─────────────────────────────────────────
+async function copyToClipboard(text: string, label: string) {
+  try {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    toaster.create({
+      title: `${label} copied`,
+      type: "success",
+      duration: 2000,
+    });
+  } catch {
+    toaster.create({
+      title: "Failed to copy",
+      type: "error",
+      duration: 2000,
+    });
+  }
+}
+
+function openInGoogleMaps(address: string) {
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function formatDuration(minutes: number | null): string {
+  if (!minutes) return "";
+  if (minutes < 60) return `${minutes} mins`;
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins > 0 ? `${hrs} hr ${mins} mins` : `${hrs} hr`;
+}
 
 interface AvailableJob {
   id: string;
@@ -31,6 +76,7 @@ interface AvailableJob {
   deliveryNotes: string | null;
   // Route
   distanceMiles: number | null;
+  durationMinutes: number | null;
   // Schedule
   moveDate: string;
   preferredTimeWindow: string | null;
@@ -253,10 +299,30 @@ export default function DriverJobsPage() {
 
               {/* Pickup Details */}
               <Box bg="green.50" p={3} borderRadius="md">
-                <Text fontSize="xs" fontWeight="700" color="green.600" mb={1.5}>
-                  PICKUP
-                </Text>
-                <Text fontSize="sm" color="gray.800" mb={1}>
+                <HStack justify="space-between" mb={1.5}>
+                  <Text fontSize="xs" fontWeight="700" color="green.600">
+                    PICKUP
+                  </Text>
+                  <HStack gap={1}>
+                    <IconButton
+                      aria-label="Copy pickup address"
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(job.pickupAddress, "Pickup address")}
+                    >
+                      📋
+                    </IconButton>
+                    <IconButton
+                      aria-label="Open pickup in Google Maps"
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => openInGoogleMaps(job.pickupAddress)}
+                    >
+                      🗺️
+                    </IconButton>
+                  </HStack>
+                </HStack>
+                <Text fontSize="sm" color="gray.800" mb={1} wordBreak="break-word">
                   {job.pickupAddress}
                 </Text>
                 <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
@@ -275,10 +341,30 @@ export default function DriverJobsPage() {
 
               {/* Delivery Details */}
               <Box bg="red.50" p={3} borderRadius="md">
-                <Text fontSize="xs" fontWeight="700" color="red.600" mb={1.5}>
-                  DROP-OFF
-                </Text>
-                <Text fontSize="sm" color="gray.800" mb={1}>
+                <HStack justify="space-between" mb={1.5}>
+                  <Text fontSize="xs" fontWeight="700" color="red.600">
+                    DROP-OFF
+                  </Text>
+                  <HStack gap={1}>
+                    <IconButton
+                      aria-label="Copy drop-off address"
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(job.deliveryAddress, "Drop-off address")}
+                    >
+                      📋
+                    </IconButton>
+                    <IconButton
+                      aria-label="Open drop-off in Google Maps"
+                      size="xs"
+                      variant="ghost"
+                      onClick={() => openInGoogleMaps(job.deliveryAddress)}
+                    >
+                      🗺️
+                    </IconButton>
+                  </HStack>
+                </HStack>
+                <Text fontSize="sm" color="gray.800" mb={1} wordBreak="break-word">
                   {job.deliveryAddress}
                 </Text>
                 <HStack gap={3} flexWrap="wrap" fontSize="xs" color="gray.600">
@@ -295,8 +381,10 @@ export default function DriverJobsPage() {
                 )}
               </Box>
 
-              {/* Schedule Details */}
+              {/* Route + Schedule Details */}
               <HStack gap={4} fontSize="xs" color="gray.500" flexWrap="wrap">
+                {job.distanceMiles && <Text>📏 {job.distanceMiles} mi</Text>}
+                {job.durationMinutes && <Text>⏱️ {formatDuration(job.durationMinutes)}</Text>}
                 <Text>
                   📅{" "}
                   {new Date(job.moveDate).toLocaleDateString("en-GB", {
@@ -317,7 +405,6 @@ export default function DriverJobsPage() {
                           : job.preferredTimeWindow}
                   </Text>
                 )}
-                {job.distanceMiles && <Text>📏 {job.distanceMiles} mi</Text>}
                 <Text>📦 {job.itemCount} item{job.itemCount !== 1 ? "s" : ""}</Text>
               </HStack>
 

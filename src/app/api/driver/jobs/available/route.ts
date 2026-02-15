@@ -122,6 +122,7 @@ export async function GET(req: NextRequest) {
         deliveryNotes: job.deliveryNotes,
         // Route
         distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        durationMinutes: job.durationMinutes,
         // Schedule
         moveDate: job.moveDate,
         preferredTimeWindow: job.preferredTimeWindow,
