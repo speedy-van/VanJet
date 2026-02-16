@@ -170,13 +170,13 @@ export default function HomePage() {
                   backdropFilter="blur(16px)"
                   borderRadius="12px"
                   border="1px solid rgba(255, 255, 255, 0.2)"
-                  p={{ base: 5, md: 7 }}
+                  p={{ base: 4, md: 7 }}
                   w="100%"
-                  maxW={{ base: "640px", lg: "100%" }}
+                  maxW={{ base: "100%", sm: "640px", lg: "100%" }}
                   mx={{ base: "auto", lg: 0 }}
                   shadow="0 8px 32px rgba(0,0,0,0.24)"
                 >
-                  <VStack gap={4}>
+                  <VStack gap={{ base: 3, md: 4 }}>
                     <Stack
                       direction={{ base: "column", md: "row" }}
                       w="100%"
@@ -186,40 +186,40 @@ export default function HomePage() {
                         placeholder="Pickup postcode or address"
                         value={heroPickup}
                         onChange={(e) => setHeroPickup(e.target.value)}
-                        size="lg"
+                        size={{ base: "md", md: "lg" }}
                         bg="rgba(255, 255, 255, 0.95)"
                         color="#0F172A"
                         _placeholder={{ color: "#64748B" }}
                         borderColor="rgba(255, 255, 255, 0.3)"
                         borderRadius="8px"
-                        fontSize="15px"
-                        h="48px"
+                        fontSize={{ base: "14px", md: "15px" }}
+                        h={{ base: "44px", md: "48px" }}
                       />
                       <Input
                         placeholder="Delivery postcode or address"
                         value={heroDelivery}
                         onChange={(e) => setHeroDelivery(e.target.value)}
-                        size="lg"
+                        size={{ base: "md", md: "lg" }}
                         bg="rgba(255, 255, 255, 0.95)"
                         color="#0F172A"
                         _placeholder={{ color: "#64748B" }}
                         borderColor="rgba(255, 255, 255, 0.3)"
                         borderRadius="8px"
-                        fontSize="15px"
-                        h="48px"
+                        fontSize={{ base: "14px", md: "15px" }}
+                        h={{ base: "44px", md: "48px" }}
                       />
                     </Stack>
-                    <HStack gap={3} w="100%">
-                      <Link href={quoteUrl} style={{ flex: 1 }}>
+                    <Stack direction={{ base: "column", md: "row" }} gap={3} w="100%">
+                      <Link href={quoteUrl} style={{ flex: 1, width: "100%" }}>
                         <SpringHover>
                           <Button
                             w="100%"
-                            size="lg"
+                            size={{ base: "md", md: "lg" }}
                             bg="#F59E0B"
                             color="#111827"
                             fontWeight="800"
-                            fontSize="16px"
-                            h="52px"
+                            fontSize={{ base: "15px", md: "16px" }}
+                            h={{ base: "48px", md: "52px" }}
                             borderRadius="8px"
                             _hover={{ bg: "#D97706", transform: "scale(1.02)" }}
                           >
@@ -227,15 +227,16 @@ export default function HomePage() {
                           </Button>
                         </SpringHover>
                       </Link>
-                      <Link href="/#how-it-works">
+                      <Link href="/#how-it-works" style={{ width: "100%" }}>
                         <Button
-                          size="lg"
+                          w="100%"
+                          size={{ base: "md", md: "lg" }}
                           variant="outline"
                           border="2px solid rgba(255,255,255,0.4)"
                           color="white"
                           fontWeight="600"
-                          fontSize="16px"
-                          h="52px"
+                          fontSize={{ base: "15px", md: "16px" }}
+                          h={{ base: "48px", md: "52px" }}
                           borderRadius="8px"
                           bg="transparent"
                           _hover={{ bg: "rgba(255,255,255,0.1)" }}
@@ -243,7 +244,7 @@ export default function HomePage() {
                           See How It Works
                         </Button>
                       </Link>
-                    </HStack>
+                    </Stack>
                   </VStack>
                 </Box>
               </motion.div>
