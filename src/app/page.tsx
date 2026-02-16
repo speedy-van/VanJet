@@ -5,7 +5,6 @@ import {
   Text,
   VStack,
   Stack,
-  Input,
   Button,
   Container,
   HStack,
@@ -24,6 +23,7 @@ import { PricingTable } from "@/components/PricingTable";
 import { PricingBanner } from "@/components/PricingBanner";
 import { Footer } from "@/components/Footer";
 import { SpringHover } from "@/components/animations/Motion";
+import { AddressAutocomplete } from "@/components/booking/AddressAutocomplete";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -182,31 +182,29 @@ export default function HomePage() {
                       w="100%"
                       gap={3}
                     >
-                      <Input
-                        placeholder="Pickup postcode or address"
+                      <AddressAutocomplete
                         value={heroPickup}
-                        onChange={(e) => setHeroPickup(e.target.value)}
-                        size={{ base: "md", md: "lg" }}
-                        bg="rgba(255, 255, 255, 0.95)"
-                        color="#0F172A"
-                        _placeholder={{ color: "#64748B" }}
-                        borderColor="rgba(255, 255, 255, 0.3)"
-                        borderRadius="8px"
-                        fontSize={{ base: "14px", md: "15px" }}
-                        h={{ base: "44px", md: "48px" }}
+                        onChange={setHeroPickup}
+                        onSelect={(result) => setHeroPickup(result.address)}
+                        placeholder="Pickup postcode or address"
+                        variant="hero"
+                        inputProps={{
+                          size: { base: "md", md: "lg" },
+                          fontSize: { base: "14px", md: "15px" },
+                          h: { base: "44px", md: "48px" },
+                        }}
                       />
-                      <Input
-                        placeholder="Delivery postcode or address"
+                      <AddressAutocomplete
                         value={heroDelivery}
-                        onChange={(e) => setHeroDelivery(e.target.value)}
-                        size={{ base: "md", md: "lg" }}
-                        bg="rgba(255, 255, 255, 0.95)"
-                        color="#0F172A"
-                        _placeholder={{ color: "#64748B" }}
-                        borderColor="rgba(255, 255, 255, 0.3)"
-                        borderRadius="8px"
-                        fontSize={{ base: "14px", md: "15px" }}
-                        h={{ base: "44px", md: "48px" }}
+                        onChange={setHeroDelivery}
+                        onSelect={(result) => setHeroDelivery(result.address)}
+                        placeholder="Delivery postcode or address"
+                        variant="hero"
+                        inputProps={{
+                          size: { base: "md", md: "lg" },
+                          fontSize: { base: "14px", md: "15px" },
+                          h: { base: "44px", md: "48px" },
+                        }}
                       />
                     </Stack>
                     <Stack direction={{ base: "column", md: "row" }} gap={3} w="100%">

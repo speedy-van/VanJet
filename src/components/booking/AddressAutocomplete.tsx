@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Box, Input, VStack, Text } from "@chakra-ui/react";
+import { Box, Input, VStack, Text, InputProps } from "@chakra-ui/react";
 import { publicEnv } from "@/lib/env";
 
 interface Suggestion {
@@ -21,6 +21,8 @@ interface AddressAutocompleteProps {
     featureType: string;
   }) => void;
   placeholder?: string;
+  variant?: "default" | "hero";
+  inputProps?: Partial<InputProps>;
 }
 
 export function AddressAutocomplete({
@@ -28,11 +30,15 @@ export function AddressAutocomplete({
   onChange,
   onSelect,
   placeholder = "Start typing a UK address...",
+  variant = "default",
+  inputProps = {},
 }: AddressAutocompleteProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [noResults, setNoResults] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isHero = variant === "hero";
 
   const fetchSuggestions = useCallback(async (query: string) => {
     if (query.length < 3) {
@@ -106,13 +112,20 @@ export function AddressAutocomplete({
         onFocus={() => suggestions.length > 0 && setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 200)}
         autoComplete="off"
-        bg="white"
+        bg={isHero ? "rgba(255, 255, 255, 0.95)" : "white"}
+        color={isHero ? "#0F172A" : undefined}
+        _placeholder={isHero ? { color: "#64748B" } : undefined}
+        borderColor={isHero ? "rgba(255, 255, 255, 0.3)" : undefined}
+        borderRadius={isHero ? "8px" : undefined}
+        {...inputProps}
       />
-      <Text fontSize="2xs" color="gray.400" mt={0.5}>
-        UK addresses only
-      </Text>
+      {!isHero && (
+        <Text fontSize="2xs" color="gray.400" mt={0.5}>
+          UK addresses only
+        </Text>
+      )}
       {noResults && value.length >= 3 && (
-        <Text fontSize="xs" color="red.500" mt={1}>
+        <Text fontSize="xs" color={isHero ? "orange.200" : "red.500"} mt={1}>
           Please enter a UK address.
         </Text>
       )}
