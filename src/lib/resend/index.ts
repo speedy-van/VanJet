@@ -85,7 +85,7 @@ export async function sendJobConfirmation({
       Drivers will start sending you quotes shortly. We'll notify you as soon as a quote arrives.
     </p>
     <div style="text-align:center;margin:24px 0;">
-      <a href="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/jobs/${jobId}"
+      <a href="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/job/${jobId}/quotes"
          style="display:inline-block;padding:14px 32px;background:#0070f3;color:#fff;font-weight:700;
                 border-radius:8px;text-decoration:none;font-size:16px;">
         View Your Job
@@ -126,7 +126,7 @@ export async function sendQuoteNotification({
       <strong>${driverName}</strong> has quoted <strong>&pound;${price}</strong> for your job.
     </p>
     <div style="text-align:center;margin:24px 0;">
-      <a href="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/jobs/${jobId}"
+      <a href="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/job/${jobId}/quotes"
          style="display:inline-block;padding:14px 32px;background:#0070f3;color:#fff;font-weight:700;
                 border-radius:8px;text-decoration:none;font-size:16px;">
         Review Quote

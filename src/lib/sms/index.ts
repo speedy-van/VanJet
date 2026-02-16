@@ -55,7 +55,7 @@ async function sendSMS(to: string, message: string): Promise<void> {
 export async function sendJobCreatedSMS(phone: string, jobId: string) {
   return sendSMS(
     phone,
-    `VanJet: Your job #${jobId.slice(0, 8)} has been created. Drivers will start quoting soon. Track it at ${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/jobs/${jobId}`
+    `VanJet: Your job #${jobId.slice(0, 8)} has been created. Drivers will start quoting soon. Track it at ${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/job/${jobId}/quotes`
   );
 }
 
