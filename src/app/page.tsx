@@ -83,10 +83,6 @@ const NEON_SHADOW_HOVER =
   "0 0 0 1px rgba(59, 130, 246, 0.5), 0 0 50px rgba(59, 130, 246, 0.3), 0 20px 40px rgba(0,0,0,0.25)";
 
 export default function HomePage() {
-  const moves = useCountUp(1240, 1500);
-  const rating = useCountUp(48, 1500); // 4.8 * 10
-  const drivers = useCountUp(94, 1500);
-
   // Hero address inputs state
   const [heroPickup, setHeroPickup] = useState("");
   const [heroDelivery, setHeroDelivery] = useState("");
@@ -131,14 +127,15 @@ export default function HomePage() {
                 transition={{ duration: 0.7, ease: EASE }}
               >
                 <Text
+                  as="h1"
                   fontSize={{ base: "2.5rem", md: "3.25rem", lg: "3.75rem" }}
                   fontWeight="800"
                   lineHeight="1.08"
                   letterSpacing="-0.02em"
                 >
-                  Move anything,
+                  UK&apos;s #1 Man &amp; Van
                   <br />
-                  anywhere in the UK
+                  and Removal Marketplace
                 </Text>
               </motion.div>
 
@@ -156,8 +153,8 @@ export default function HomePage() {
                   mt={5}
                   lineHeight="1.7"
                 >
-                  Get instant quotes from verified drivers and removal companies.
-                  House moves, single items, office relocations and more.
+                  Move anything, anywhere in the UK. Get instant quotes from verified
+                  drivers and removal companies. House moves, single items, office relocations.
                 </Text>
               </motion.div>
 
@@ -292,7 +289,7 @@ export default function HomePage() {
                 >
                   <VStack gap={0}>
                     <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {moves.toLocaleString()}+
+                      1,200+
                     </Text>
                     <Text fontSize="sm" opacity={0.8}>
                       Moves completed
@@ -300,7 +297,7 @@ export default function HomePage() {
                   </VStack>
                   <VStack gap={0}>
                     <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {(rating / 10).toFixed(1)}★
+                      4.8★
                     </Text>
                     <Text fontSize="sm" opacity={0.8}>
                       Average rating
@@ -308,7 +305,7 @@ export default function HomePage() {
                   </VStack>
                   <VStack gap={0}>
                     <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="800">
-                      {drivers}+
+                      50+
                     </Text>
                     <Text fontSize="sm" opacity={0.8}>
                       Verified drivers

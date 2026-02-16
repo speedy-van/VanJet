@@ -17,24 +17,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.baseUrl),
   title: {
-    default: "Free UK Moving Marketplace – Pay Drivers Directly | VanJet",
-    template: "%s | VanJet UK",
+    default: "VanJet – UK Man & Van & Removal Marketplace | Free Quotes",
+    template: "%s | VanJet",
   },
   description:
-    "Get instant moving quotes from verified UK drivers. No platform fees. No hidden charges. You pay only the driver price.",
+    "Compare instant quotes from verified UK removal companies and man & van drivers. House moves, office relocations, single items. No platform fees. Book in 2 minutes.",
   keywords: [
-    "free moving marketplace",
-    "no platform fees",
-    "man and van",
-    "house removals",
+    "man and van UK",
     "removal company UK",
+    "house removals",
+    "cheap man and van",
+    "removal quotes",
     "furniture delivery",
     "office removals",
     "piano movers",
     "student removals",
-    "van hire with driver",
     "instant removal quotes",
-    "cheap removals UK",
     "zero commission",
     "VanJet",
   ],
@@ -51,9 +49,9 @@ export const metadata: Metadata = {
     locale: SITE.locale,
     url: SITE.baseUrl,
     siteName: SITE.name,
-    title: "Free UK Moving Marketplace – No Platform Fees",
+    title: "VanJet – UK Removal & Man and Van Marketplace",
     description:
-      "Get instant quotes from verified UK drivers. No fees. Pay drivers directly.",
+      "Get instant quotes from verified UK drivers. No platform fees. House moves, single items, office relocations.",
     images: [
       {
         url: "/og-image.jpg",
@@ -66,9 +64,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: SITE.twitter,
-    title: "Free UK Moving Marketplace – No Platform Fees",
+    title: "VanJet – UK Man & Van Marketplace",
     description:
-      "Get instant quotes from verified UK drivers. No fees. Pay drivers directly.",
+      "Instant removal quotes. Verified drivers. Zero platform fees.",
     images: ["/og-image.jpg"],
   },
   icons: {
