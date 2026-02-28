@@ -3,14 +3,14 @@
 // Returns pending/quoted jobs that match driver profile.
 // Auth: driver role required.
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { db } from "@/lib/db";
 import { jobs, jobItems, driverProfiles, quotes } from "@/lib/db/schema";
-import { eq, and, inArray, ne, sql } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !["driver", "admin"].includes((session.user as { role?: string }).role ?? "")) {

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { db } from "@/lib/db";
 import { driverProfiles, users } from "@/lib/db/schema";
-import { eq, desc, count, and } from "drizzle-orm";
+import { eq, desc, count } from "drizzle-orm";
 
 // GET — list driver applications with optional status filter
 export async function GET(req: NextRequest) {

@@ -10,10 +10,7 @@ import {
   Flex,
   Badge,
   Spinner,
-  Input,
-  Tabs,
   Grid,
-  SimpleGrid,
   IconButton,
 } from "@chakra-ui/react";
 import { toaster } from "@/components/ui/toaster";
@@ -166,10 +163,9 @@ export default function JobQuotesPage({
 
   useEffect(() => {
     fetchQuotes();
-    
-    // Auto-refresh every 30 seconds
     const interval = setInterval(fetchQuotes, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchQuotes is stable per jobId
   }, [jobId]);
 
   // Auto-reprice old jobs on page load (runs once when job data loads)
@@ -194,6 +190,7 @@ export default function JobQuotesPage({
     // Trigger auto-reprice
     setAutoRepriced(true);
     handleRecalculatePrice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleRecalculatePrice triggers once
   }, [job, quotes, loading, autoRepriced]);
 
   async function fetchQuotes() {

@@ -80,6 +80,7 @@ export function BookingWizard() {
     <Box minH="100vh" bg="#F9FAFB" py={{ base: 6, md: 10 }}>
       <Container maxW="700px" px={{ base: 4, md: 6 }}>
         {/* Reference Number Badge (sticky at top when available) */}
+        {/* eslint-disable-next-line react-hooks/incompatible-library -- React Hook Form watch() is required for reactive display */}
         {form.watch("referenceNumber") && (
           <Box
             bg="white"

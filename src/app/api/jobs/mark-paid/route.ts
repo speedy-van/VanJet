@@ -1,7 +1,7 @@
 // ─── VanJet · Mark Job as Paid API ────────────────────────────
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { jobs, bookings, quotes, users } from "@/lib/db/schema";
+import { jobs, bookings, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateTrackingToken } from "@/lib/tracking/token";
 import { generateOrderNumber } from "@/lib/order-number";

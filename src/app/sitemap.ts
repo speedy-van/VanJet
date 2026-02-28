@@ -1,13 +1,7 @@
 // ─── VanJet · Sitemap ─────────────────────────────────────────
 // Programmatic sitemap. English only. No car/motorcycle.
 import type { MetadataRoute } from "next";
-import {
-  SITE,
-  ALL_SERVICE_SLUGS,
-  VALID_SERVICES,
-  CITY_DATA,
-  CITY_ROUTES,
-} from "@/lib/seo/site";
+import { SITE, VALID_SERVICES, CITY_DATA } from "@/lib/seo/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE.baseUrl;
@@ -20,6 +14,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/", priority: 1.0, changeFrequency: "daily" as const },
     { url: "/book", priority: 0.9, changeFrequency: "weekly" as const },
     { url: "/blog", priority: 0.7, changeFrequency: "weekly" as const },
+    { url: "/reviews", priority: 0.7, changeFrequency: "weekly" as const },
+    { url: "/contact", priority: 0.6, changeFrequency: "monthly" as const },
+    { url: "/privacy", priority: 0.5, changeFrequency: "monthly" as const },
+    { url: "/login", priority: 0.5, changeFrequency: "monthly" as const },
+    { url: "/register", priority: 0.5, changeFrequency: "monthly" as const },
   ];
 
   for (const page of staticPages) {
@@ -31,27 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
   }
 
-  // ── /services/[service] ─────────────────────────────────────
-  for (const slug of ALL_SERVICE_SLUGS) {
-    entries.push({
-      url: `${base}/services/${slug}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    });
-  }
-
-  // ── /removals/[city] ───────────────────────────────────────
-  for (const city of Object.keys(CITY_DATA)) {
-    entries.push({
-      url: `${base}/removals/${city}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    });
-  }
-
-  // ── /[service]/[city] (high-value combos) ──────────────────
+  // ── /[service]/[city] (programmatic SEO landing pages) ──────
   for (const service of VALID_SERVICES) {
     for (const city of Object.keys(CITY_DATA)) {
       entries.push({
@@ -61,16 +40,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.8,
       });
     }
-  }
-
-  // ── /removals/[from]-to-[to] (major routes) ───────────────
-  for (const [from, to] of CITY_ROUTES) {
-    entries.push({
-      url: `${base}/removals/${from}-to-${to}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    });
   }
 
   // ── Blog seed posts ─────────────────────────────────────────

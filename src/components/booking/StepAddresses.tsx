@@ -240,7 +240,7 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
           let errorData;
           try {
             errorData = JSON.parse(text);
-          } catch (parseErr) {
+          } catch {
             console.error("Failed to parse error response as JSON");
             throw new Error(`Draft job creation failed (${res.status}): ${text || res.statusText}`);
           }

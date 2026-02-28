@@ -2,7 +2,7 @@
 // POST /api/driver/stripe/connect
 // Creates Express account for driver if not already exists.
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { db } from "@/lib/db";
@@ -10,7 +10,7 @@ import { driverProfiles, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createDriverStripeAccount } from "@/lib/stripe";
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !["driver", "admin"].includes((session.user as { role?: string }).role ?? "")) {

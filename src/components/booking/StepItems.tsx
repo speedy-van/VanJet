@@ -133,20 +133,6 @@ export function StepItems({ form, onNext, onBack }: StepItemsProps) {
     );
   };
 
-  const removeItem = (id: string) => {
-    form.setValue(
-      "items",
-      items.filter((i) => i.id !== id)
-    );
-  };
-
-  const toggleFragile = (id: string) => {
-    form.setValue(
-      "items",
-      items.map((i) => (i.id === id ? { ...i, fragile: !i.fragile } : i))
-    );
-  };
-
   const handleNext = () => {
     if (items.length === 0 && !notSure && !hasLargeItems) {
       setError("Add at least one item or check a flexibility option to continue.");

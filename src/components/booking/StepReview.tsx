@@ -9,7 +9,6 @@ import {
   Button,
   Flex,
   Badge,
-  SimpleGrid,
 } from "@chakra-ui/react";
 import { TIME_WINDOWS } from "./types";
 import type { BookingForm } from "./types";
@@ -101,7 +100,7 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
       setPricingEngine(null);
       setJobResult(null);
     }
-  }, [pickupAddress, dropoffAddress]);
+  }, [pickupAddress, dropoffAddress, pricingEngine, jobResult]);
 
   // Calculate add-ons cost
   const addOnsCost = 
@@ -274,12 +273,13 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
         fetchedEngineData = engineData;
         
         // Debug logging when PRICING_DEBUG=true
-        if ((engineData as any).debugVersion) {
+        const debugData = engineData as PricingEngineResult & { debugVersion?: string; debugDistanceCost?: number; debugVatAmount?: number; debugRoundTripMultiplier?: number };
+        if (debugData.debugVersion) {
           console.log("[PRICING_DEBUG] StepReview received pricing response:");
-          console.log(`  debugVersion: ${(engineData as any).debugVersion}`);
-          console.log(`  debugDistanceCost: £${(engineData as any).debugDistanceCost?.toFixed(2) || 'N/A'}`);
-          console.log(`  debugVatAmount: £${(engineData as any).debugVatAmount?.toFixed(2) || 'N/A'}`);
-          console.log(`  debugRoundTripMultiplier: ${(engineData as any).debugRoundTripMultiplier || 'N/A'}`);
+          console.log(`  debugVersion: ${debugData.debugVersion}`);
+          console.log(`  debugDistanceCost: £${debugData.debugDistanceCost?.toFixed(2) ?? "N/A"}`);
+          console.log(`  debugVatAmount: £${debugData.debugVatAmount?.toFixed(2) ?? "N/A"}`);
+          console.log(`  debugRoundTripMultiplier: ${debugData.debugRoundTripMultiplier ?? "N/A"}`);
           console.log(`  totalPrice: £${engineData.totalPrice?.toFixed(2)}`);
           console.log(`  priceRange: £${engineData.priceMin} - £${engineData.priceMax}`);
         }

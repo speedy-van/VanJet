@@ -1,7 +1,7 @@
 // ─── VanJet · Admin Jobs Page ─────────────────────────────────
 import { db } from "@/lib/db";
 import { jobs, quotes } from "@/lib/db/schema";
-import { eq, desc, count, sql, or, and, ilike } from "drizzle-orm";
+import { eq, desc, count, sql, and, ilike } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { formatGBP } from "@/lib/money/format";
 import Link from "next/link";

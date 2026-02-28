@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { jobs, quotes, users, driverProfiles, jobItems } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export async function GET(
   req: NextRequest,
@@ -57,16 +57,6 @@ export async function GET(
 
     // ── Fetch driver profiles for extra details ───────────────
     const driverIds = [...new Set(allQuotes.map((q) => q.driverId))];
-    const profiles = driverIds.length > 0
-      ? await db
-          .select()
-          .from(driverProfiles)
-          .where(
-            driverIds.length === 1
-              ? eq(driverProfiles.userId, driverIds[0])
-              : eq(driverProfiles.userId, driverIds[0]) // fallback — build properly below
-          )
-      : [];
 
     // Fetch all profiles for the driver IDs
     const allProfiles = driverIds.length > 0

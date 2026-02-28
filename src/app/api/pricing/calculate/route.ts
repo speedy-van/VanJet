@@ -177,7 +177,10 @@ export async function POST(req: Request) {
     }
 
     // ── Response ──────────────────────────────────────────────
-    const response: any = {
+    interface PricingResponse {
+      [key: string]: unknown;
+    }
+    const response: PricingResponse = {
       ...result,
       aiConfidence,
       aiWarnings,

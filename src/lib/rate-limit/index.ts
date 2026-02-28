@@ -3,8 +3,6 @@
 // Optional: requires UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
 // Gracefully skips limiting if not configured.
 
-import { NextResponse } from "next/server";
-
 // Types
 interface RateLimitResult {
   ok: boolean;
@@ -13,10 +11,12 @@ interface RateLimitResult {
   skipped: boolean;
 }
 
+type RedisInstance = InstanceType<typeof import("@upstash/redis").Redis>;
+type RatelimitClass = typeof import("@upstash/ratelimit").Ratelimit;
+
 // Lazy-init Redis and Ratelimit only if env vars are present
-let redis: any = null;
-let Ratelimit: any = null;
-let Redis: any = null;
+let redis: RedisInstance | null = null;
+let Ratelimit: RatelimitClass | null = null;
 
 function isRedisConfigured(): boolean {
   return !!(
@@ -25,15 +25,14 @@ function isRedisConfigured(): boolean {
   );
 }
 
-async function getRedis(): Promise<any> {
+async function getRedis(): Promise<RedisInstance | null> {
   if (!isRedisConfigured()) return null;
   if (redis) return redis;
 
   try {
     // Dynamic import to avoid build-time crashes when deps missing
     const { Redis: RedisClass } = await import("@upstash/redis");
-    Redis = RedisClass;
-    redis = new Redis({
+    redis = new RedisClass({
       url: process.env.UPSTASH_REDIS_REST_URL!,
       token: process.env.UPSTASH_REDIS_REST_TOKEN!,
     });
@@ -44,11 +43,11 @@ async function getRedis(): Promise<any> {
   }
 }
 
-async function getRatelimitClass(): Promise<any> {
+async function getRatelimitClass(): Promise<RatelimitClass | null> {
   if (Ratelimit) return Ratelimit;
   try {
-    const module = await import("@upstash/ratelimit");
-    Ratelimit = module.Ratelimit;
+    const ratelimitModule = await import("@upstash/ratelimit");
+    Ratelimit = ratelimitModule.Ratelimit;
     return Ratelimit;
   } catch (err) {
     console.warn("[VanJet] Ratelimit import failed:", err);
@@ -59,7 +58,7 @@ async function getRatelimitClass(): Promise<any> {
 // ── Pre-configured limiters ────────────────────────────────────
 
 /** /api/tracking/latest — 60 requests per minute per IP */
-export async function getLatestLimiter(): Promise<any> {
+export async function getLatestLimiter(): Promise<InstanceType<RatelimitClass> | null> {
   if (!isRedisConfigured()) return null;
   const r = await getRedis();
   const RatelimitClass = await getRatelimitClass();
@@ -73,7 +72,7 @@ export async function getLatestLimiter(): Promise<any> {
 }
 
 /** /api/tracking/subscribe — 10 connections per minute per IP */
-export async function getSubscribeLimiter(): Promise<any> {
+export async function getSubscribeLimiter(): Promise<InstanceType<RatelimitClass> | null> {
   if (!isRedisConfigured()) return null;
   const r = await getRedis();
   const RatelimitClass = await getRatelimitClass();
@@ -87,7 +86,7 @@ export async function getSubscribeLimiter(): Promise<any> {
 }
 
 /** /api/tracking/update — 30 requests per minute per driver */
-export async function getUpdateLimiter(): Promise<any> {
+export async function getUpdateLimiter(): Promise<InstanceType<RatelimitClass> | null> {
   if (!isRedisConfigured()) return null;
   const r = await getRedis();
   const RatelimitClass = await getRatelimitClass();
@@ -109,7 +108,7 @@ export function getClientIP(req: Request): string {
 
 // ── Helper: apply limiter and return result ────────────────────
 export async function applyRateLimit(
-  limiter: any,
+  limiter: InstanceType<RatelimitClass> | null,
   identifier: string
 ): Promise<RateLimitResult> {
   // Skip if Redis not configured

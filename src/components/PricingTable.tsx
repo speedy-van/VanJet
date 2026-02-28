@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Text, VStack, Button, Table } from "@chakra-ui/react";
+import { Box, Text, VStack, Button } from "@chakra-ui/react";
 import Link from "next/link";
 import { BlurIn } from "@/components/animations/Motion";
 

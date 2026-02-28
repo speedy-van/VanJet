@@ -155,11 +155,6 @@ export async function POST(req: NextRequest) {
       (sum, i) => sum + (i.weightKg ?? 10) * (i.quantity ?? 1),
       0
     );
-    const totalVolumeM3 = itemsArr.reduce(
-      (sum, i) => sum + (i.volumeM3 ?? 0.05) * (i.quantity ?? 1),
-      0
-    );
-
     // ── Pricing via hybrid engine ────────────────────────────────
     const pricingInput: PricingInput = {
       jobType: body.jobType,

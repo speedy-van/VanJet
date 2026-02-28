@@ -15,8 +15,8 @@ export const SITE = {
   locale: "en-GB",
   country: "GB",
   currency: "GBP",
-  phone: "+44 1202 129746",
-  email: "hello@van-jet.com",
+  phone: "01202 129746",
+  email: "support@speedy-van.co.uk",
   address: {
     street: "71-75 Shelton Street",
     city: "London",

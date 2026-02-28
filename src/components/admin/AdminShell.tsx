@@ -29,6 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Applications", href: "/admin/applications", icon: "📝" },
   { label: "Drivers", href: "/admin/drivers", icon: "🚚" },
   { label: "Users", href: "/admin/users", icon: "👥" },
+  { label: "Audit Log", href: "/admin/audit-log", icon: "📜" },
 ];
 
 interface AdminShellProps {

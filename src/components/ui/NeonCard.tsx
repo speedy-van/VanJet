@@ -8,9 +8,9 @@ interface NeonCardProps {
   variant?: "default" | "premium" | "subtle";
   hoverGlow?: boolean;
   accentColor?: string;
-  padding?: any;
+  padding?: Record<string, number> | number;
   minHeight?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const NEON_VARIANTS = {

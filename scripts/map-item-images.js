@@ -1,5 +1,6 @@
 // ─── Map items.json entries to their best-matching image file ──
 // Run: node scripts/map-item-images.js
+/* eslint-disable @typescript-eslint/no-require-imports -- Node script, CommonJS required */
 const fs = require("fs");
 const path = require("path");
 

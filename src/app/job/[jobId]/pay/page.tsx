@@ -18,7 +18,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { getStripeClient } from "@/lib/stripe/client";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 function PayPageInner({
@@ -30,7 +30,6 @@ function PayPageInner({
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
   const quoteId = searchParams.get("quoteId");
-  const router = useRouter();
 
   const [clientSecret, setClientSecret] = useState("");
   const [amountPence, setAmountPence] = useState(0);
@@ -145,7 +144,6 @@ function QuotePaymentForm({
 }) {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter();
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);

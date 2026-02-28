@@ -1,6 +1,6 @@
 // ─── VanJet · Admin Bookings Page ─────────────────────────────
 import { db } from "@/lib/db";
-import { bookings, jobs, users } from "@/lib/db/schema";
+import { bookings } from "@/lib/db/schema";
 import { eq, desc, count } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";

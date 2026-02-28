@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, SimpleGrid, Text, VStack, Flex } from "@chakra-ui/react";
+import { Box, Text, VStack, Flex } from "@chakra-ui/react";
 import { BlurIn, StaggerParent, StaggerChild } from "@/components/animations/Motion";
 
 interface RecentMove {

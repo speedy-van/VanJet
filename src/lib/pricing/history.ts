@@ -3,6 +3,8 @@
 // DB-ready: when quote_outcomes table is added, swap in real queries.
 // English only.
 
+/* eslint-disable @typescript-eslint/no-unused-vars -- stub params for future use */
+
 /**
  * Get a pricing adjustment based on historical acceptance rates for a job type.
  * Returns a multiplier (1.0 = no adjustment).

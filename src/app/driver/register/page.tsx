@@ -15,7 +15,6 @@ import {
   Button,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const VAN_SIZES = [
   "Small Van",
@@ -36,7 +35,6 @@ const COVERAGE_OPTIONS = [
 ];
 
 export default function DriverRegisterPage() {
-  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",

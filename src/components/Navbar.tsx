@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Flex, Text, Button, HStack, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Text, Button, HStack } from "@chakra-ui/react";
 import Link from "next/link";
 
 const NAV_LINKS = [

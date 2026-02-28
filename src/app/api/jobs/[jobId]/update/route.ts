@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { jobs, jobItems } from "@/lib/db/schema";
-import { geocodeAddress, getDirections } from "@/lib/mapbox";
 import { calculatePrice, validatePriceWithGrok } from "@/lib/pricing";
 import type { PricingInput } from "@/lib/pricing";
 import { sendJobConfirmation } from "@/lib/resend";
@@ -72,10 +71,6 @@ export async function PATCH(
     const itemsArr = body.items ?? [];
     const totalWeightKg = itemsArr.reduce(
       (sum, i) => sum + (i.weightKg ?? 10) * (i.quantity ?? 1),
-      0
-    );
-    const totalVolumeM3 = itemsArr.reduce(
-      (sum, i) => sum + (i.volumeM3 ?? 0.05) * (i.quantity ?? 1),
       0
     );
 

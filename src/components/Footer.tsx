@@ -41,6 +41,8 @@ export function Footer() {
             Company
           </Text>
           <Link href="/blog"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">Blog</Text></Link>
+          <Link href="/login"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">Sign in</Text></Link>
+          <Link href="/my-bookings"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">My Bookings</Text></Link>
           <Link href="/driver/register"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">Become a Driver</Text></Link>
           <Link href="/contact"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">Contact Us</Text></Link>
           <Link href="/privacy"><Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">Privacy Policy</Text></Link>
@@ -56,14 +58,14 @@ export function Footer() {
               01202 129746
             </Text>
           </Link>
-          <Link href="mailto:hello@van-jet.com">
+          <Link href="mailto:support@speedy-van.co.uk">
             <Text fontSize="14px" _hover={{ color: "white" }} transition="color 150ms">
-              hello@van-jet.com
+              support@speedy-van.co.uk
             </Text>
           </Link>
           <Text fontSize="14px">United Kingdom</Text>
           <Text fontSize="13px" color="#94A3B8" mt={2}>
-            We're available 7 days a week
+            We&apos;re available 7 days a week
           </Text>
         </VStack>
       </SimpleGrid>
