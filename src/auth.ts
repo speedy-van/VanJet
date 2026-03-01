@@ -6,9 +6,10 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { bootstrapAdmin } from "@/lib/dev/bootstrapAdmin";
+import { serverEnv } from "@/lib/env";
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: serverEnv.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/admin/login",

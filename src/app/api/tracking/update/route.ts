@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getUpdateLimiter, applyRateLimit } from "@/lib/rate-limit";
+import { serverEnv } from "@/lib/env";
 
 const VALID_STATUSES = [
   "on_the_way",
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
     // Dev-only guard (for testing without full driver auth)
     if (!authedUserId && process.env.NODE_ENV === "development") {
       const devKey = req.headers.get("x-dev-driver-key");
-      if (devKey && devKey === process.env.DEV_DRIVER_KEY) {
+      if (devKey && devKey === serverEnv.DEV_DRIVER_KEY) {
         authedUserId = "dev-driver";
       }
     }

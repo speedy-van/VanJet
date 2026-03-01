@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Text, VStack, Heading } from "@chakra-ui/react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -105,7 +105,8 @@ export function ServiceCards() {
         transition={{ duration: 0.7, ease: EASE }}
       >
         <VStack gap={3} mb={{ base: 8, md: 12 }}>
-          <Text
+          <Heading
+            as="h2"
             fontSize={{ base: "1.75rem", md: "2.25rem" }}
             fontWeight="800"
             textAlign="center"
@@ -113,7 +114,7 @@ export function ServiceCards() {
             letterSpacing="-0.01em"
           >
             Our Services
-          </Text>
+          </Heading>
           <Text
             color="#64748B"
             textAlign="center"
@@ -207,7 +208,8 @@ export function ServiceCards() {
 
                   {/* Bottom content */}
                   <Box>
-                    <Text
+                    <Heading
+                      as="h3"
                       fontSize={{ base: "2xl", md: "3xl" }}
                       fontWeight="800"
                       color="white"
@@ -216,7 +218,7 @@ export function ServiceCards() {
                       lineHeight="1.15"
                     >
                       {s.title}
-                    </Text>
+                    </Heading>
 
                     <Text
                       fontSize={{ base: "14px", md: "15px" }}

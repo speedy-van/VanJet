@@ -9,11 +9,12 @@ import { sendJobConfirmation } from "@/lib/resend";
 import { sendDriverNewJobSMS } from "@/lib/sms";
 import { eq } from "drizzle-orm";
 import { generateReferenceNumber } from "@/lib/reference-number";
+import { serverEnv } from "@/lib/env";
 
 // ── Pricing Profile Configuration ──────────────────────────────────────
-const PRICING_PROFILE = process.env.PRICING_PROFILE ?? "competitive";
-const ENABLE_VAT = process.env.ENABLE_VAT === "true";
-const PRICING_DEBUG = process.env.PRICING_DEBUG === "true";
+const PRICING_PROFILE = serverEnv.PRICING_PROFILE;
+const ENABLE_VAT = serverEnv.ENABLE_VAT;
+const PRICING_DEBUG = serverEnv.PRICING_DEBUG;
 
 interface CreateJobBody {
   // Auth: provide customerId OR contactEmail (guest checkout)

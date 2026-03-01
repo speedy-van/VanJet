@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { serverEnv } from "@/lib/env";
 
 let bootstrapped = false;
 
@@ -13,8 +14,8 @@ export async function bootstrapAdmin(): Promise<void> {
   if (bootstrapped) return;
   if (process.env.NODE_ENV !== "development") return;
 
-  const email = process.env.ADMIN_EMAIL;
-  const password = process.env.ADMIN_PASSWORD;
+  const email = serverEnv.ADMIN_EMAIL;
+  const password = serverEnv.ADMIN_PASSWORD;
 
   if (!email || !password) {
     console.log(

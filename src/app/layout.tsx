@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/Providers";
 import { SITE } from "@/lib/seo/site";
+import { publicEnv } from "@/lib/env";
 import {
   generateLocalBusinessSchema,
   generateHowItWorksSchema,
@@ -79,8 +80,8 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-const gaId = process.env.NEXT_PUBLIC_GA_ID;
-const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+const gaId = publicEnv.GA_ID;
+const gtmId = publicEnv.GTM_ID;
 
 export default function RootLayout({
   children,

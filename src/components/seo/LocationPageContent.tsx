@@ -339,6 +339,181 @@ export function LocationPageContent({
         </Flex>
       </Box>
 
+      {/* Related Items Section - Internal Linking for SEO */}
+      <Box bg="white" py={{ base: 12, md: 16 }} px={{ base: 4, md: 8 }}>
+        <Box maxW="1280px" mx="auto">
+          <Text
+            as="h2"
+            fontSize={{ base: "1.75rem", md: "2rem" }}
+            fontWeight="800"
+            color="#0F172A"
+            mb={3}
+            textAlign="center"
+          >
+            Common Items We Move
+          </Text>
+          <Text
+            fontSize="15px"
+            color="#6B7280"
+            textAlign="center"
+            mb={{ base: 8, md: 12 }}
+            maxW="600px"
+            mx="auto"
+          >
+            Whatever you need moved, VanJet has you covered. Get instant quotes for:
+          </Text>
+
+          <SimpleGrid
+            columns={{ base: 2, sm: 3, md: 4, lg: 6 }}
+            gap={{ base: 3, md: 4 }}
+            maxW="1200px"
+            mx="auto"
+          >
+            <Link href="/items/sofa">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>🛋️</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Sofa
+                </Text>
+              </Box>
+            </Link>
+            <Link href="/items/bed">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>🛏️</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Bed
+                </Text>
+              </Box>
+            </Link>
+            <Link href="/items/wardrobe">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>🚪</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Wardrobe
+                </Text>
+              </Box>
+            </Link>
+            <Link href="/items/table">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>🪑</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Table
+                </Text>
+              </Box>
+            </Link>
+            <Link href="/items/piano">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>🎹</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Piano
+                </Text>
+              </Box>
+            </Link>
+            <Link href="/items/boxes">
+              <Box
+                p={4}
+                borderRadius="12px"
+                bg="#F8FAFC"
+                border="1px solid #E5E7EB"
+                textAlign="center"
+                cursor="pointer"
+                transition="all 0.25s"
+                _hover={{
+                  shadow: "md",
+                  transform: "translateY(-2px)",
+                  borderColor: "#1D4ED8",
+                  bg: "#EBF1FF",
+                }}
+              >
+                <Text fontSize="24px" mb={2}>📦</Text>
+                <Text fontSize="13px" fontWeight="600" color="#1D4ED8">
+                  Boxes
+                </Text>
+              </Box>
+            </Link>
+          </SimpleGrid>
+
+          <HStack gap={2} justify="center" mt={{ base: 8, md: 12 }}>
+            <Text fontSize="14px" color="#6B7280">
+              See all items:
+            </Text>
+            <Link href="/items/sofa" style={{ color: "#1D4ED8", textDecoration: "underline", fontWeight: 600 }}>
+              <Text>Available items →</Text>
+            </Link>
+          </HStack>
+        </Box>
+      </Box>
+
       {/* Bottom CTA */}
       <Box bg="#1D4ED8" py={{ base: 12, md: 16 }} px={{ base: 4, md: 8 }}>
         <Box maxW="700px" mx="auto" textAlign="center">

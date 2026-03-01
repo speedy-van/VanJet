@@ -7,6 +7,22 @@ import type { PricingInput, PricingBreakdown } from "./engine";
 
 const GROK_BASE_URL = "https://api.x.ai/v1";
 
+/** Extract plain text from xAI Responses API output array. */
+function extractTextFromResponsesOutput(
+  data: { output?: Array<{ content?: Array<{ type?: string; text?: string }> }> }
+): string {
+  const output = data.output ?? [];
+  for (const item of output) {
+    const content = item.content ?? [];
+    for (const block of content) {
+      if (block.type === "output_text" && typeof block.text === "string") {
+        return block.text;
+      }
+    }
+  }
+  return "";
+}
+
 export interface GrokValidationResult {
   isReasonable: boolean;
   adjustedPrice: number | null;
@@ -17,9 +33,7 @@ export interface GrokValidationResult {
 
 /** Check if AI pricing is enabled and an API key exists. */
 function isAiEnabled(): boolean {
-  return (
-    process.env.ENABLE_AI_PRICING === "true" && !!serverEnv.GROK_API_KEY
-  );
+  return serverEnv.ENABLE_AI_PRICING && !!serverEnv.GROK_API_KEY;
 }
 
 /**
@@ -73,7 +87,7 @@ Demand multiplier: ${engineResult.demandMultiplier}
 Is this price fair for the UK market? If not, suggest an adjusted total (including 20% VAT).`;
 
   try {
-    const res = await fetch(`${GROK_BASE_URL}/chat/completions`, {
+    const res = await fetch(`${GROK_BASE_URL}/responses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -81,23 +95,32 @@ Is this price fair for the UK market? If not, suggest an adjusted total (includi
       },
       body: JSON.stringify({
         model: "grok-3-mini",
-        messages: [
+        input: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.2,
+        store: false,
       }),
     });
 
     if (!res.ok) {
+      const errBody = await res.text();
+      let errMsg = errBody.slice(0, 300);
+      try {
+        const j = JSON.parse(errBody) as { error?: { message?: string } };
+        if (j?.error?.message) errMsg = j.error.message;
+      } catch {
+        // use errBody slice above
+      }
       console.error(
-        `[VanJet] Grok validation API error (${res.status}), skipping AI check`
+        `[VanJet] Grok validation API error (${res.status}), skipping AI check:`,
+        errMsg
       );
       return null;
     }
 
-    const data = await res.json();
-    const content: string = data.choices?.[0]?.message?.content ?? "";
+    const data = (await res.json()) as { output?: Array<{ content?: Array<{ type?: string; text?: string }> }> };
+    const content = extractTextFromResponsesOutput(data);
     const parsed = JSON.parse(content) as GrokValidationResult;
 
     // Validate shape
@@ -133,7 +156,7 @@ export async function quickEstimate(
 Respond with JSON only: { "min": number, "max": number, "explanation": "short English text" }`;
 
   try {
-    const res = await fetch(`${GROK_BASE_URL}/chat/completions`, {
+    const res = await fetch(`${GROK_BASE_URL}/responses`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -141,7 +164,7 @@ Respond with JSON only: { "min": number, "max": number, "explanation": "short En
       },
       body: JSON.stringify({
         model: "grok-3-mini",
-        messages: [
+        input: [
           {
             role: "system",
             content:
@@ -149,14 +172,23 @@ Respond with JSON only: { "min": number, "max": number, "explanation": "short En
           },
           { role: "user", content: prompt },
         ],
-        temperature: 0.2,
+        store: false,
       }),
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const errBody = await res.text();
+      try {
+        const j = JSON.parse(errBody) as { error?: { message?: string } };
+        console.error(`[VanJet] Grok quickEstimate API error (${res.status}):`, j?.error?.message ?? errBody.slice(0, 200));
+      } catch {
+        console.error(`[VanJet] Grok quickEstimate API error (${res.status}):`, errBody.slice(0, 200));
+      }
+      return null;
+    }
 
-    const data = await res.json();
-    const content: string = data.choices?.[0]?.message?.content ?? "";
+    const data = (await res.json()) as { output?: Array<{ content?: Array<{ type?: string; text?: string }> }> };
+    const content = extractTextFromResponsesOutput(data);
     return JSON.parse(content);
   } catch {
     return null;

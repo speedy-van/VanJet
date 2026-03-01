@@ -3,6 +3,8 @@
 // Optional: requires UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
 // Gracefully skips limiting if not configured.
 
+import { serverEnv } from "@/lib/env";
+
 // Types
 interface RateLimitResult {
   ok: boolean;
@@ -19,10 +21,7 @@ let redis: RedisInstance | null = null;
 let Ratelimit: RatelimitClass | null = null;
 
 function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL &&
-    process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return !!(serverEnv.UPSTASH_REDIS_REST_URL && serverEnv.UPSTASH_REDIS_REST_TOKEN);
 }
 
 async function getRedis(): Promise<RedisInstance | null> {
@@ -33,8 +32,8 @@ async function getRedis(): Promise<RedisInstance | null> {
     // Dynamic import to avoid build-time crashes when deps missing
     const { Redis: RedisClass } = await import("@upstash/redis");
     redis = new RedisClass({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      url: serverEnv.UPSTASH_REDIS_REST_URL!,
+      token: serverEnv.UPSTASH_REDIS_REST_TOKEN!,
     });
     return redis;
   } catch (err) {

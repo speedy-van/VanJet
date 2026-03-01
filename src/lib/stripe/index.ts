@@ -1,6 +1,6 @@
 // ─── VanJet · Stripe Connect Helpers ──────────────────────────
 import Stripe from "stripe";
-import { serverEnv, publicEnv, ZERO_COMMISSION_MODE } from "@/lib/env";
+import { serverEnv, publicEnv } from "@/lib/env";
 
 let _stripe: Stripe | null = null;
 
@@ -68,7 +68,7 @@ export async function createPaymentIntent({
 
   if (driverStripeAccountId) {
     // Zero commission mode: full amount transfers to driver, no application_fee
-    if (!ZERO_COMMISSION_MODE) {
+    if (!serverEnv.ZERO_COMMISSION_MODE) {
       // Fallback for non-zero commission mode (not currently active)
       console.warn("[VanJet] ZERO_COMMISSION_MODE is disabled - this is unexpected in production.");
     }

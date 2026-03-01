@@ -7,10 +7,11 @@ import { db } from "@/lib/db";
 import { jobs, jobItems } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { calculatePrice } from "@/lib/pricing";
+import { serverEnv } from "@/lib/env";
 import type { PricingInput } from "@/lib/pricing";
 
-const PRICING_PROFILE = process.env.PRICING_PROFILE ?? "competitive";
-const ENABLE_VAT = process.env.ENABLE_VAT === "true";
+const PRICING_PROFILE = serverEnv.PRICING_PROFILE;
+const ENABLE_VAT = serverEnv.ENABLE_VAT;
 
 export async function PATCH(
   req: NextRequest,

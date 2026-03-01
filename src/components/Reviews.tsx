@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Text, VStack, HStack, Badge } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, Badge, Heading } from "@chakra-ui/react";
 import Link from "next/link";
 import { BlurIn, StaggerParent, StaggerChild } from "@/components/animations/Motion";
 import { STATIC_REVIEWS, REVIEWS_SUMMARY } from "@/lib/reviews/static-data";
@@ -46,7 +46,8 @@ export function Reviews({ initialReviews }: ReviewsProps) {
     <Box bg="#F9FAFB" py={{ base: 12, md: 24 }} px={{ base: 4, md: 8 }}>
       <BlurIn>
         <VStack gap={3} mb={{ base: 8, md: 12 }}>
-          <Text
+          <Heading
+            as="h2"
             fontSize={{ base: "1.75rem", md: "2.25rem" }}
             fontWeight="800"
             textAlign="center"
@@ -54,7 +55,7 @@ export function Reviews({ initialReviews }: ReviewsProps) {
             letterSpacing="-0.01em"
           >
             What Our Customers Say
-          </Text>
+          </Heading>
           <Text
             color="#6B7280"
             textAlign="center"

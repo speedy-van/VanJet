@@ -66,6 +66,78 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "7 min read",
     category: "Business",
   },
+  {
+    slug: "how-to-move-a-sofa-safely",
+    title: "How to Move a Sofa Safely: Expert Tips & Techniques",
+    excerpt:
+      "Moving a sofa can be challenging. Learn how to navigate doorways, protect your home, and prevent damage to your furniture.",
+    date: "2026-01-20",
+    readTime: "5 min read",
+    category: "Furniture Moving",
+  },
+  {
+    slug: "how-to-move-a-wardrobe-safely",
+    title: "How to Move a Wardrobe Safely: Disassembly & Transport",
+    excerpt:
+      "Wardrobes are bulky and delicate. Discover the best methods for disassembly, protection, and reassembly at your new home.",
+    date: "2026-01-19",
+    readTime: "6 min read",
+    category: "Furniture Moving",
+  },
+  {
+    slug: "how-to-move-a-bed-and-mattress-safely",
+    title: "How to Move a Bed and Mattress Safely",
+    excerpt:
+      "Bed frames and mattresses require special care. Learn protective wrapping, disassembly tips, and safe handling techniques.",
+    date: "2026-01-18",
+    readTime: "5 min read",
+    category: "Furniture Moving",
+  },
+  {
+    slug: "how-to-move-a-fridge-freezer-safely",
+    title: "How to Move a Fridge Freezer Safely: A Complete Guide",
+    excerpt:
+      "Moving appliances like fridges requires proper disconnection and handling. Expert tips to avoid damage and ensure functionality.",
+    date: "2026-01-17",
+    readTime: "6 min read",
+    category: "Appliance Moving",
+  },
+  {
+    slug: "how-to-move-a-washing-machine-safely",
+    title: "How to Move a Washing Machine Safely: Disconnect & Reconnect",
+    excerpt:
+      "Washing machines are complex and heavy. Learn how to safely disconnect, transport, and reconnect for a smooth move.",
+    date: "2026-01-16",
+    readTime: "6 min read",
+    category: "Appliance Moving",
+  },
+  {
+    slug: "how-to-move-a-piano-safely",
+    title: "How to Move a Piano Safely: Professional Techniques",
+    excerpt:
+      "Pianos are delicate and expensive. Discover specialist handling, equipment, and best practices for safe piano removal.",
+    date: "2026-01-15",
+    readTime: "7 min read",
+    category: "Specialist Moving",
+  },
+  {
+    slug: "how-to-move-a-safe-safely",
+    title: "How to Move a Safe Safely: Heavy-Load Handling",
+    excerpt:
+      "Safes are incredibly heavy and valuable. Learn the equipment, techniques, and safety measures for moving security items.",
+    date: "2026-01-14",
+    readTime: "6 min read",
+    category: "Specialist Moving",
+  },
+  {
+    slug: "how-to-pack-moving-boxes-like-a-pro",
+    title: "How to Pack Moving Boxes Like a Pro: 10 Expert Tips",
+    excerpt:
+      "Proper packing protects your items and makes unpacking easier. Master weight distribution, labeling, and protective materials.",
+    date: "2026-01-13",
+    readTime: "5 min read",
+    category: "Packing Tips",
+  },
 ];
 
 export default function BlogPage() {

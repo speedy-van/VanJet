@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, SimpleGrid, Text, VStack, Flex } from "@chakra-ui/react";
+import { Box, SimpleGrid, Text, VStack, Flex, Heading } from "@chakra-ui/react";
 import { BlurIn, FadeUp } from "@/components/animations/Motion";
 
 const steps = [
@@ -34,7 +34,8 @@ export function HowItWorks() {
     >
       <BlurIn>
         <VStack gap={3} mb={{ base: 8, md: 12 }}>
-          <Text
+          <Heading
+            as="h2"
             fontSize={{ base: "1.75rem", md: "2.25rem" }}
             fontWeight="800"
             textAlign="center"
@@ -42,7 +43,7 @@ export function HowItWorks() {
             letterSpacing="-0.01em"
           >
             How It Works
-          </Text>
+          </Heading>
           <Text
             color="#64748B"
             textAlign="center"
