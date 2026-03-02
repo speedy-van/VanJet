@@ -7,7 +7,7 @@ import { PILLAR_SLUGS } from "@/lib/seo/pillar-items";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = SITE.baseUrl;
-  const now = new Date().toISOString();
+  const now = new Date();
 
   const entries: MetadataRoute.Sitemap = [];
 
