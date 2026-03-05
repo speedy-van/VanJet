@@ -32,6 +32,9 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   avatarUrl: text("avatar_url"),
   emailVerified: boolean("email_verified").notNull().default(false),
+  twoFactorSecret: text("two_factor_secret"),
+    twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
   ...timestamps,
 });
 
@@ -40,6 +43,7 @@ export const driverProfiles = pgTable(
   "driver_profiles",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+      
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
