@@ -34,7 +34,7 @@ export const users = pgTable("users", {
   emailVerified: boolean("email_verified").notNull().default(false),
   twoFactorSecret: text("two_factor_secret"),
     twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
-  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  
   ...timestamps,
 });
 
