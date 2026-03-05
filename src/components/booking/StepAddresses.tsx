@@ -128,8 +128,8 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
         const data = await res.json();
         if (data.routes && data.routes.length > 0) {
           const route = data.routes[0];
-          const distanceKm = (route.distance / 1000).toFixed(1);
-          setDistance(parseFloat(distanceKm));
+          const distanceMi = (route.distance / 1609.344).toFixed(1);
+          setDistance(parseFloat(distanceMi));
 
           // Draw route line
           map.on("load", () => {

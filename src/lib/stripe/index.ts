@@ -45,8 +45,12 @@ export async function createOnboardingLink(stripeAccountId: string) {
 
 /**
  * Create a PaymentIntent. If a driver Stripe account is provided,
- * applies the 15% platform fee and sets up transfer to the driver.
+ * applies the platform fee and sets up transfer to the driver.
  * If no driver yet (direct booking), the platform holds the funds.
+ *
+ * Fee structure:
+ *   - ZERO_COMMISSION_MODE=true  → full amount to driver, no platform fee
+ *   - ZERO_COMMISSION_MODE=false → 15% platform fee (configurable via PLATFORM_FEE_PERCENT)
  */
 export async function createPaymentIntent({
   amountPence,
@@ -67,12 +71,16 @@ export async function createPaymentIntent({
   };
 
   if (driverStripeAccountId) {
-    // Zero commission mode: full amount transfers to driver, no application_fee
-    if (!serverEnv.ZERO_COMMISSION_MODE) {
-      // Fallback for non-zero commission mode (not currently active)
-      console.warn("[VanJet] ZERO_COMMISSION_MODE is disabled - this is unexpected in production.");
+    if (serverEnv.ZERO_COMMISSION_MODE) {
+      // Zero commission: full amount to driver
+      params.transfer_data = { destination: driverStripeAccountId };
+    } else {
+      // Platform takes a fee (default 15%)
+      const feePercent = parseFloat(process.env.PLATFORM_FEE_PERCENT || "15");
+      const applicationFeePence = Math.round(amountPence * (feePercent / 100));
+      params.application_fee_amount = applicationFeePence;
+      params.transfer_data = { destination: driverStripeAccountId };
     }
-    params.transfer_data = { destination: driverStripeAccountId };
   }
 
   const intent = await stripe.paymentIntents.create(params);
@@ -81,4 +89,30 @@ export async function createPaymentIntent({
     clientSecret: intent.client_secret,
     paymentIntentId: intent.id,
   };
+}
+
+/**
+ * Issue a refund for a PaymentIntent.
+ * @param paymentIntentId - The Stripe PaymentIntent ID
+ * @param amountPence - Omit for full refund, or specify partial amount in pence
+ * @returns The Stripe Refund object
+ */
+export async function issueRefund({
+  paymentIntentId,
+  amountPence,
+  reason,
+}: {
+  paymentIntentId: string;
+  amountPence?: number;
+  reason?: "requested_by_customer" | "duplicate" | "fraudulent";
+}) {
+  const stripe = getStripe();
+  const params: Stripe.RefundCreateParams = {
+    payment_intent: paymentIntentId,
+    reason: reason ?? "requested_by_customer",
+  };
+  if (amountPence != null && amountPence > 0) {
+    params.amount = amountPence;
+  }
+  return stripe.refunds.create(params);
 }

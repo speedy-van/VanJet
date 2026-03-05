@@ -38,7 +38,7 @@ interface SerializedJob {
   deliveryAddress: string;
   deliveryLat: string | null;
   deliveryLng: string | null;
-  distanceKm: string | null;
+  distanceMiles: string | null;
   moveDate: string;
   description: string | null;
   estimatedPrice: string | null;
@@ -322,8 +322,8 @@ export function BookingManagement({
           <InfoRow
             label="Distance"
             value={
-              job.distanceKm
-                ? `${Number(job.distanceKm).toFixed(1)} mi`
+              job.distanceMiles
+                ? `${Number(job.distanceMiles).toFixed(1)} mi`
                 : "—"
             }
           />

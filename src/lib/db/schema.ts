@@ -22,6 +22,11 @@ const timestamps = {
     .defaultNow(),
 };
 
+/** Soft-delete column. If non-null, the record is considered deleted. */
+const softDelete = {
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
+};
+
 // ── Users ───────────────────────────────────────────────────────
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -33,7 +38,7 @@ export const users = pgTable("users", {
   avatarUrl: text("avatar_url"),
   emailVerified: boolean("email_verified").notNull().default(false),
   twoFactorSecret: text("two_factor_secret"),
-    twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(false),
   
   ...timestamps,
 });
@@ -68,7 +73,11 @@ export const driverProfiles = pgTable(
     reviewedBy: varchar("reviewed_by", { length: 255 }),
     ...timestamps,
   },
-  (table) => [index("driver_profiles_user_id_idx").on(table.userId)]
+  (table) => [
+    index("driver_profiles_user_id_idx").on(table.userId),
+    index("driver_profiles_status_idx").on(table.applicationStatus),
+    index("driver_profiles_stripe_idx").on(table.stripeAccountId),
+  ]
 );
 
 // ── Jobs ────────────────────────────────────────────────────────
@@ -88,7 +97,7 @@ export const jobs = pgTable(
     deliveryAddress: text("delivery_address").notNull(),
     deliveryLat: numeric("delivery_lat", { precision: 10, scale: 7 }),
     deliveryLng: numeric("delivery_lng", { precision: 10, scale: 7 }),
-    distanceKm: numeric("distance_km", { precision: 8, scale: 2 }), // stored in miles (column name kept for migration safety)
+    distanceMiles: numeric("distance_miles", { precision: 8, scale: 2 }), // driving distance in miles (from Mapbox)
     durationMinutes: integer("duration_minutes"), // estimated travel time
     moveDate: timestamp("move_date", { withTimezone: true }).notNull(),
     description: text("description"),
@@ -114,10 +123,14 @@ export const jobs = pgTable(
     contactName: varchar("contact_name", { length: 255 }),
     contactPhone: varchar("contact_phone", { length: 30 }),
     ...timestamps,
+    ...softDelete,
   },
   (table) => [
     index("jobs_customer_id_idx").on(table.customerId),
     uniqueIndex("jobs_reference_number_idx").on(table.referenceNumber),
+    index("jobs_status_idx").on(table.status),
+    index("jobs_move_date_idx").on(table.moveDate),
+    index("jobs_status_date_idx").on(table.status, table.moveDate),
   ]
 );
 
@@ -157,7 +170,12 @@ export const quotes = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     ...timestamps,
   },
-  (table) => [index("quotes_job_id_idx").on(table.jobId)]
+  (table) => [
+    index("quotes_job_id_idx").on(table.jobId),
+    index("quotes_driver_id_idx").on(table.driverId),
+    index("quotes_status_idx").on(table.status),
+    index("quotes_expires_at_idx").on(table.expiresAt),
+  ]
 );
 
 // ── Bookings ────────────────────────────────────────────────────
@@ -198,6 +216,10 @@ export const bookings = pgTable(
   },
   (table) => [
     index("bookings_job_id_idx").on(table.jobId),
+    index("bookings_driver_id_idx").on(table.driverId),
+    index("bookings_payment_status_idx").on(table.paymentStatus),
+    index("bookings_status_idx").on(table.status),
+    index("bookings_stripe_pi_idx").on(table.stripePaymentIntentId),
     uniqueIndex("bookings_tracking_token_idx").on(table.trackingToken),
     uniqueIndex("bookings_order_number_idx").on(table.orderNumber),
   ]
@@ -250,18 +272,48 @@ export const bookingTrackingEvents = pgTable(
 );
 
 // ── Reviews ─────────────────────────────────────────────────────
-export const reviews = pgTable("reviews", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  bookingId: uuid("booking_id")
-    .notNull()
-    .references(() => bookings.id, { onDelete: "cascade" }),
-  reviewerId: uuid("reviewer_id")
-    .notNull()
-    .references(() => users.id),
-  revieweeId: uuid("reviewee_id")
-    .notNull()
-    .references(() => users.id),
-  rating: integer("rating").notNull(), // 1-5
-  comment: text("comment"),
-  ...timestamps,
-});
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookingId: uuid("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "cascade" }),
+    reviewerId: uuid("reviewer_id")
+      .notNull()
+      .references(() => users.id),
+    revieweeId: uuid("reviewee_id")
+      .notNull()
+      .references(() => users.id),
+    rating: integer("rating").notNull(), // 1-5
+    comment: text("comment"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("reviews_booking_reviewer_idx").on(table.bookingId, table.reviewerId),
+    index("reviews_reviewee_id_idx").on(table.revieweeId),
+  ]
+);
+
+// ── Change Log (General Audit Trail) ────────────────────────────
+export const changeLogs = pgTable(
+  "change_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    userId: uuid("user_id").references(() => users.id), // who made the change
+    tableName: varchar("table_name", { length: 50 }).notNull(), // jobs, bookings, quotes, etc.
+    recordId: uuid("record_id").notNull(), // PK of the changed record
+    action: varchar("action", { length: 20 }).notNull(), // CREATE | UPDATE | DELETE | SOFT_DELETE
+    previousValues: text("previous_values"), // JSON of old values
+    newValues: text("new_values"), // JSON of new values
+    changeReason: text("change_reason"), // optional human-readable reason
+  },
+  (table) => [
+    index("change_logs_table_record_idx").on(table.tableName, table.recordId),
+    index("change_logs_user_idx").on(table.userId),
+    index("change_logs_created_at_idx").on(table.createdAt),
+  ]
+);

@@ -10,6 +10,12 @@ import { sendDriverNewJobSMS } from "@/lib/sms";
 import { eq } from "drizzle-orm";
 import { generateReferenceNumber } from "@/lib/reference-number";
 import { serverEnv } from "@/lib/env";
+import {
+  extractPostcodeFromAddress,
+  validateEmail,
+  validateMoveDate,
+  validateItems,
+} from "@/lib/utils/validation";
 
 // ── Pricing Profile Configuration ──────────────────────────────────────
 const PRICING_PROFILE = serverEnv.PRICING_PROFILE;
@@ -68,12 +74,35 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (body.contactEmail && !validateEmail(body.contactEmail)) {
+      return NextResponse.json(
+        { error: "Invalid email address format." },
+        { status: 400 }
+      );
+    }
     if (!body.pickupAddress || !body.deliveryAddress) {
       return NextResponse.json(
         { error: "Both pickup and delivery addresses are required." },
         { status: 400 }
       );
     }
+
+    // Validate UK addresses have postcodes
+    const pickupPostcode = extractPostcodeFromAddress(body.pickupAddress);
+    const deliveryPostcode = extractPostcodeFromAddress(body.deliveryAddress);
+    if (!pickupPostcode) {
+      return NextResponse.json(
+        { error: "Pickup address must include a valid UK postcode." },
+        { status: 400 }
+      );
+    }
+    if (!deliveryPostcode) {
+      return NextResponse.json(
+        { error: "Delivery address must include a valid UK postcode." },
+        { status: 400 }
+      );
+    }
+
     if (!body.moveDate) {
       return NextResponse.json(
         { error: "Move date is required." },
@@ -87,12 +116,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const moveDate = new Date(body.moveDate);
-    if (isNaN(moveDate.getTime())) {
+    // Validate move date
+    const moveDateValidation = validateMoveDate(body.moveDate);
+    if (!moveDateValidation.valid) {
       return NextResponse.json(
-        { error: "Invalid move date format. Use ISO 8601." },
+        { error: moveDateValidation.error },
         { status: 400 }
       );
+    }
+    const moveDate = moveDateValidation.date!;
+
+    // Validate items if provided
+    if (body.items && body.items.length > 0) {
+      const itemValidation = validateItems(body.items);
+      if (!itemValidation.valid) {
+        return NextResponse.json(
+          { error: itemValidation.error },
+          { status: 400 }
+        );
+      }
     }
 
     // ── Resolve customer (existing ID or find/create by email) ─
@@ -243,7 +285,7 @@ export async function POST(req: NextRequest) {
             deliveryAddress: delivery.placeName,
             deliveryLat: String(delivery.lat),
             deliveryLng: String(delivery.lng),
-            distanceKm: String(directions.distanceMiles), // stored in miles (not km)
+            distanceMiles: String(directions.distanceMiles),
             durationMinutes: directions.durationMinutes,
             moveDate,
             description: body.description ?? null,

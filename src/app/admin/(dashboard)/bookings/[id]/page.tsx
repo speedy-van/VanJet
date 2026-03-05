@@ -82,7 +82,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
     deliveryAddress: job.deliveryAddress,
     deliveryLat: job.deliveryLat,
     deliveryLng: job.deliveryLng,
-    distanceKm: job.distanceKm,
+    distanceMiles: job.distanceMiles,
     moveDate: job.moveDate.toISOString(),
     description: job.description,
     estimatedPrice: job.estimatedPrice,

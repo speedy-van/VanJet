@@ -12,6 +12,8 @@ import {
 } from "@/lib/pricing";
 import { serverEnv } from "@/lib/env";
 import type { PricingInput } from "@/lib/pricing";
+import { checkApiRateLimit } from "@/lib/ratelimit";
+import { getClientIP } from "@/lib/rate-limit";
 
 // ── Pricing Profile Configuration ─────────────────────────────
 const PRICING_PROFILE = serverEnv.PRICING_PROFILE;
@@ -20,12 +22,22 @@ const PRICING_DEBUG = serverEnv.PRICING_DEBUG;
 
 export async function POST(req: Request) {
   try {
+    // API rate limiting
+    const ip = getClientIP(req);
+    const rateLimit = await checkApiRateLimit(ip);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
 
     // ── Validate required fields ──────────────────────────────
     const missing: string[] = [];
     if (!body.jobType) missing.push("jobType");
-    if (body.distanceMiles == null && body.distanceKm == null) missing.push("distanceMiles");
+    if (body.distanceMiles == null) missing.push("distanceMiles");
     if (!Array.isArray(body.items) || body.items.length === 0)
       missing.push("items (non-empty array)");
     if (!body.preferredDate) missing.push("preferredDate");
@@ -48,7 +60,7 @@ export async function POST(req: Request) {
 
     const input: PricingInput = {
       jobType: body.jobType,
-      distanceMiles: Number(body.distanceMiles ?? body.distanceKm ?? 0),
+      distanceMiles: Number(body.distanceMiles ?? 0),
       items: body.items.map(
         (i: { name?: string; quantity?: number; weightKg?: number; volumeM3?: number }) => ({
           name: i.name ?? "Item",

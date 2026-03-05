@@ -17,8 +17,10 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totp, setTotp] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsTwoFactor, setNeedsTwoFactor] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,12 +31,23 @@ export default function AdminLoginPage() {
       redirect: false,
       email,
       password,
+      totp: totp || undefined,
     });
 
     setLoading(false);
 
     if (res?.error) {
-      setError("Invalid email or password.");
+      if (res.error === "Two-factor code required.") {
+        setNeedsTwoFactor(true);
+        setError("Enter your 2FA code.");
+      } else if (res.error === "Invalid two-factor code.") {
+        setNeedsTwoFactor(true);
+        setError(res.error);
+      } else if (res.error === "Too many login attempts. Please try again later.") {
+        setError(res.error);
+      } else {
+        setError("Invalid email or password.");
+      }
       return;
     }
 
@@ -88,6 +101,23 @@ export default function AdminLoginPage() {
                 size="lg"
               />
             </Box>
+
+            {needsTwoFactor && (
+              <Box w="full">
+                <Text fontSize="sm" fontWeight="500" mb={1} color="gray.600">
+                  Two-factor code
+                </Text>
+                <Input
+                  type="text"
+                  placeholder="000000"
+                  value={totp}
+                  onChange={(e) => setTotp(e.target.value)}
+                  maxLength={6}
+                  size="lg"
+                  autoComplete="one-time-code"
+                />
+              </Box>
+            )}
 
             {error && (
               <Box

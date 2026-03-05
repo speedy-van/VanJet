@@ -6,12 +6,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { jobs, quotes, users, driverProfiles, jobItems } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { checkApiRateLimit } from "@/lib/ratelimit";
+import { getClientIP } from "@/lib/rate-limit";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
+    // API rate limiting
+    const ip = getClientIP(req);
+    const rateLimit = await checkApiRateLimit(ip);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { jobId } = await params;
 
     if (!jobId) {
@@ -113,7 +125,7 @@ export async function GET(
         deliveryHasLift: job.deliveryHasLift,
         deliveryNotes: job.deliveryNotes,
         // Route
-        distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        distanceMiles: job.distanceMiles ? Number(job.distanceMiles) : null,
         durationMinutes: job.durationMinutes,
         // Schedule
         moveDate: job.moveDate,

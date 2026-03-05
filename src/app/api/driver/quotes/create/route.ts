@@ -10,6 +10,8 @@ import { jobs, quotes, driverProfiles, users } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { sendQuoteNotification } from "@/lib/resend";
 import { sendNewQuoteSMS } from "@/lib/sms";
+import { checkApiRateLimit } from "@/lib/ratelimit";
+import { getClientIP } from "@/lib/rate-limit";
 
 interface CreateQuoteBody {
   jobId: string;
@@ -20,6 +22,16 @@ interface CreateQuoteBody {
 
 export async function POST(req: NextRequest) {
   try {
+    // API rate limiting
+    const ip = getClientIP(req);
+    const rateLimit = await checkApiRateLimit(ip);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.id || !["driver", "admin"].includes((session.user as { role?: string }).role ?? "")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

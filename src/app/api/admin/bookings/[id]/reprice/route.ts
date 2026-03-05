@@ -61,8 +61,8 @@ export async function POST(
     .from(jobItems)
     .where(eq(jobItems.jobId, booking.jobId));
 
-  // Resolve distance (stored in miles despite legacy column name)
-  let distanceMiles = job.distanceKm ? Number(job.distanceKm) : 0;
+  // Resolve distance (stored in miles)
+  let distanceMiles = job.distanceMiles ? Number(job.distanceMiles) : 0;
 
   if (distanceMiles <= 0) {
     // Try to recalculate from stored coordinates
@@ -80,10 +80,10 @@ export async function POST(
         );
         distanceMiles = directions.distanceMiles;
 
-        // Store recalculated distance on job (miles, legacy column name)
+        // Store recalculated distance on job
         await db
           .update(jobs)
-          .set({ distanceKm: String(distanceMiles), updatedAt: new Date() })
+          .set({ distanceMiles: String(distanceMiles), updatedAt: new Date() })
           .where(eq(jobs.id, job.id));
       } catch {
         // Fallback: use a default distance if Mapbox fails

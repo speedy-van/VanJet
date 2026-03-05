@@ -98,3 +98,42 @@ export async function sendOtpSMS(phone: string, otp: string) {
     `VanJet: Your verification code is ${otp}. It expires in 10 minutes. Do not share this code.`
   );
 }
+
+export async function sendPaymentFailedSMS(phone: string, reason: string) {
+  return sendSMS(
+    phone,
+    `VanJet: Your payment could not be processed. Reason: ${reason}. Please try again or contact your bank.`
+  );
+}
+
+export async function sendRefundSMS(
+  phone: string,
+  amount: string,
+  isFullRefund: boolean
+) {
+  return sendSMS(
+    phone,
+    `VanJet: A ${isFullRefund ? "full" : "partial"} refund of £${amount} has been issued. It should appear in your account within 5-10 business days.`
+  );
+}
+
+export async function sendCancellationSMS(
+  phone: string,
+  bookingId: string,
+  reason: string
+) {
+  return sendSMS(
+    phone,
+    `VanJet: Booking #${bookingId.slice(0, 8)} has been cancelled. Reason: ${reason}. If you have questions, contact us.`
+  );
+}
+
+export async function sendDriverCancellationSMS(
+  phone: string,
+  bookingId: string
+) {
+  return sendSMS(
+    phone,
+    `VanJet: The driver has cancelled booking #${bookingId.slice(0, 8)}. We're finding you a new driver. A full refund will be processed if needed.`
+  );
+}

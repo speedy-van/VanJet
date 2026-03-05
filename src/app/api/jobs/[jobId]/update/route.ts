@@ -75,7 +75,7 @@ export async function PATCH(
     );
 
     // Get distance from existing job data
-    const distanceMiles = Number(existingJob.distanceKm) || 10;
+    const distanceMiles = Number(existingJob.distanceMiles) || 10;
 
     // Calculate pricing
     const pricingInput: PricingInput = {

@@ -179,3 +179,132 @@ export async function sendBookingConfirmation({
     html,
   });
 }
+
+/**
+ * Send a payment failed notification to the customer.
+ */
+export async function sendPaymentFailedNotification({
+  to,
+  name,
+  jobId,
+  reason,
+}: {
+  to: string;
+  name: string;
+  jobId: string;
+  reason: string;
+}) {
+  const resend = getResend();
+  if (!resend) { console.log("[VanJet] Resend not configured, skipping email."); return; }
+  const html = baseTemplate(`
+    <h2 style="color:#dc2626;font-size:20px;margin:0 0 8px;">Payment Failed</h2>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      Hi ${name},<br><br>
+      Unfortunately, your payment for job <strong>#${jobId.slice(0, 8)}</strong> could not be processed.
+    </p>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      Please try again with a different payment method or contact your bank.
+    </p>
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/job/${jobId}/quotes"
+         style="display:inline-block;padding:14px 32px;background:#0070f3;color:#fff;font-weight:700;
+                border-radius:8px;text-decoration:none;font-size:16px;">
+        Retry Payment
+      </a>
+    </div>
+  `);
+
+  return resend.emails.send({
+    from: FROM,
+    to,
+    subject: `VanJet — Payment Failed (#${jobId.slice(0, 8)})`,
+    html,
+  });
+}
+
+/**
+ * Send a refund notification to a customer or driver.
+ */
+export async function sendRefundNotification({
+  to,
+  name,
+  bookingId,
+  amount,
+  isFullRefund,
+}: {
+  to: string;
+  name: string;
+  bookingId: string;
+  amount: string;
+  isFullRefund: boolean;
+}) {
+  const resend = getResend();
+  if (!resend) { console.log("[VanJet] Resend not configured, skipping email."); return; }
+  const title = isFullRefund ? "Full Refund Issued" : "Partial Refund Issued";
+  const html = baseTemplate(`
+    <h2 style="color:#1a202c;font-size:20px;margin:0 0 8px;">${title}</h2>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      Hi ${name},<br><br>
+      A ${isFullRefund ? "full" : "partial"} refund of <strong>&pound;${amount}</strong> has been issued
+      for booking <strong>#${bookingId.slice(0, 8)}</strong>.
+    </p>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      The refund should appear in your account within 5–10 business days, depending on your bank.
+      ${isFullRefund ? "This booking has been cancelled." : ""}
+    </p>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      If you have any questions, please reply to this email or contact our support team.
+    </p>
+  `);
+
+  return resend.emails.send({
+    from: FROM,
+    to,
+    subject: `VanJet — ${title} (#${bookingId.slice(0, 8)})`,
+    html,
+  });
+}
+
+/**
+ * Send a cancellation notification to a customer or driver.
+ */
+export async function sendCancellationNotification({
+  to,
+  name,
+  bookingId,
+  reason,
+  refundIssued,
+}: {
+  to: string;
+  name: string;
+  bookingId: string;
+  reason: string;
+  refundIssued: boolean;
+}) {
+  const resend = getResend();
+  if (!resend) { console.log("[VanJet] Resend not configured, skipping email."); return; }
+  const html = baseTemplate(`
+    <h2 style="color:#dc2626;font-size:20px;margin:0 0 8px;">Booking Cancelled</h2>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      Hi ${name},<br><br>
+      Booking <strong>#${bookingId.slice(0, 8)}</strong> has been cancelled.
+    </p>
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+    ${refundIssued ? `<p style="color:#555;font-size:14px;line-height:1.6;">A full refund has been initiated and should appear in your account within 5–10 business days.</p>` : ""}
+    <p style="color:#555;font-size:14px;line-height:1.6;">
+      If you have any questions, please reply to this email or contact our support team.
+    </p>
+  `);
+
+  return resend.emails.send({
+    from: FROM,
+    to,
+    subject: `VanJet — Booking Cancelled (#${bookingId.slice(0, 8)})`,
+    html,
+  });
+}

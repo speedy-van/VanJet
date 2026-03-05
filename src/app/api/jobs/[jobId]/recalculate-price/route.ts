@@ -40,7 +40,7 @@ export async function PATCH(
     // Build pricing input
     const pricingInput: PricingInput = {
       jobType: job.jobType || "single_item",
-      distanceMiles: job.distanceKm ? Number(job.distanceKm) : 0,
+      distanceMiles: job.distanceMiles ? Number(job.distanceMiles) : 0,
       items: items.map((i) => ({
         name: i.name,
         quantity: i.quantity,

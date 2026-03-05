@@ -74,7 +74,7 @@ export default async function AdminJobDetailPage({ params }: Props) {
           />
           <InfoRow
             label="Distance"
-            value={job.distanceKm ? `${Number(job.distanceKm).toFixed(1)} mi` : "—"}
+            value={job.distanceMiles ? `${Number(job.distanceMiles).toFixed(1)} mi` : "—"}
           />
         </Box>
 

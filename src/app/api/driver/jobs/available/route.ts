@@ -121,7 +121,7 @@ export async function GET() {
         deliveryHasLift: job.deliveryHasLift,
         deliveryNotes: job.deliveryNotes,
         // Route
-        distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+        distanceMiles: job.distanceMiles ? Number(job.distanceMiles) : null,
         durationMinutes: job.durationMinutes,
         // Schedule
         moveDate: job.moveDate,

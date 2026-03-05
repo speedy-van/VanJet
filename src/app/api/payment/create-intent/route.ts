@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
           pickupAddress: job.pickupAddress,
           deliveryAddress: job.deliveryAddress,
           moveDate: job.moveDate,
-          distanceMiles: job.distanceKm ? Number(job.distanceKm) : null,
+          distanceMiles: job.distanceMiles ? Number(job.distanceMiles) : null,
         },
         quote: {
           id: quote.id,

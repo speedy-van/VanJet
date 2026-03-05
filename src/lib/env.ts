@@ -100,6 +100,11 @@ export const serverEnv = {
     return optional("DEV_DRIVER_KEY");
   },
   
+  // ── Optional: Two-Factor Encryption ───────────────────────────
+  get TWO_FACTOR_ENCRYPTION_KEY() {
+    return optional("TWO_FACTOR_ENCRYPTION_KEY");
+  },
+  
   // ── Optional: Feature Toggles ─────────────────────────────────
   get ZERO_COMMISSION_MODE() {
     return optional("ZERO_COMMISSION_MODE") === "true";
@@ -109,6 +114,8 @@ export const serverEnv = {
 /** Public env vars (available in browser via NEXT_PUBLIC_ prefix). */
 export const publicEnv = {
   // ── Required for core functionality ───────────────────────────
+  // MAPBOX_TOKEN: Restrict this token to your site's domain via Mapbox dashboard
+  // to prevent unauthorized usage (Settings → Access tokens → URL restrictions).
   MAPBOX_TOKEN: requiredPublic("MAPBOX_TOKEN"),
   STRIPE_PUBLISHABLE_KEY: requiredPublic("STRIPE_PUBLISHABLE_KEY"),
   
