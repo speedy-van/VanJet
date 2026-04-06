@@ -46,3 +46,7 @@ next-env.d.ts
 .env*.local
 
 .env.production
+
+# Duplicate/backup folders (images already in public/images/items/)
+/UK_Removal_Dataset/Images_Only/
+/my-vanjet/
