@@ -10,18 +10,20 @@ import { getPublicReviews } from "@/lib/reviews/queries";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.baseUrl),
   title: {
-    default: "VanJet – UK Man & Van & Removal Marketplace | Free Quotes",
+    default: "VanJet – Scotland's Trusted Man & Van Marketplace | Glasgow, Edinburgh & Beyond",
     template: "%s | VanJet",
   },
   description:
-    "Compare instant quotes from verified UK removal companies and man & van drivers. House moves, office relocations, single items. No platform fees. Book in 2 minutes.",
+    "Scotland's #1 man & van and removal marketplace. Compare instant quotes from verified drivers in Glasgow, Edinburgh, and across Scotland. House moves, office relocations, single items. Book in 2 minutes.",
   keywords: [
-    "man and van UK",
-    "removal company UK",
-    "house removals",
-    "man and van London",
-    "furniture delivery",
-    "Office removals",
+    "man and van Glasgow",
+    "man and van Edinburgh",
+    "man and van Scotland",
+    "removal company Scotland",
+    "house removals Glasgow",
+    "house removals Edinburgh",
+    "furniture delivery Scotland",
+    "office removals Glasgow",
     "instant removal quotes",
   ],
   alternates: { canonical: "/" },

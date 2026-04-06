@@ -32,39 +32,39 @@ function getRelativeTime(msAgo: number): string {
 const recentMoves: RecentMove[] = [
   {
     id: "1",
-    from: "London SE1",
-    to: "Brighton BN1",
+    from: "Glasgow G1",
+    to: "Edinburgh EH1",
     type: "House Move",
-    items: "3-bed house — 42 items",
-    price: "£485",
-    timestamp: 2 * 3600000, // 2 hours ago
+    items: "2-bed flat — 28 items",
+    price: "£320",
+    timestamp: 3 * 3600000, // 3 hours ago
   },
   {
     id: "2",
-    from: "Manchester M1",
-    to: "Liverpool L1",
-    type: "Office Relocation",
-    items: "Small office — 18 items",
-    price: "£310",
+    from: "Glasgow G42",
+    to: "East Kilbride G74",
+    type: "Single Item",
+    items: "Corner sofa",
+    price: "£145",
     timestamp: 5 * 3600000, // 5 hours ago
   },
   {
     id: "3",
-    from: "Birmingham B1",
-    to: "Coventry CV1",
-    type: "Single Item",
-    items: "Upright piano",
-    price: "£165",
-    timestamp: 22 * 3600000, // 22 hours ago
+    from: "Edinburgh EH3",
+    to: "Dundee DD1",
+    type: "Office Relocation",
+    items: "Small office — 22 items",
+    price: "£410",
+    timestamp: 26 * 3600000, // Yesterday
   },
   {
     id: "4",
-    from: "Leeds LS1",
-    to: "Sheffield S1",
-    type: "Storage Collection",
-    items: "12 boxes + wardrobe",
-    price: "£120",
-    timestamp: 26 * 3600000, // 26 hours ago
+    from: "Paisley PA1",
+    to: "Glasgow G12",
+    type: "Student Move",
+    items: "8 boxes + desk",
+    price: "£85",
+    timestamp: 2 * 3600000, // 2 hours ago
   },
 ];
 
@@ -89,7 +89,7 @@ export function RecentMoves() {
             fontSize={{ base: "15px", md: "16px" }}
             lineHeight="1.7"
           >
-            See what other customers are moving across the UK.
+            See what other customers are moving across Scotland.
           </Text>
         </VStack>
       </BlurIn>

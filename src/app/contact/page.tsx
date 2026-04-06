@@ -9,11 +9,11 @@ import { SITE } from "@/lib/seo/site";
 export const metadata: Metadata = {
   title: "Contact Us — VanJet",
   description:
-    "Get in touch with VanJet. Phone 01202 129746, email support@speedy-van.co.uk. UK removal and man and van enquiries.",
+    `Get in touch with VanJet. Phone ${SITE.phone}, email ${SITE.email}. Scotland's trusted man and van & removal service.`,
   alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact Us — VanJet",
-    description: "Contact VanJet for removal and man and van enquiries across the UK.",
+    description: "Contact VanJet for removal and man and van enquiries across Scotland and the UK.",
     url: `${SITE.baseUrl}/contact`,
     siteName: SITE.name,
     type: "website",

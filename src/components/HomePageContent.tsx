@@ -105,9 +105,9 @@ export function HomePageContent({ initialReviews }: HomePageContentProps) {
                   lineHeight="1.08"
                   letterSpacing="-0.02em"
                 >
-                  UK&apos;s #1 Man &amp; Van
+                  Scotland&apos;s Trusted
                   <br />
-                  and Removal Marketplace
+                  Man &amp; Van Marketplace
                 </Text>
               </motion.div>
               <motion.div
@@ -123,8 +123,8 @@ export function HomePageContent({ initialReviews }: HomePageContentProps) {
                   mt={5}
                   lineHeight="1.7"
                 >
-                  Move anything, anywhere in the UK. Get instant quotes from verified
-                  drivers and removal companies. House moves, single items, office relocations.
+                  Move anything, anywhere. Serving Glasgow, Edinburgh &amp; all of Scotland.
+                  Get instant quotes from verified drivers. House moves, single items, office relocations.
                 </Text>
               </motion.div>
               <motion.div

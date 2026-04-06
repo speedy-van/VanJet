@@ -1,8 +1,8 @@
 // ─── VanJet · Sitemap ─────────────────────────────────────────
 // Programmatic sitemap. English only. No car/motorcycle.
-// Only 22 pillar item pages included (not all 398 items).
+// Scottish cities prioritised. Only 22 pillar item pages included.
 import type { MetadataRoute } from "next";
-import { SITE, VALID_SERVICES, CITY_DATA } from "@/lib/seo/site";
+import { SITE, VALID_SERVICES, CITY_DATA, isScottishCity } from "@/lib/seo/site";
 import { PILLAR_SLUGS } from "@/lib/seo/pillar-items";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -35,13 +35,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   // ── /[service]/[city] (programmatic SEO landing pages) ──────
+  // Scottish cities get higher priority (0.9) than English cities (0.7)
   for (const service of VALID_SERVICES) {
     for (const city of Object.keys(CITY_DATA)) {
+      const isScottish = isScottishCity(city);
       entries.push({
         url: `${base}/${service}/${city}`,
         lastModified: now,
-        changeFrequency: "monthly",
-        priority: 0.8,
+        changeFrequency: isScottish ? "weekly" : "monthly",
+        priority: isScottish ? 0.9 : 0.7,
       });
     }
   }

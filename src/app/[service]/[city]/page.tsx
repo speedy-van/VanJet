@@ -9,6 +9,7 @@ import {
   VALID_SERVICES,
   SERVICE_META,
   CITY_DATA,
+  isScottishCity,
 } from "@/lib/seo/site";
 import type { ValidService } from "@/lib/seo/site";
 import {
@@ -88,9 +89,34 @@ export default async function ServiceCityPage({ params }: PageProps) {
 
   const svc = SERVICE_META[service as ValidService];
   const loc = CITY_DATA[city];
+  const isScottish = isScottishCity(city);
 
-  // City-specific FAQs
-  const faqs = [
+  // Scottish postcode prefixes map
+  const scottishPostcodes: Record<string, string> = {
+    glasgow: "G1–G84",
+    edinburgh: "EH1–EH17",
+    paisley: "PA1–PA4",
+    "east-kilbride": "G74–G75",
+    hamilton: "ML3",
+    motherwell: "ML1–ML2",
+    coatbridge: "ML5",
+    cumbernauld: "G67–G68",
+    livingston: "EH54",
+    dunfermline: "KY11–KY12",
+    kirkcaldy: "KY1–KY2",
+    dundee: "DD1–DD5",
+    aberdeen: "AB10–AB25",
+    stirling: "FK7–FK9",
+    perth: "PH1–PH2",
+    inverness: "IV1–IV3",
+    ayr: "KA7–KA8",
+    falkirk: "FK1–FK2",
+    greenock: "PA15–PA16",
+    kilmarnock: "KA1–KA3",
+  };
+
+  // Base FAQs for all cities
+  const baseFaqs = [
     {
       question: `How much does ${svc.title.toLowerCase()} cost in ${loc.name}?`,
       answer: `Prices vary based on distance, items, and date. Use our instant quote calculator to get a personalised estimate for ${loc.name}. Most ${svc.title.toLowerCase()} jobs start from £40.`,
@@ -108,6 +134,31 @@ export default async function ServiceCityPage({ params }: PageProps) {
       answer: `We cover the entire ${loc.region} region and beyond. Enter your pickup and delivery postcodes for an exact quote.`,
     },
   ];
+
+  // Scotland-specific FAQs
+  const scottishFaqs = isScottish
+    ? [
+        {
+          question: `Do you cover the whole ${loc.name} area?`,
+          answer: `Yes, we cover all of ${loc.name} (${scottishPostcodes[city] || "all postcodes"}) and surrounding areas${
+            city === "glasgow" || city === "edinburgh"
+              ? " including the wider Central Belt"
+              : city === "aberdeen"
+                ? " including the North East of Scotland"
+                : city === "inverness"
+                  ? " including the Highlands"
+                  : ""
+          }. Our drivers are local and know the area well.`,
+        },
+        {
+          question: `What are typical ${svc.title.toLowerCase()} prices in Scotland?`,
+          answer: `Scottish ${svc.title.toLowerCase()} prices are competitive. A studio flat move within ${loc.name} typically costs £95–£180, while a 2-bed flat ranges from £250–£430. Prices reflect Scottish distances and rates, not London pricing.`,
+        },
+      ]
+    : [];
+
+  // Combine FAQs (Scottish FAQs first for Scottish cities)
+  const faqs = isScottish ? [...scottishFaqs, ...baseFaqs] : baseFaqs;
 
   const locationSchema = generateLocationSchema({
     service: svc.title,

@@ -5,12 +5,12 @@ import Link from "next/link";
 import { BlurIn } from "@/components/animations/Motion";
 
 const pricingData = [
-  { moveType: "Single item / small load", avgPrice: "£25 – £65", duration: "1–2 hours" },
-  { moveType: "Studio flat", avgPrice: "£120 – £220", duration: "2–4 hours" },
-  { moveType: "1 bedroom flat", avgPrice: "£200 – £360", duration: "3–5 hours" },
-  { moveType: "2 bedroom flat", avgPrice: "£320 – £530", duration: "4–7 hours" },
-  { moveType: "3 bedroom house", avgPrice: "£480 – £760", duration: "6–9 hours" },
-  { moveType: "4+ bedroom house", avgPrice: "£700 – £1,200+", duration: "Full day+" },
+  { moveType: "Single item / small load", avgPrice: "£25 – £55", duration: "1–2 hours" },
+  { moveType: "Studio flat", avgPrice: "£95 – £180", duration: "2–3 hours" },
+  { moveType: "1 bedroom flat", avgPrice: "£150 – £290", duration: "2–4 hours" },
+  { moveType: "2 bedroom flat", avgPrice: "£250 – £430", duration: "3–6 hours" },
+  { moveType: "3 bedroom house", avgPrice: "£380 – £650", duration: "5–8 hours" },
+  { moveType: "4+ bedroom house", avgPrice: "£550 – £1,000+", duration: "Full day+" },
 ];
 
 export function PricingTable() {
@@ -34,7 +34,7 @@ export function PricingTable() {
             fontSize={{ base: "15px", md: "16px" }}
             lineHeight="1.7"
           >
-            Average costs for common moves across the UK. No hidden fees — ever.
+            Average costs for common moves across Scotland. No hidden fees — ever.
           </Text>
         </VStack>
       </BlurIn>
