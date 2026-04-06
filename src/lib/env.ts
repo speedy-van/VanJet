@@ -111,18 +111,21 @@ export const serverEnv = {
   },
 } as const;
 
-/** Public env vars (available in browser via NEXT_PUBLIC_ prefix). */
+/** Public env vars (available in browser via NEXT_PUBLIC_ prefix). 
+ * IMPORTANT: Must use static process.env.NEXT_PUBLIC_* access for Next.js to inline at build time.
+ * Dynamic access like process.env[varName] does NOT work for client-side code.
+ */
 export const publicEnv = {
   // ── Required for core functionality ───────────────────────────
   // MAPBOX_TOKEN: Restrict this token to your site's domain via Mapbox dashboard
   // to prevent unauthorized usage (Settings → Access tokens → URL restrictions).
-  MAPBOX_TOKEN: requiredPublic("MAPBOX_TOKEN"),
-  STRIPE_PUBLISHABLE_KEY: requiredPublic("STRIPE_PUBLISHABLE_KEY"),
+  MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "",
+  STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "",
   
   // ── Optional: App URL ─────────────────────────────────────────
-  APP_URL: optional("NEXT_PUBLIC_URL") || "http://localhost:3000",
+  APP_URL: process.env.NEXT_PUBLIC_URL || "http://localhost:3000",
   
   // ── Optional: Analytics ───────────────────────────────────────
-  GA_ID: optional("NEXT_PUBLIC_GA_ID"),
-  GTM_ID: optional("NEXT_PUBLIC_GTM_ID"),
+  GA_ID: process.env.NEXT_PUBLIC_GA_ID ?? "",
+  GTM_ID: process.env.NEXT_PUBLIC_GTM_ID ?? "",
 } as const;
