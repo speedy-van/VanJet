@@ -1,0 +1,22 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <linearGradient id="zyphon-gradient" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <filter id="zyphon-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#zyphon-glow)">
+    <path d="M22 22 L98 22 L98 42 L50 78 L98 78 L98 98 L22 98 L22 78 L70 42 L22 42 Z"
+          fill="url(#zyphon-gradient)"/>
+  </g>
+  <circle cx="100" cy="20" r="5" fill="#f0abfc" opacity="0.9"/>
+  <circle cx="100" cy="20" r="2.5" fill="#ffffff"/>
+</svg>

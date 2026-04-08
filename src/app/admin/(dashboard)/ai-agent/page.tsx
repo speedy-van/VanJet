@@ -14,8 +14,8 @@ import {
   HStack,
   Textarea,
   Badge,
-  Avatar,
 } from "@chakra-ui/react";
+import Image from "next/image";
 import { Send, Trash2, User, Loader2, Zap } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 
@@ -168,10 +168,13 @@ export default function AdminAIAgentPage() {
       {/* Header */}
       <Flex justify="space-between" align="center" mb={4}>
         <HStack gap={3}>
-          <Box title={t("identityHint")}>
-            <Avatar.Root colorPalette="purple" size="md">
-              <Avatar.Fallback>Z</Avatar.Fallback>
-            </Avatar.Root>
+          <Box title={t("identityHint")} flexShrink={0}>
+            <Image
+              src="/images/zyphon-logo.svg"
+              alt="Zyphon"
+              width={40}
+              height={40}
+            />
           </Box>
           <Box>
             <HStack gap={2} align="center">
@@ -221,9 +224,12 @@ export default function AdminAIAgentPage() {
               py={12}
               color="gray.400"
             >
-              <Avatar.Root colorPalette="purple" size="xl">
-                <Avatar.Fallback>Z</Avatar.Fallback>
-              </Avatar.Root>
+              <Image
+                src="/images/zyphon-logo.svg"
+                alt="Zyphon"
+                width={64}
+                height={64}
+              />
               <Text mt={4} textAlign="center" fontWeight="600" color="gray.600">
                 Zyphon
               </Text>
