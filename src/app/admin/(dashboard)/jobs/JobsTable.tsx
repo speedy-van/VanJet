@@ -99,12 +99,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
     });
   }, [jobs]);
 
-  const clearSelection = useCallback(() => {
-    console.log("[JobsTable] Clearing selection");
-    setSelectedIds(() => new Set<string>());
-  }, []);
-
-  // Force re-render when selection changes
+  // Note: We don't use clearSelection callback here - direct inline handler ensures fresh state update
   const selectedCount = selectedIds.size;
   const allSelected = jobs.length > 0 && selectedCount === jobs.length;
   const someSelected = selectedCount > 0;
@@ -133,9 +128,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
             size="sm"
             variant="outline"
             colorPalette="red"
-            onClick={() => {
-              setSelectedIds(new Set<string>());
-            }}
+            onClick={() => setSelectedIds(new Set<string>())}
           >
             <X size={16} />
             <Text ml={1}>Clear Selection</Text>
