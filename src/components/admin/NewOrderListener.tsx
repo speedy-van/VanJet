@@ -1,7 +1,8 @@
 "use client";
 
 // ─── VanJet · New Order Listener Component ────────────────────
-// Listens for new orders via SSE and shows toast + plays sound
+// Polls for new orders and shows toast + plays sound
+// Uses polling instead of SSE for serverless compatibility
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -9,8 +10,10 @@ import { Box, Flex, Text, Button, Badge } from "@chakra-ui/react";
 import { Bell, X, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 
+// Polling interval in milliseconds (10 seconds)
+const POLL_INTERVAL = 10000;
+
 interface OrderEvent {
-  type: "new_order" | "connected" | "heartbeat";
   orderId?: string;
   orderNumber?: string;
   serviceType?: string;
@@ -38,8 +41,9 @@ export function NewOrderListener() {
   const [connected, setConnected] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCheckedRef = useRef<string>(new Date().toISOString());
+  const seenOrdersRef = useRef<Set<string>>(new Set());
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize audio
   useEffect(() => {
@@ -68,7 +72,11 @@ export function NewOrderListener() {
   // Handle new order event
   const handleNewOrder = useCallback(
     (event: OrderEvent) => {
-      if (event.type !== "new_order" || !event.orderNumber) return;
+      if (!event.orderNumber) return;
+      
+      // Skip if we've already seen this order
+      if (seenOrdersRef.current.has(event.orderNumber)) return;
+      seenOrdersRef.current.add(event.orderNumber);
 
       const notification: NewOrderNotification = {
         id: event.orderId || crypto.randomUUID(),
@@ -91,59 +99,52 @@ export function NewOrderListener() {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
 
-  // Setup SSE connection
-  useEffect(() => {
-    function connect() {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-
-      const eventSource = new EventSource("/api/admin/orders/stream");
-      eventSourceRef.current = eventSource;
-
-      eventSource.onopen = () => {
-        setConnected(true);
-        console.log("[NewOrderListener] SSE connected");
-      };
-
-      eventSource.onmessage = (e) => {
-        try {
-          const data: OrderEvent = JSON.parse(e.data);
-          
-          if (data.type === "connected") {
-            setConnected(true);
-          } else if (data.type === "new_order") {
-            handleNewOrder(data);
-          }
-          // Ignore heartbeats
-        } catch (error) {
-          console.error("[NewOrderListener] Parse error:", error);
-        }
-      };
-
-      eventSource.onerror = () => {
+  // Poll for new orders
+  const pollForOrders = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `/api/admin/orders/poll?since=${encodeURIComponent(lastCheckedRef.current)}`
+      );
+      
+      if (!response.ok) {
         setConnected(false);
-        eventSource.close();
-        
-        // Reconnect after 5 seconds
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log("[NewOrderListener] Reconnecting...");
-          connect();
-        }, 5000);
-      };
-    }
-
-    connect();
-
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
+        return;
       }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
+      
+      setConnected(true);
+      const data = await response.json();
+      
+      // Update last checked timestamp
+      if (data.timestamp) {
+        lastCheckedRef.current = data.timestamp;
+      }
+      
+      // Process new orders
+      if (data.orders && Array.isArray(data.orders)) {
+        for (const order of data.orders) {
+          handleNewOrder(order);
+        }
+      }
+    } catch (error) {
+      console.error("[NewOrderListener] Poll error:", error);
+      setConnected(false);
+    }
+  }, [handleNewOrder]);
+
+  // Setup polling
+  useEffect(() => {
+    // Initial poll
+    pollForOrders();
+    
+    // Start polling interval
+    pollIntervalRef.current = setInterval(pollForOrders, POLL_INTERVAL);
+    
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
       }
     };
-  }, [handleNewOrder]);
+  }, [pollForOrders]);
 
   // Toggle sound
   const toggleSound = useCallback(() => {
