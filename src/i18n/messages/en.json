@@ -372,18 +372,6 @@
       "chipVisitors": "Visitor Analytics",
       "chipRevenue": "Revenue"
     },
-    "aiAgent": {
-      "title": "Zyphon",
-      "subtitle": "Your smart agent inside the admin panel",
-      "placeholder": "Type your message here...",
-      "send": "Send",
-      "clear": "Clear Chat",
-      "thinking": "Thinking...",
-      "executing": "Executing",
-      "error": "An error occurred",
-      "welcome": "Hello! I'm Zyphon, your smart agent. How can I help you today?",
-      "retry": "Retry"
-    },
     "settings": {
       "title": "Settings",
       "language": "Language",
