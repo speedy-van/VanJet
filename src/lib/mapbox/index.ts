@@ -41,9 +41,11 @@ export async function geocodeAddress(
   const token = publicEnv.MAPBOX_TOKEN;
   if (!token) throw new Error("Mapbox token is not configured.");
 
+  // UK mainland bounding box: SW corner to NE corner (lon,lat,lon,lat)
+  const ukBbox = "-8.65,49.84,1.77,60.86";
   const url = `${MAPBOX_BASE}/geocoding/v5/mapbox.places/${encodeURIComponent(
     query
-  )}.json?country=GB&language=en&types=address,postcode,place&limit=1&access_token=${token}`;
+  )}.json?country=GB&bbox=${ukBbox}&language=en&types=address,postcode,place&limit=1&access_token=${token}`;
 
   const res = await fetchWithRetry(url);
   if (!res.ok) throw new Error("Geocoding request failed.");

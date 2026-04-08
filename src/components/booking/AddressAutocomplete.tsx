@@ -51,9 +51,11 @@ export function AddressAutocomplete({
     if (!token) return;
 
     try {
+      // UK mainland bounding box: SW corner to NE corner (lon,lat,lon,lat)
+      const ukBbox = "-8.65,49.84,1.77,60.86";
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
         query
-      )}.json?country=GB&language=en&autocomplete=true&limit=6&types=address,place,postcode&access_token=${token}`;
+      )}.json?country=GB&bbox=${ukBbox}&language=en&autocomplete=true&limit=6&types=address,place,postcode&access_token=${token}`;
       const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();

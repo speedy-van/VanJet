@@ -477,7 +477,7 @@ export function StepAddresses({ form, onNext }: StepAddressesProps) {
                 gap={2}
               >
                 <Text fontSize="sm" fontWeight="600" color="gray.700">
-                  📏 Estimated distance: {distance} km
+                  📏 Estimated distance: {distance.toFixed(1)} miles
                 </Text>
               </Flex>
             )}

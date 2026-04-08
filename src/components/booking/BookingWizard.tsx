@@ -18,6 +18,8 @@ import { StepItems } from "./StepItems";
 import { StepSchedule } from "./StepSchedule";
 import { StepReview } from "./StepReview";
 import { StepSuccess } from "./StepSuccess";
+import { StepTransition } from "./shared";
+import "./shared/motion.css";
 
 export function BookingWizard() {
   const searchParams = useSearchParams();
@@ -105,26 +107,28 @@ export function BookingWizard() {
           <ProgressStepper current={step} />
         )}
 
-        {/* Steps */}
-        {step === 0 && <StepAddresses form={form} onNext={next} />}
-        {step === 1 && (
-          <StepItems form={form} onNext={next} onBack={back} />
-        )}
-        {step === 2 && (
-          <StepSchedule
-            form={form}
-            onNext={next}
-            onBack={back}
-          />
-        )}
-        {step === 3 && (
-          <StepReview
-            form={form}
-            onNext={next}
-            onBack={back}
-          />
-        )}
-        {step === 4 && <StepSuccess form={form} />}
+        {/* Steps with animated transitions */}
+        <StepTransition stepKey={step}>
+          {step === 0 && <StepAddresses form={form} onNext={next} />}
+          {step === 1 && (
+            <StepItems form={form} onNext={next} onBack={back} />
+          )}
+          {step === 2 && (
+            <StepSchedule
+              form={form}
+              onNext={next}
+              onBack={back}
+            />
+          )}
+          {step === 3 && (
+            <StepReview
+              form={form}
+              onNext={next}
+              onBack={back}
+            />
+          )}
+          {step === 4 && <StepSuccess form={form} />}
+        </StepTransition>
       </Container>
     </Box>
   );

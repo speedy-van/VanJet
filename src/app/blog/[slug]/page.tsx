@@ -917,7 +917,7 @@ Confirm floor access with a professional mover before purchasing a safe for an u
 
 **Cost of Safe Moving**
 
-- Local move (< 10 km): £300–£600
+- Local move (< 10 miles): £300–£600
 - Weight surcharge: £50–£100+ per 100 kg over 500 kg
 - Exterior hoist (stairs): £500–£2000
 - Long-distance moves: £800–£3000+

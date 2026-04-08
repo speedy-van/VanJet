@@ -1,0 +1,164 @@
+/* ─── VanJet · Booking Wizard Motion CSS ─────────────────────── */
+/* CSS-only animations that complement Framer Motion for simpler cases. */
+/* All animations respect prefers-reduced-motion. */
+
+/* ─── Keyframes (wrapped in reduced-motion check) ─────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes wizardStepEnter {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes valuePulse {
+    0% {
+      transform: scale(1);
+      color: inherit;
+    }
+    50% {
+      transform: scale(1.05);
+      color: var(--chakra-colors-purple-600);
+    }
+    100% {
+      transform: scale(1);
+      color: inherit;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  @keyframes indicatorPop {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes softGlow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+    }
+  }
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────── */
+
+/* Step enter animation */
+.wizard-enter {
+  animation: wizardStepEnter 0.3s ease-out forwards;
+}
+
+/* Value update pulse */
+.wizard-pulse {
+  animation: valuePulse 0.4s ease-out;
+}
+
+/* Error shake */
+.wizard-shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* Skeleton shimmer */
+.wizard-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--chakra-colors-gray-100) 25%,
+    var(--chakra-colors-gray-50) 50%,
+    var(--chakra-colors-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Press feedback for buttons */
+.wizard-pressable {
+  transition: transform 0.15s ease-out;
+}
+
+.wizard-pressable:active {
+  transform: scale(0.97);
+}
+
+/* Desktop-only hover lift */
+@media (hover: hover) {
+  .wizard-hover-lift {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+  
+  .wizard-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.15);
+  }
+}
+
+/* Indicator pop-in */
+.wizard-indicator-pop {
+  animation: indicatorPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Soft glow pulse (for current step indicator) */
+.wizard-glow {
+  animation: softGlow 2s ease-in-out infinite;
+}
+
+/* ─── Reduced Motion Fallbacks ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .wizard-enter,
+  .wizard-pulse,
+  .wizard-shake,
+  .wizard-shimmer,
+  .wizard-indicator-pop,
+  .wizard-glow {
+    animation: none;
+  }
+  
+  .wizard-pressable:active {
+    transform: none;
+  }
+  
+  .wizard-hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* ─── Dark Mode Shimmer ───────────────────────────────────────── */
+[data-theme="dark"] .wizard-shimmer,
+.dark .wizard-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--chakra-colors-gray-800) 25%,
+    var(--chakra-colors-gray-700) 50%,
+    var(--chakra-colors-gray-800) 75%
+  );
+  background-size: 200% 100%;
+}
