@@ -6,6 +6,12 @@ import { getOrdersTool, getOrderByIdTool } from "./orders";
 import { getDriversTool, suspendDriverTool } from "./drivers";
 import { getCustomersTool } from "./customers";
 import { broadcastToDriversTool } from "./broadcast";
+import {
+  reportBookingsTool,
+  reportDriversTool,
+  reportVisitorsTool,
+  getCurrentAdminTool,
+} from "./reports";
 
 export interface ToolDefinition {
   name: string;
@@ -76,6 +82,30 @@ const toolSchemas: Record<string, Record<string, unknown>> = {
     },
     required: ["message"],
   },
+  report_bookings: {
+    type: "object",
+    properties: {
+      days: { type: ["number", "string"], description: "Period in days (default 30)" },
+    },
+    required: [],
+  },
+  report_drivers: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
+  report_visitors: {
+    type: "object",
+    properties: {
+      days: { type: ["number", "string"], description: "Period in days (default 7)" },
+    },
+    required: [],
+  },
+  get_current_admin: {
+    type: "object",
+    properties: {},
+    required: [],
+  },
 };
 
 // Coerce string values to proper types based on expected schema
@@ -107,6 +137,10 @@ export const tools: Record<string, ToolDefinition> = {
   get_customers: { ...getCustomersTool, jsonSchema: toolSchemas.get_customers },
   suspend_driver: { ...suspendDriverTool, jsonSchema: toolSchemas.suspend_driver },
   broadcast_to_drivers: { ...broadcastToDriversTool, jsonSchema: toolSchemas.broadcast_to_drivers },
+  report_bookings: { ...reportBookingsTool, jsonSchema: toolSchemas.report_bookings },
+  report_drivers: { ...reportDriversTool, jsonSchema: toolSchemas.report_drivers },
+  report_visitors: { ...reportVisitorsTool, jsonSchema: toolSchemas.report_visitors },
+  get_current_admin: { ...getCurrentAdminTool, jsonSchema: toolSchemas.get_current_admin },
 };
 
 // Convert tools to Groq tool format

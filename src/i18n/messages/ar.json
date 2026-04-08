@@ -365,7 +365,12 @@
       "emptyState": "اسأل زايفون أي شي عن العمليات",
       "identityHint": "صنعه احمد الوكاع",
       "tagline": "وكيلك الذكي داخل لوحة الإدارة",
-      "byCreator": "by Ahmad Alwakai"
+      "byCreator": "by Ahmad Alwakai",
+      "resetBtn": "محادثة جديدة",
+      "chipOrders": "الطلبات اليوم",
+      "chipDrivers": "تقرير السائقين",
+      "chipVisitors": "تحليل الزوار",
+      "chipRevenue": "الإيرادات"
     },
     "aiAgent": {
       "title": "Zyphon",

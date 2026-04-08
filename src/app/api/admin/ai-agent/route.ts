@@ -13,6 +13,13 @@ import {
   containsForbiddenTokens,
 } from "@/lib/ai/identityGuard";
 import { logAIToolAction } from "@/lib/ai/audit";
+import {
+  getOrCreateConversation,
+  loadContextWindow,
+  appendMessage,
+  resetConversation,
+  getAdminName,
+} from "@/lib/ai/memory";
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -67,6 +74,47 @@ export async function POST(req: NextRequest) {
     // Parse body
     const body = await req.json();
     const messages: Message[] = body.messages || [];
+    const isBoot = body.boot === true;
+    const isReset = body.reset === true;
+
+    // Handle reset
+    if (isReset) {
+      await resetConversation(adminId);
+      return new Response(
+        JSON.stringify({ ok: true }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle boot trigger — return personalized greeting
+    if (isBoot) {
+      const conv = await getOrCreateConversation(adminId);
+      const history = await loadContextWindow(conv.id);
+
+      // If there's already history, send it back
+      if (history.length > 0) {
+        return new Response(
+          JSON.stringify({
+            greeting: null,
+            history: history.filter((m) => m.role === "user" || m.role === "assistant"),
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      // New conversation — personalized greeting
+      const adminName = await getAdminName(adminId);
+      const firstName = adminName?.split(" ")[0] ?? "Admin";
+      const greeting = `هلا ${firstName}! آني زايفون، وكيلك الذكي. شلون أكدر أساعدك اليوم؟`;
+
+      // Persist the greeting
+      await appendMessage(conv.id, "assistant", greeting);
+
+      return new Response(
+        JSON.stringify({ greeting, history: [] }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return new Response(
@@ -80,8 +128,8 @@ export async function POST(req: NextRequest) {
     const tools = getGroqTools();
 
     // ── IDENTITY GUARD: Short-circuit identity questions ──
-    const lastUserMessage = messages[messages.length - 1];
-    if (lastUserMessage?.role === "user" && detectIdentityQuestion(lastUserMessage.content)) {
+    const lastUserMsg = messages[messages.length - 1];
+    if (lastUserMsg?.role === "user" && detectIdentityQuestion(lastUserMsg.content)) {
       const identityAnswer = getIdentityResponse("ar");
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
@@ -100,7 +148,15 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Build conversation with system prompt
+    // Build conversation with system prompt + persistent memory
+    const conv = await getOrCreateConversation(adminId);
+    const history = await loadContextWindow(conv.id);
+
+    // Persist the new user message
+    if (lastUserMsg?.role === "user") {
+      await appendMessage(conv.id, "user", lastUserMsg.content);
+    }
+
     // Using ChatCompletionMessageParam type from Groq SDK
     type ConversationMessage = {
       role: "system" | "user" | "assistant" | "tool";
@@ -116,10 +172,15 @@ export async function POST(req: NextRequest) {
     
     const conversation: ConversationMessage[] = [
       { role: "system", content: systemPrompt },
-      ...messages.map((m) => ({
+      // Load persistent history
+      ...history.map((m) => ({
         role: m.role as "user" | "assistant",
         content: m.content,
       })),
+      // Add the new user message (if not already in history)
+      ...(lastUserMsg?.role === "user"
+        ? [{ role: "user" as const, content: lastUserMsg.content }]
+        : []),
     ];
 
     // Tool calling loop (max 6 iterations)
@@ -197,6 +258,9 @@ export async function POST(req: NextRequest) {
           status: "error",
         }).catch(() => {});
       }
+
+      // Persist assistant response
+      appendMessage(conv.id, "assistant", finalContent).catch(() => {});
 
       // Create streaming response
       const encoder = new TextEncoder();

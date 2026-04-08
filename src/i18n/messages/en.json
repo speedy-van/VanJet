@@ -365,7 +365,12 @@
       "emptyState": "Ask Zyphon anything about operations",
       "identityHint": "Created by Ahmad Alwakai",
       "tagline": "Your smart agent inside the admin panel",
-      "byCreator": "by Ahmad Alwakai"
+      "byCreator": "by Ahmad Alwakai",
+      "resetBtn": "New Chat",
+      "chipOrders": "Today's Orders",
+      "chipDrivers": "Driver Report",
+      "chipVisitors": "Visitor Analytics",
+      "chipRevenue": "Revenue"
     },
     "aiAgent": {
       "title": "Zyphon",

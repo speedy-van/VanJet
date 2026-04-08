@@ -16,13 +16,20 @@ import {
   Badge,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import { Send, Trash2, User, Loader2, Zap } from "lucide-react";
+import { Send, Trash2, User, Loader2, Zap, RotateCcw } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
+
+const QUICK_ACTIONS = [
+  { labelKey: "chipOrders", prompt: "شلون الطلبات اليوم؟" },
+  { labelKey: "chipDrivers", prompt: "وريني تقرير السائقين" },
+  { labelKey: "chipVisitors", prompt: "شكو بالزوار اليوم؟" },
+  { labelKey: "chipRevenue", prompt: "شلون الإيرادات هالشهر؟" },
+];
 
 export default function AdminAIAgentPage() {
   const t = useTranslations("admin.zyphon");
@@ -35,6 +42,7 @@ export default function AdminAIAgentPage() {
   
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const bootedRef = useRef(false);
 
   // Auto-scroll to bottom
   const scrollToBottom = useCallback(() => {
@@ -44,6 +52,32 @@ export default function AdminAIAgentPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamingContent, scrollToBottom]);
+
+  // Boot trigger — load persistent memory or get greeting
+  useEffect(() => {
+    if (bootedRef.current) return;
+    bootedRef.current = true;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/ai-agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ boot: true }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.history && data.history.length > 0) {
+          setMessages(data.history);
+        } else if (data.greeting) {
+          setMessages([{ role: "assistant", content: data.greeting }]);
+        }
+      } catch {
+        // Silent boot failure
+      }
+    })();
+  }, []);
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || loading) return;
@@ -148,10 +182,20 @@ export default function AdminAIAgentPage() {
     [handleSend]
   );
 
-  const handleClear = useCallback(() => {
+  const handleClear = useCallback(async () => {
     setMessages([]);
     setStreamingContent("");
     setCurrentTool(null);
+    // Reset conversation on server
+    try {
+      await fetch("/api/admin/ai-agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reset: true }),
+      });
+    } catch {
+      // Silent — local state already cleared
+    }
   }, []);
 
   // Cleanup on unmount
@@ -191,17 +235,19 @@ export default function AdminAIAgentPage() {
           </Box>
         </HStack>
         
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleClear}
-          disabled={loading || messages.length === 0}
-        >
-          <Trash2 size={16} />
-          <Box as="span" ms={2}>
-            {t("clear")}
-          </Box>
-        </Button>
+        <HStack gap={2}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClear}
+            disabled={loading || messages.length === 0}
+          >
+            <RotateCcw size={16} />
+            <Box as="span" ms={2}>
+              {t("resetBtn")}
+            </Box>
+          </Button>
+        </HStack>
       </Flex>
 
       {/* Messages Area */}
@@ -236,6 +282,21 @@ export default function AdminAIAgentPage() {
               <Text mt={1} textAlign="center" fontSize="sm">
                 {t("emptyState")}
               </Text>
+              <HStack mt={4} gap={2} flexWrap="wrap" justify="center">
+                {QUICK_ACTIONS.map((action) => (
+                  <Button
+                    key={action.labelKey}
+                    size="sm"
+                    variant="outline"
+                    colorPalette="purple"
+                    onClick={() => {
+                      setInput(action.prompt);
+                    }}
+                  >
+                    {t(action.labelKey)}
+                  </Button>
+                ))}
+              </HStack>
             </Flex>
           )}
 

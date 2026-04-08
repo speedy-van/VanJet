@@ -446,3 +446,40 @@ export const visitEvents = pgTable(
     index("visit_events_created_idx").on(table.createdAt),
   ]
 );
+
+// ── Zyphon Conversations ────────────────────────────────────────
+export const zyphonConversations = pgTable(
+  "zyphon_conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    adminId: uuid("admin_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: varchar("title", { length: 255 }),
+    active: boolean("active").notNull().default(true),
+    ...timestamps,
+  },
+  (table) => [
+    index("zyphon_conv_admin_idx").on(table.adminId),
+    index("zyphon_conv_active_idx").on(table.adminId, table.active),
+  ]
+);
+
+// ── Zyphon Messages ─────────────────────────────────────────────
+export const zyphonMessages = pgTable(
+  "zyphon_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => zyphonConversations.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 20 }).notNull(), // user | assistant | system | tool
+    content: text("content").notNull(),
+    toolName: varchar("tool_name", { length: 100 }),
+    toolCallId: varchar("tool_call_id", { length: 100 }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("zyphon_msg_conv_idx").on(table.conversationId, table.createdAt),
+  ]
+);
