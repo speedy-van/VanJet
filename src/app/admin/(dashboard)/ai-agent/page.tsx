@@ -152,6 +152,14 @@ export default function AdminAIAgentPage() {
             if (parsed.tool) {
               setCurrentTool(parsed.tool);
             }
+            // Detect action plan from tool results and dispatch to cursor
+            if (parsed.actionPlan) {
+              window.dispatchEvent(
+                new CustomEvent("zyphon:execute-plan", {
+                  detail: { actions: parsed.actionPlan },
+                })
+              );
+            }
           } catch {
             // Ignore parse errors
           }

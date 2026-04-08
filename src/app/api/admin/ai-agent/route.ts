@@ -186,6 +186,7 @@ export async function POST(req: NextRequest) {
     // Tool calling loop (max 6 iterations)
     let iterations = 0;
     const maxIterations = 6;
+    let pendingActionPlan: unknown[] | null = null;
 
     while (iterations < maxIterations) {
       iterations++;
@@ -232,6 +233,14 @@ export async function POST(req: NextRequest) {
 
           const result = await executeTool(toolName, toolInput, adminId);
 
+          // If this is a UI action plan, store it for streaming
+          if (toolName === "plan_ui_actions" && result.ok && result.data) {
+            const planData = result.data as { actions?: unknown[] };
+            if (planData.actions) {
+              pendingActionPlan = planData.actions;
+            }
+          }
+
           // Add tool result to conversation
           conversation.push({
             role: "tool",
@@ -264,8 +273,16 @@ export async function POST(req: NextRequest) {
 
       // Create streaming response
       const encoder = new TextEncoder();
+      const actionPlan = pendingActionPlan;
       const stream = new ReadableStream({
         start(controller) {
+          // If there's an action plan, send it first
+          if (actionPlan) {
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ actionPlan })}\n\n`)
+            );
+          }
+
           // Stream the content character by character (simulating streaming)
           const words = finalContent.split(" ");
           let index = 0;

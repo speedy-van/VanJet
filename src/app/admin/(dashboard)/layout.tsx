@@ -11,6 +11,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { NewOrderListener } from "@/components/admin/NewOrderListener";
+import { ZyphonCursor } from "@/components/admin/ZyphonCursor";
 import { getLocaleFromCookie, getDirection, type Locale } from "@/i18n/config";
 
 export const metadata = {
@@ -65,6 +66,7 @@ export default async function AdminLayout({
       <div dir={direction} lang={locale} style={{ fontFamily: locale === 'ar' ? 'Cairo, Inter, sans-serif' : 'Inter, sans-serif' }}>
         <AdminShell user={session.user} locale={locale}>{children}</AdminShell>
         <NewOrderListener />
+        <ZyphonCursor />
       </div>
     </NextIntlClientProvider>
   );

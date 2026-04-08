@@ -12,6 +12,7 @@ import {
   reportVisitorsTool,
   getCurrentAdminTool,
 } from "./reports";
+import { planUIActionsTool } from "./uiActions";
 
 export interface ToolDefinition {
   name: string;
@@ -106,6 +107,27 @@ const toolSchemas: Record<string, Record<string, unknown>> = {
     properties: {},
     required: [],
   },
+  plan_ui_actions: {
+    type: "object",
+    properties: {
+      goal: { type: "string", description: "What the user wants to accomplish" },
+      actions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            type: { type: "string", enum: ["click", "navigate", "scroll", "type", "highlight", "wait"] },
+            target: { type: "string", description: "Target registry key or CSS selector" },
+            value: { type: "string", description: "Text to type or URL to navigate to" },
+            description: { type: "string", description: "Human-readable description" },
+          },
+          required: ["type", "target", "description"],
+        },
+      },
+      confirm: { type: "boolean", description: "Set to true to execute the plan" },
+    },
+    required: ["goal", "actions"],
+  },
 };
 
 // Coerce string values to proper types based on expected schema
@@ -141,6 +163,7 @@ export const tools: Record<string, ToolDefinition> = {
   report_drivers: { ...reportDriversTool, jsonSchema: toolSchemas.report_drivers },
   report_visitors: { ...reportVisitorsTool, jsonSchema: toolSchemas.report_visitors },
   get_current_admin: { ...getCurrentAdminTool, jsonSchema: toolSchemas.get_current_admin },
+  plan_ui_actions: { ...planUIActionsTool, jsonSchema: toolSchemas.plan_ui_actions },
 };
 
 // Convert tools to Groq tool format
