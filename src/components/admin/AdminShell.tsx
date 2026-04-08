@@ -19,6 +19,7 @@ import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./NotificationBell";
+import { VanJetLogo } from "@/components/brand/VanJetLogo";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -122,9 +123,9 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
         p={4}
       >
         <Link href="/admin">
-          <Text fontSize="xl" fontWeight="800" color="brand.500" mb={6}>
-            Van<Text as="span" color="gray.800">Jet</Text>
-          </Text>
+          <Box mb={6}>
+            <VanJetLogo variant="lockup" width={140} height={46} />
+          </Box>
         </Link>
 
         <SidebarContent pathname={pathname} t={t} />
@@ -172,9 +173,7 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
         shadow="xl"
       >
         <Flex justify="space-between" align="center" mb={6}>
-          <Text fontSize="xl" fontWeight="800" color="brand.500">
-            Van<Text as="span" color="gray.800">Jet</Text>
-          </Text>
+          <VanJetLogo variant="lockup" width={140} height={46} />
           <IconButton
             aria-label="Close menu"
             size="sm"

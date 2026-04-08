@@ -3,6 +3,7 @@
 import { Box, Text, VStack, SimpleGrid, HStack, Flex, Wrap, WrapItem } from "@chakra-ui/react";
 import Link from "next/link";
 import { SITE, TOP_SCOTTISH_CITIES, CITY_DATA } from "@/lib/seo/site";
+import { VanJetLogo } from "@/components/brand/VanJetLogo";
 
 export function Footer() {
   return (
@@ -16,9 +17,7 @@ export function Footer() {
       >
         {/* Brand */}
         <VStack align={{ base: "center", md: "flex-start" }} gap={3}>
-          <Text fontSize="xl" fontWeight="800" color="white">
-            Van<Text as="span" color="#F97316">Jet</Text>
-          </Text>
+          <VanJetLogo variant="lockup" width={120} height={40} />
           <Text fontSize="14px" lineHeight="1.65">
             Scotland&apos;s trusted man &amp; van marketplace.
             Compare quotes from verified drivers in seconds.

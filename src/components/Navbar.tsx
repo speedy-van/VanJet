@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, Flex, Text, Button, HStack } from "@chakra-ui/react";
 import Link from "next/link";
+import { VanJetLogo } from "@/components/brand/VanJetLogo";
 
 const NAV_LINKS = [
   { label: "Services", href: "/man-and-van/london" },
@@ -39,17 +40,7 @@ export function Navbar() {
         <Flex maxW="1280px" mx="auto" align="center" justify="space-between">
           {/* Logo — left */}
           <Link href="/">
-            <Text
-              fontSize={{ base: "xl", md: "2xl" }}
-              fontWeight="800"
-              color="#0F2D5E"
-              letterSpacing="-0.02em"
-            >
-              Van
-              <Text as="span" color="#0F172A">
-                Jet
-              </Text>
-            </Text>
+            <VanJetLogo variant="lockup" priority />
           </Link>
 
           {/* Centre nav — desktop only */}

@@ -12,6 +12,7 @@ import {
   Button,
   VStack,
 } from "@chakra-ui/react";
+import { VanJetLogo } from "@/components/brand/VanJetLogo";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -64,9 +65,7 @@ export default function AdminLoginPage() {
         w={{ base: "90%", sm: "420px" }}
       >
         <VStack gap={1} mb={6}>
-          <Text fontSize="2xl" fontWeight="800" color="brand.500">
-            Van<Text as="span" color="gray.800">Jet</Text>
-          </Text>
+          <VanJetLogo variant="lockup" width={180} height={60} />
           <Text fontSize="lg" fontWeight="600" color="gray.700">
             Admin Sign In
           </Text>

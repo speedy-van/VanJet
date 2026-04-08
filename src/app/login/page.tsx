@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { VanJetLogo } from "@/components/brand/VanJetLogo";
 
 export default function CustomerLoginPage() {
   const router = useRouter();
@@ -63,14 +64,7 @@ export default function CustomerLoginPage() {
         <VStack gap={6} alignItems="stretch">
           <Box textAlign="center">
             <Link href="/">
-              <Text
-                fontSize="2xl"
-                fontWeight="800"
-                color="#1D4ED8"
-                letterSpacing="-0.5px"
-              >
-                VanJet
-              </Text>
+              <VanJetLogo variant="lockup" width={180} height={60} />
             </Link>
             <Heading
               as="h1"

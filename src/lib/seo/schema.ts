@@ -49,7 +49,7 @@ export function generateLocalBusinessSchema() {
       },
     ],
     sameAs: [`https://twitter.com/${SITE.twitter.replace("@", "")}`],
-    logo: `${SITE.baseUrl}/logo.png`,
+    logo: `${SITE.baseUrl}/brand/vanjet-lockup.svg`,
     image: `${SITE.baseUrl}/og-image.jpg`,
   };
 }

@@ -27,7 +27,7 @@ function baseTemplate(content: string): string {
       <table width="100%" style="max-width:560px;background:#ffffff;border-radius:12px;padding:32px 24px;">
         <tr><td>
           <div style="text-align:center;margin-bottom:24px;">
-            <span style="font-size:24px;font-weight:800;color:#0070f3;">Van</span><span style="font-size:24px;font-weight:800;color:#1a202c;">Jet</span>
+            <img src="${process.env.NEXT_PUBLIC_URL || "https://van-jet.com"}/brand/vanjet-lockup.svg" alt="VanJet" width="160" height="52" style="display:inline-block;width:160px;height:52px;" />
           </div>
           ${content}
           <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
