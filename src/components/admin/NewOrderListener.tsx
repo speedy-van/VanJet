@@ -44,6 +44,7 @@ export function NewOrderListener() {
   const lastCheckedRef = useRef<string>(new Date().toISOString());
   const seenOrdersRef = useRef<Set<string>>(new Set());
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const soundLoopRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize audio
   useEffect(() => {
@@ -55,19 +56,47 @@ export function NewOrderListener() {
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (soundLoopRef.current) {
+        clearInterval(soundLoopRef.current);
+      }
     };
   }, []);
 
-  // Play notification sound
-  const playSound = useCallback(() => {
-    if (soundEnabled && audioRef.current) {
+  // Start looping notification sound (plays every 3 seconds until stopped)
+  const startSoundLoop = useCallback(() => {
+    if (!soundEnabled) return;
+    
+    // Play immediately
+    if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(() => {
-        // Browser may block autoplay - user needs to interact first
         console.log("[NewOrderListener] Sound blocked by browser policy");
       });
     }
+    
+    // Loop every 3 seconds if there are active notifications
+    if (soundLoopRef.current) {
+      clearInterval(soundLoopRef.current);
+    }
+    soundLoopRef.current = setInterval(() => {
+      if (audioRef.current && soundEnabled) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      }
+    }, 3000);
   }, [soundEnabled]);
+  
+  // Stop the sound loop
+  const stopSoundLoop = useCallback(() => {
+    if (soundLoopRef.current) {
+      clearInterval(soundLoopRef.current);
+      soundLoopRef.current = null;
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, []);
 
   // Handle new order event
   const handleNewOrder = useCallback(
@@ -89,15 +118,22 @@ export function NewOrderListener() {
       };
 
       setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
-      playSound();
+      startSoundLoop();
     },
-    [playSound]
+    [startSoundLoop]
   );
 
-  // Dismiss notification
+  // Dismiss notification and stop sound if no more notifications
   const dismissNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  }, []);
+    setNotifications((prev) => {
+      const remaining = prev.filter((n) => n.id !== id);
+      // Stop sound loop when all notifications are dismissed
+      if (remaining.length === 0) {
+        stopSoundLoop();
+      }
+      return remaining;
+    });
+  }, [stopSoundLoop]);
 
   // Poll for new orders
   const pollForOrders = useCallback(async () => {
@@ -148,16 +184,20 @@ export function NewOrderListener() {
 
   // Toggle sound
   const toggleSound = useCallback(() => {
-    setSoundEnabled((prev) => !prev);
-    
-    // Try to play a silent sound to enable audio context
-    if (!soundEnabled && audioRef.current) {
-      audioRef.current.volume = 0;
-      audioRef.current.play().then(() => {
-        if (audioRef.current) audioRef.current.volume = 0.7;
-      }).catch(() => {});
-    }
-  }, [soundEnabled]);
+    setSoundEnabled((prev) => {
+      const newState = !prev;
+      
+      if (!newState) {
+        // Sound disabled - stop the loop
+        stopSoundLoop();
+      } else if (notifications.length > 0) {
+        // Sound enabled and there are notifications - start loop
+        startSoundLoop();
+      }
+      
+      return newState;
+    });
+  }, [stopSoundLoop, startSoundLoop, notifications.length]);
 
   return (
     <>
@@ -249,8 +289,12 @@ export function NewOrderListener() {
                 <Text fontWeight="600" color="green.600">
                   £{notification.price.toFixed(2)}
                 </Text>
-                <Link href={`/admin/bookings`}>
-                  <Button size="xs" colorPalette="blue">
+                <Link href={`/admin/jobs/${notification.id}`}>
+                  <Button 
+                    size="xs" 
+                    colorPalette="blue"
+                    onClick={() => dismissNotification(notification.id)}
+                  >
                     {t("viewDetails")}
                   </Button>
                 </Link>
