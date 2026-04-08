@@ -2,6 +2,7 @@
 
 // ─── VanJet · Admin Shell (Sidebar + Topbar) ──────────────────
 // Supports Arabic (RTL) and English (LTR) localization
+// Collapsible sidebar with smooth animation
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
@@ -15,8 +16,9 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -53,10 +55,12 @@ function SidebarContent({
   pathname,
   onNavigate,
   t,
+  collapsed = false,
 }: {
   pathname: string;
   onNavigate?: () => void;
   t: (key: string) => string;
+  collapsed?: boolean;
 }) {
   return (
     <VStack gap={1} align="stretch" flex="1">
@@ -79,9 +83,11 @@ function SidebarContent({
               _hover={{ bg: isActive ? "blue.50" : "gray.100" }}
               transition="all 0.15s"
               gap={2}
+              justifyContent={collapsed ? "center" : "flex-start"}
+              title={collapsed ? t(item.labelKey) : undefined}
             >
               <Box flexShrink={0}>{item.icon}</Box>
-              <Text>{t(item.labelKey)}</Text>
+              {!collapsed && <Text>{t(item.labelKey)}</Text>}
             </HStack>
           </Link>
         );
@@ -93,7 +99,26 @@ function SidebarContent({
 export function AdminShell({ user, locale, children }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const t = useTranslations("admin.navigation");
+
+  // Load collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("vanjet-sidebar-collapsed");
+    if (saved === "true") setSidebarCollapsed(true);
+  }, []);
+
+  // Save collapsed state to localStorage
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("vanjet-sidebar-collapsed", String(next));
+      return next;
+    });
+  };
+
+  // Sidebar width based on collapsed state
+  const sidebarWidth = sidebarCollapsed ? "64px" : "240px";
 
   // Get current page title
   const getCurrentPageTitle = () => {
@@ -112,7 +137,7 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
         as="aside"
         display={{ base: "none", md: "flex" }}
         flexDirection="column"
-        w="240px"
+        w={sidebarWidth}
         bg="white"
         borderRightWidth="1px"
         borderColor="gray.200"
@@ -121,28 +146,74 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
         left="0"
         bottom="0"
         zIndex="100"
-        p={4}
+        p={sidebarCollapsed ? 2 : 4}
+        transition="all 0.2s ease-in-out"
+        overflow="hidden"
       >
+        {/* Logo */}
         <Link href="/admin">
-          <Box mb={6}>
-            <VanJetLogo variant="lockup" width={140} height={46} />
+          <Box mb={6} overflow="hidden">
+            {sidebarCollapsed ? (
+              <Box
+                w="40px"
+                h="40px"
+                mx="auto"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <VanJetLogo variant="mark" width={32} height={32} />
+              </Box>
+            ) : (
+              <VanJetLogo variant="lockup" width={140} height={46} />
+            )}
           </Box>
         </Link>
 
-        <SidebarContent pathname={pathname} t={t} />
+        <SidebarContent pathname={pathname} t={t} collapsed={sidebarCollapsed} />
 
-        <Box pt={4} borderTopWidth="1px" borderColor="gray.200" mt={4}>
-          <Text fontSize="xs" color="gray.500" mb={1} truncate>
-            {user.email}
-          </Text>
+        {/* Collapse Toggle Button */}
+        <Box pt={3} borderTopWidth="1px" borderColor="gray.200" mt="auto">
           <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            w="full"
+            onClick={toggleSidebar}
+            display="flex"
+            justifyContent={sidebarCollapsed ? "center" : "flex-start"}
+            gap={2}
+            color="gray.500"
+            _hover={{ bg: "gray.100", color: "gray.700" }}
+          >
+            {sidebarCollapsed ? (
+              <ChevronRight size={18} />
+            ) : (
+              <>
+                <ChevronLeft size={18} />
+                <Text fontSize="xs">Collapse</Text>
+              </>
+            )}
+          </Button>
+        </Box>
+
+        {/* User Info & Sign Out */}
+        <Box pt={3} borderTopWidth="1px" borderColor="gray.200" mt={2}>
+          {!sidebarCollapsed && (
+            <Text fontSize="xs" color="gray.500" mb={1} truncate>
+              {user.email}
+            </Text>
+          )}
+          <Button
+            type="button"
             size="sm"
             variant="outline"
             colorPalette="red"
             w="full"
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
+            title={sidebarCollapsed ? t("signOut") : undefined}
           >
-            {t("signOut")}
+            {sidebarCollapsed ? "🚪" : t("signOut")}
           </Button>
         </Box>
       </Box>
@@ -210,8 +281,9 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
       {/* ── Main Content Area ───────────────────────────── */}
       <Box
         flex="1"
-        ml={{ base: 0, md: "240px" }}
+        ml={{ base: 0, md: sidebarWidth }}
         minH="100vh"
+        transition="margin-left 0.2s ease-in-out"
       >
         {/* Topbar */}
         <Flex
