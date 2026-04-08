@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Box, Flex, Text, Button, HStack } from "@chakra-ui/react";
 import Link from "next/link";
 import { VanJetLogo } from "@/components/brand/VanJetLogo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const NAV_LINKS = [
   { label: "Services", href: "/man-and-van/london" },
@@ -66,7 +67,7 @@ export function Navbar() {
             ))}
           </HStack>
 
-          {/* Right — CTA + mobile hamburger */}
+          {/* Right — CTA + Theme + mobile hamburger */}
           <HStack gap={2}>
             <Link href="/book">
               <Button
@@ -80,6 +81,8 @@ export function Navbar() {
                 Get Quote
               </Button>
             </Link>
+
+            <ThemeToggle />
 
             {/* Hamburger — mobile only */}
             <Box

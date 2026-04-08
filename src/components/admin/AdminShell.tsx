@@ -19,6 +19,7 @@ import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { VanJetLogo } from "@/components/brand/VanJetLogo";
 import type { Locale } from "@/i18n/config";
 
@@ -244,6 +245,7 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
 
           <HStack gap={2}>
             <NotificationBell />
+            <ThemeToggle />
             <LanguageSwitcher currentLocale={locale} />
             <Text fontSize="sm" color="gray.500" display={{ base: "none", md: "block" }}>
               {user.name}

@@ -90,6 +90,38 @@ const vanjetConfig = defineConfig({
         hover:  { value: "0 4px 12px rgba(0, 0, 0, 0.12)" },
       },
     },
+    // ── Semantic Tokens (Dark Mode Support) ──────────────────
+    semanticTokens: {
+      colors: {
+        "bg.canvas": {
+          value: { _light: "#ffffff", _dark: "#0f172a" },
+        },
+        "bg.surface": {
+          value: { _light: "#f8fafc", _dark: "#1e293b" },
+        },
+        "bg.subtle": {
+          value: { _light: "#f1f5f9", _dark: "#334155" },
+        },
+        "bg.muted": {
+          value: { _light: "#e2e8f0", _dark: "#475569" },
+        },
+        "fg.default": {
+          value: { _light: "#0f172a", _dark: "#f1f5f9" },
+        },
+        "fg.muted": {
+          value: { _light: "#475569", _dark: "#94a3b8" },
+        },
+        "fg.subtle": {
+          value: { _light: "#64748b", _dark: "#64748b" },
+        },
+        "border.default": {
+          value: { _light: "#e2e8f0", _dark: "#334155" },
+        },
+        "border.subtle": {
+          value: { _light: "#f1f5f9", _dark: "#1e293b" },
+        },
+      },
+    },
   },
 });
 
