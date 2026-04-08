@@ -25,6 +25,7 @@ import {
   sendRefundNotification,
 } from "@/lib/resend";
 import { sendBookingConfirmedSMS, sendPaymentFailedSMS, sendRefundSMS } from "@/lib/sms";
+import { emitNewOrder } from "@/lib/events/newOrderEventBus";
 
 const WEBHOOK_SECRET = serverEnv.STRIPE_WEBHOOK_SECRET;
 
@@ -281,6 +282,17 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
       orderNumber,
     })
     .returning();
+
+  // Emit new order event for admin real-time notifications
+  emitNewOrder({
+    id: newBooking.id,
+    orderNumber,
+    serviceType: job.jobType,
+    pickupPostcode: job.pickupAddress,
+    deliveryPostcode: job.deliveryAddress,
+    finalPrice: parseFloat(finalPrice),
+    createdAt: new Date(),
+  });
 
   const [customer] = await db
     .select()

@@ -1,11 +1,17 @@
 // ─── VanJet · Admin Layout (Server Component) ────────────────
 // Protects all /admin/* routes. Redirects unauthenticated users to login.
 // Shows 403 if user is not an admin.
+// Provides Arabic-first localization with RTL support.
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { NewOrderListener } from "@/components/admin/NewOrderListener";
+import { getLocaleFromCookie, getDirection, type Locale } from "@/i18n/config";
 
 export const metadata = {
   title: "Admin Dashboard | VanJet",
@@ -45,5 +51,21 @@ export default async function AdminLayout({
     );
   }
 
-  return <AdminShell user={session.user}>{children}</AdminShell>;
+  // Get locale from cookie
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get("NEXT_LOCALE")?.value;
+  const locale = getLocaleFromCookie(localeCookie);
+  const direction = getDirection(locale);
+  
+  // Load messages for the locale
+  const messages = await getMessages();
+
+  return (
+    <NextIntlClientProvider messages={messages} locale={locale}>
+      <div dir={direction} lang={locale} style={{ fontFamily: locale === 'ar' ? 'Cairo, Inter, sans-serif' : 'Inter, sans-serif' }}>
+        <AdminShell user={session.user} locale={locale}>{children}</AdminShell>
+        <NewOrderListener />
+      </div>
+    </NextIntlClientProvider>
+  );
 }

@@ -5,6 +5,7 @@ import { eq, desc, count } from "drizzle-orm";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { DriverVerifyToggle } from "@/components/admin/DriverVerifyToggle";
+import { getTranslations } from "next-intl/server";
 
 const LIMIT = 20;
 
@@ -13,6 +14,9 @@ interface Props {
 }
 
 export default async function AdminDriversPage({ searchParams }: Props) {
+  const t = await getTranslations("admin.drivers");
+  const tCommon = await getTranslations("admin.common");
+  const tPagination = await getTranslations("admin.pagination");
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
   const verifiedFilter = params.verified;
@@ -56,16 +60,16 @@ export default async function AdminDriversPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / LIMIT);
 
   const filters = [
-    { label: "All", value: "" },
-    { label: "Verified", value: "true" },
-    { label: "Unverified", value: "false" },
+    { label: t("filters.all"), value: "" },
+    { label: t("verified"), value: "true" },
+    { label: t("unverified"), value: "false" },
   ];
 
   return (
     <Box>
       <Flex justify="space-between" align="center" mb={4} flexWrap="wrap" gap={2}>
         <Text fontSize="xl" fontWeight="700" color="gray.800">
-          Drivers ({total})
+          {t("title")} ({total})
         </Text>
         <Link href="/admin/applications">
           <Box
@@ -73,7 +77,7 @@ export default async function AdminDriversPage({ searchParams }: Props) {
             fontSize="sm" fontWeight="600" _hover={{ bg: "blue.600" }}
             cursor="pointer"
           >
-            📝 Driver Applications
+            📝 {tCommon("applications") || "Driver Applications"}
           </Box>
         </Link>
       </Flex>
@@ -108,22 +112,22 @@ export default async function AdminDriversPage({ searchParams }: Props) {
         <Box as="table" w="full" fontSize="sm">
           <Box as="thead" bg="gray.50">
             <Box as="tr">
-              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">Name</Box>
-              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">Email</Box>
-              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">Company</Box>
-              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">Van</Box>
-              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">Rating</Box>
-              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">Jobs</Box>
-              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">Stripe</Box>
-              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">Verified</Box>
-              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">Action</Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">{t("name")}</Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">{t("email")}</Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">{t("company")}</Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">{t("van")}</Box>
+              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">{t("rating")}</Box>
+              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">{t("totalJobs")}</Box>
+              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">{t("stripe")}</Box>
+              <Box as="th" textAlign="center" px={4} py={3} fontWeight="600" color="gray.600">{t("verified")}</Box>
+              <Box as="th" textAlign="left" px={4} py={3} fontWeight="600" color="gray.600">{tCommon("actions")}</Box>
             </Box>
           </Box>
           <Box as="tbody">
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: '#a0aec0' }}>
-                  No drivers found.
+                  {tCommon("noResults")}
                 </td>
               </tr>
             ) : (
@@ -146,7 +150,7 @@ export default async function AdminDriversPage({ searchParams }: Props) {
                       color={d.stripeOnboarded ? "green.800" : "gray.600"}
                       fontSize="xs" fontWeight="600"
                     >
-                      {d.stripeOnboarded ? "Yes" : "No"}
+                      {d.stripeOnboarded ? tCommon("yes") : tCommon("no")}
                     </Flex>
                   </Box>
                   <Box as="td" px={4} py={3} textAlign="center">
@@ -155,7 +159,7 @@ export default async function AdminDriversPage({ searchParams }: Props) {
                       color={d.verified ? "green.800" : "yellow.800"}
                       fontSize="xs" fontWeight="600"
                     >
-                      {d.verified ? "Verified" : "Pending"}
+                      {d.verified ? t("verified") : tCommon("pending")}
                     </Flex>
                   </Box>
                   <Box as="td" px={4} py={3}>
@@ -177,17 +181,17 @@ export default async function AdminDriversPage({ searchParams }: Props) {
           {page > 1 && (
             <a href={`/admin/drivers?page=${page - 1}${verifiedFilter ? `&verified=${verifiedFilter}` : ""}`}>
               <Box px={3} py={1} borderRadius="md" bg="white" borderWidth="1px" borderColor="gray.200" fontSize="sm" _hover={{ bg: "gray.100" }} cursor="pointer">
-                ← Prev
+                ← {tPagination("prev")}
               </Box>
             </a>
           )}
           <Box px={3} py={1} fontSize="sm" color="gray.500">
-            Page {page} of {totalPages}
+            {tPagination("page")} {page} {tPagination("of")} {totalPages}
           </Box>
           {page < totalPages && (
             <a href={`/admin/drivers?page=${page + 1}${verifiedFilter ? `&verified=${verifiedFilter}` : ""}`}>
               <Box px={3} py={1} borderRadius="md" bg="white" borderWidth="1px" borderColor="gray.200" fontSize="sm" _hover={{ bg: "gray.100" }} cursor="pointer">
-                Next →
+                {tPagination("next")} →
               </Box>
             </a>
           )}

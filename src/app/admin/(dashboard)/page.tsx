@@ -2,7 +2,10 @@
 import { db } from "@/lib/db";
 import { users, jobs, bookings, driverProfiles, quotes } from "@/lib/db/schema";
 import { count, sum, eq } from "drizzle-orm";
-import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";import { formatGBP } from "@/lib/money/format";
+import { Box, Flex, Text, SimpleGrid } from "@chakra-ui/react";
+import { formatGBP } from "@/lib/money/format";
+import { getTranslations } from "next-intl/server";
+
 async function getStats() {
   const [
     [jobCount],
@@ -55,22 +58,23 @@ function StatCard({
 }
 
 export default async function AdminDashboardPage() {
+  const t = await getTranslations("admin.dashboard");
   const stats = await getStats();
 
   return (
     <Box>
       <Text fontSize="xl" fontWeight="700" mb={5} color="gray.800">
-        Overview
+        {t("title")}
       </Text>
 
       <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={4}>
-        <StatCard label="Total Jobs" value={stats.jobs} color="blue.600" />
-        <StatCard label="Bookings" value={stats.bookings} color="green.600" />
-        <StatCard label="Drivers" value={stats.drivers} color="purple.600" />
-        <StatCard label="Users" value={stats.users} color="cyan.600" />
-        <StatCard label="Quotes" value={stats.quotes} color="orange.600" />
+        <StatCard label={t("totalJobs")} value={stats.jobs} color="blue.600" />
+        <StatCard label={t("bookings")} value={stats.bookings} color="green.600" />
+        <StatCard label={t("drivers")} value={stats.drivers} color="purple.600" />
+        <StatCard label={t("users")} value={stats.users} color="cyan.600" />
+        <StatCard label={t("quotes")} value={stats.quotes} color="orange.600" />
         <StatCard
-          label="Revenue (Paid)"
+          label={t("revenuePaid")}
           value={formatGBP(Number(stats.revenue))}
           color="green.700"
         />
@@ -79,7 +83,7 @@ export default async function AdminDashboardPage() {
       {/* Recent Jobs */}
       <Box mt={8}>
         <Text fontSize="lg" fontWeight="600" mb={3} color="gray.800">
-          Recent Jobs
+          {t("recentJobs")}
         </Text>
         <RecentJobsTable />
       </Box>

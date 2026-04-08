@@ -1,9 +1,11 @@
 "use client";
 
 // ─── VanJet · Admin Shell (Sidebar + Topbar) ──────────────────
+// Supports Arabic (RTL) and English (LTR) localization
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import {
   Box,
   Flex,
@@ -14,35 +16,43 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import type { Locale } from "@/i18n/config";
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Dashboard", href: "/admin", icon: "📊" },
-  { label: "Jobs", href: "/admin/jobs", icon: "📦" },
-  { label: "Bookings", href: "/admin/bookings", icon: "📋" },
-  { label: "Quotes", href: "/admin/quotes", icon: "💬" },
-  { label: "Applications", href: "/admin/applications", icon: "📝" },
-  { label: "Drivers", href: "/admin/drivers", icon: "🚚" },
-  { label: "Users", href: "/admin/users", icon: "👥" },
-  { label: "Audit Log", href: "/admin/audit-log", icon: "📜" },
+  { labelKey: "dashboard", href: "/admin", icon: "📊" },
+  { labelKey: "jobs", href: "/admin/jobs", icon: "📦" },
+  { labelKey: "bookings", href: "/admin/bookings", icon: "📋" },
+  { labelKey: "quotes", href: "/admin/quotes", icon: "💬" },
+  { labelKey: "applications", href: "/admin/applications", icon: "📝" },
+  { labelKey: "drivers", href: "/admin/drivers", icon: "🚚" },
+  { labelKey: "users", href: "/admin/users", icon: "👥" },
+  { labelKey: "chat", href: "/admin/chat", icon: "💬" },
+  { labelKey: "visitors", href: "/admin/visitors", icon: "👁️" },
+  { labelKey: "aiAgent", href: "/admin/ai-agent", icon: "🤖" },
+  { labelKey: "auditLog", href: "/admin/audit-log", icon: "📜" },
 ];
 
 interface AdminShellProps {
   user: { name: string; email: string; role: string };
+  locale: Locale;
   children: React.ReactNode;
 }
 
 function SidebarContent({
   pathname,
   onNavigate,
+  t,
 }: {
   pathname: string;
   onNavigate?: () => void;
+  t: (key: string) => string;
 }) {
   return (
     <VStack gap={1} align="stretch" flex="1">
@@ -65,7 +75,7 @@ function SidebarContent({
               _hover={{ bg: isActive ? "blue.50" : "gray.100" }}
               transition="all 0.15s"
             >
-              {item.icon}  {item.label}
+              {item.icon}  {t(item.labelKey)}
             </Box>
           </Link>
         );
@@ -74,9 +84,20 @@ function SidebarContent({
   );
 }
 
-export function AdminShell({ user, children }: AdminShellProps) {
+export function AdminShell({ user, locale, children }: AdminShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const t = useTranslations("admin.navigation");
+
+  // Get current page title
+  const getCurrentPageTitle = () => {
+    const currentItem = NAV_ITEMS.find((n) =>
+      n.href === "/admin"
+        ? pathname === "/admin"
+        : pathname.startsWith(n.href)
+    );
+    return currentItem ? t(currentItem.labelKey) : t("dashboard");
+  };
 
   return (
     <Flex minH="100vh" bg="gray.50">
@@ -102,7 +123,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
           </Text>
         </Link>
 
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} t={t} />
 
         <Box pt={4} borderTopWidth="1px" borderColor="gray.200" mt={4}>
           <Text fontSize="xs" color="gray.500" mb={1} truncate>
@@ -115,7 +136,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             w="full"
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
           >
-            Sign Out
+            {t("signOut")}
           </Button>
         </Box>
       </Box>
@@ -163,6 +184,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
         <SidebarContent
           pathname={pathname}
           onNavigate={() => setMobileOpen(false)}
+          t={t}
         />
 
         <Box pt={4} borderTopWidth="1px" borderColor="gray.200" mt={4}>
@@ -176,7 +198,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             w="full"
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
           >
-            Sign Out
+            {t("signOut")}
           </Button>
         </Box>
       </Box>
@@ -213,16 +235,13 @@ export function AdminShell({ user, children }: AdminShellProps) {
               ☰
             </IconButton>
             <Text fontWeight="600" fontSize="lg" color="gray.800">
-              {NAV_ITEMS.find((n) =>
-                n.href === "/admin"
-                  ? pathname === "/admin"
-                  : pathname.startsWith(n.href)
-              )?.label ?? "Admin"}
+              {getCurrentPageTitle()}
             </Text>
           </HStack>
 
-          <HStack gap={2} display={{ base: "none", md: "flex" }}>
-            <Text fontSize="sm" color="gray.500">
+          <HStack gap={2}>
+            <LanguageSwitcher currentLocale={locale} />
+            <Text fontSize="sm" color="gray.500" display={{ base: "none", md: "block" }}>
               {user.name}
             </Text>
           </HStack>

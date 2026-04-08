@@ -317,3 +317,132 @@ export const changeLogs = pgTable(
     index("change_logs_created_at_idx").on(table.createdAt),
   ]
 );
+
+// ── Chats ───────────────────────────────────────────────────────
+// Chat type: DIRECT (1:1), GROUP_DRIVERS (canonical drivers group), GROUP_CUSTOMERS
+export const chats = pgTable(
+  "chats",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    chatType: varchar("chat_type", { length: 20 }).notNull().default("DIRECT"), // DIRECT | GROUP_DRIVERS | GROUP_CUSTOMERS
+    name: varchar("name", { length: 255 }), // Optional name for group chats
+    ...timestamps,
+  },
+  (table) => [
+    index("chats_type_idx").on(table.chatType),
+  ]
+);
+
+// ── Chat Members ────────────────────────────────────────────────
+export const chatMembers = pgTable(
+  "chat_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chats.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+    leftAt: timestamp("left_at", { withTimezone: true }),
+    isAdmin: boolean("is_admin").notNull().default(false),
+  },
+  (table) => [
+    index("chat_members_chat_idx").on(table.chatId),
+    index("chat_members_user_idx").on(table.userId),
+    uniqueIndex("chat_members_chat_user_idx").on(table.chatId, table.userId),
+  ]
+);
+
+// ── Chat Messages ───────────────────────────────────────────────
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    chatId: uuid("chat_id")
+      .notNull()
+      .references(() => chats.id, { onDelete: "cascade" }),
+    senderId: uuid("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    index("chat_messages_chat_created_idx").on(table.chatId, table.createdAt),
+    index("chat_messages_sender_idx").on(table.senderId),
+  ]
+);
+
+// ── AI Agent Audit Logs ─────────────────────────────────────────
+export const aiAgentAuditLogs = pgTable(
+  "ai_agent_audit_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    actorAdminId: uuid("actor_admin_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    toolName: varchar("tool_name", { length: 100 }).notNull(),
+    input: text("input"), // JSON string of tool input
+    output: text("output"), // JSON string of tool output
+    status: varchar("status", { length: 20 }).notNull().default("pending"), // pending | success | error
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("ai_audit_admin_idx").on(table.actorAdminId),
+    index("ai_audit_created_idx").on(table.createdAt),
+    index("ai_audit_tool_idx").on(table.toolName),
+  ]
+);
+
+// ── Visitors Analytics ──────────────────────────────────────────
+export const visitors = pgTable(
+  "visitors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fingerprint: varchar("fingerprint", { length: 64 }).notNull().unique(),
+    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+    visitCount: integer("visit_count").notNull().default(1),
+    country: varchar("country", { length: 100 }),
+    region: varchar("region", { length: 100 }),
+    city: varchar("city", { length: 100 }),
+    lat: numeric("lat", { precision: 10, scale: 7 }),
+    lng: numeric("lng", { precision: 10, scale: 7 }),
+    isp: varchar("isp", { length: 255 }),
+    timezone: varchar("timezone", { length: 100 }),
+    browser: varchar("browser", { length: 100 }),
+    browserVersion: varchar("browser_version", { length: 50 }),
+    os: varchar("os", { length: 100 }),
+    osVersion: varchar("os_version", { length: 50 }),
+    deviceType: varchar("device_type", { length: 50 }), // desktop | mobile | tablet
+    userAgent: text("user_agent"),
+    ipHash: varchar("ip_hash", { length: 64 }).notNull(),
+  },
+  (table) => [
+    index("visitors_fingerprint_idx").on(table.fingerprint),
+    index("visitors_country_idx").on(table.country),
+    index("visitors_last_seen_idx").on(table.lastSeenAt),
+  ]
+);
+
+// ── Visit Events ────────────────────────────────────────────────
+export const visitEvents = pgTable(
+  "visit_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    visitorId: uuid("visitor_id")
+      .notNull()
+      .references(() => visitors.id, { onDelete: "cascade" }),
+    path: varchar("path", { length: 500 }).notNull(),
+    referrer: varchar("referrer", { length: 500 }),
+    durationMs: integer("duration_ms"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("visit_events_visitor_created_idx").on(table.visitorId, table.createdAt),
+    index("visit_events_created_idx").on(table.createdAt),
+  ]
+);

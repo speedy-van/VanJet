@@ -1,0 +1,435 @@
+{
+  "admin": {
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "search": "Search",
+      "filter": "Filter",
+      "clear": "Clear",
+      "refresh": "Refresh",
+      "loading": "Loading...",
+      "noResults": "No results",
+      "actions": "Actions",
+      "status": "Status",
+      "date": "Date",
+      "time": "Time",
+      "all": "All",
+      "yes": "Yes",
+      "no": "No",
+      "submit": "Submit",
+      "reset": "Reset",
+      "details": "Details",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "select": "Select",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "required": "Required",
+      "optional": "Optional",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "inProgress": "In Progress"
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "jobs": "Jobs",
+      "bookings": "Bookings",
+      "quotes": "Quotes",
+      "applications": "Applications",
+      "drivers": "Drivers",
+      "users": "Users",
+      "auditLog": "Audit Log",
+      "chat": "Chat",
+      "visitors": "Visitors",
+      "aiAgent": "AI Agent",
+      "settings": "Settings",
+      "signOut": "Sign Out"
+    },
+    "dashboard": {
+      "title": "Overview",
+      "totalJobs": "Total Jobs",
+      "bookings": "Bookings",
+      "drivers": "Drivers",
+      "users": "Users",
+      "quotes": "Quotes",
+      "revenuePaid": "Revenue (Paid)",
+      "recentJobs": "Recent Jobs",
+      "todaySessions": "Today's Sessions",
+      "countries": "Countries",
+      "devices": "Devices"
+    },
+    "jobs": {
+      "title": "Jobs",
+      "pickup": "Pickup Location",
+      "delivery": "Delivery Location",
+      "moveDate": "Move Date",
+      "serviceType": "Service Type",
+      "estimatedPrice": "Estimated Price",
+      "finalPrice": "Final Price",
+      "referenceNumber": "Reference Number",
+      "customer": "Customer",
+      "description": "Description",
+      "items": "Items",
+      "distance": "Distance",
+      "duration": "Duration",
+      "floor": "Floor",
+      "hasLift": "Has Lift",
+      "needsPacking": "Needs Packing",
+      "flexibleDates": "Flexible Dates",
+      "timeWindow": "Time Window",
+      "contactName": "Contact Name",
+      "contactPhone": "Contact Phone",
+      "pickupNotes": "Pickup Notes",
+      "deliveryNotes": "Delivery Notes",
+      "status": {
+        "pending": "Pending",
+        "quoted": "Quoted",
+        "accepted": "Accepted",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "filters": {
+        "status": "Filter by Status",
+        "dateRange": "Date Range",
+        "serviceType": "Service Type"
+      }
+    },
+    "bookings": {
+      "title": "Bookings",
+      "orderNumber": "Order Number",
+      "paymentStatus": "Payment Status",
+      "trackingToken": "Tracking Token",
+      "finalPrice": "Final Price",
+      "priceBreakdown": "Price Breakdown",
+      "driverAssigned": "Driver Assigned",
+      "cancelledAt": "Cancelled At",
+      "cancelledReason": "Cancellation Reason",
+      "deliveredAt": "Delivered At",
+      "actions": {
+        "edit": "Edit Booking",
+        "cancel": "Cancel Booking",
+        "reprice": "Reprice",
+        "assignDriver": "Assign Driver",
+        "viewTracking": "View Tracking",
+        "refund": "Refund"
+      },
+      "payment": {
+        "unpaid": "Unpaid",
+        "paid": "Paid",
+        "refunded": "Refunded"
+      },
+      "status": {
+        "confirmed": "Confirmed",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "editModal": {
+        "title": "Edit Booking",
+        "serviceType": "Service Type",
+        "moveDateTime": "Move Date & Time",
+        "timeWindow": "Time Window",
+        "pickup": "Pickup",
+        "delivery": "Delivery",
+        "address": "Address",
+        "floor": "Floor",
+        "flat": "Flat",
+        "hasLift": "Has Lift",
+        "notes": "Notes",
+        "items": "Items",
+        "itemName": "Item Name",
+        "quantity": "Quantity",
+        "addItem": "Add Item",
+        "removeItem": "Remove Item",
+        "saveChanges": "Save Changes",
+        "saving": "Saving..."
+      },
+      "cancelModal": {
+        "title": "Cancel Booking",
+        "warning": "This action will cancel the booking and update its status. The booking record will be preserved. This cannot be undone.",
+        "reason": "Cancellation Reason",
+        "reasonPlaceholder": "Enter reason for cancellation...",
+        "confirmCancel": "Confirm Cancel",
+        "cancelling": "Cancelling..."
+      },
+      "repriceModal": {
+        "title": "Recalculate Price",
+        "currentPrice": "Current Price",
+        "newPrice": "New Price",
+        "description": "This will recalculate the booking price using the current pricing engine with the job's stored data (distance, items, dates). The new price will replace the current one.",
+        "calculate": "Calculate Price",
+        "calculating": "Calculating...",
+        "accept": "Accept New Price",
+        "priceDiff": "Difference"
+      }
+    },
+    "quotes": {
+      "title": "Quotes",
+      "price": "Price",
+      "message": "Message",
+      "estimatedDuration": "Estimated Duration",
+      "expiresAt": "Expires At",
+      "driver": "Driver",
+      "actions": {
+        "accept": "Accept",
+        "reject": "Reject"
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected",
+        "expired": "Expired"
+      }
+    },
+    "applications": {
+      "title": "Driver Applications",
+      "driverApplications": "Driver Applications",
+      "companyName": "Company Name",
+      "vanSize": "Van Size",
+      "maxWeight": "Max Weight",
+      "coverageRadius": "Coverage Radius",
+      "bio": "Bio",
+      "documents": "Documents",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "viewDetails": "View Details"
+      },
+      "status": {
+        "pending": "Under Review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "rejectModal": {
+        "title": "Reject Application",
+        "reason": "Rejection Reason",
+        "reasonPlaceholder": "Enter rejection reason..."
+      }
+    },
+    "drivers": {
+      "title": "Drivers",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "van": "Van",
+      "rating": "Rating",
+      "totalJobs": "Total Jobs",
+      "stripe": "Stripe",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "actions": {
+        "verify": "Verify",
+        "unverify": "Unverify",
+        "suspend": "Suspend",
+        "viewProfile": "View Profile"
+      },
+      "filters": {
+        "all": "All",
+        "verified": "Verified",
+        "unverified": "Unverified",
+        "status": "Filter by Status"
+      }
+    },
+    "users": {
+      "title": "Users",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role",
+      "emailVerified": "Email Verified",
+      "twoFactorEnabled": "Two-Factor Auth",
+      "createdAt": "Created At",
+      "roles": {
+        "customer": "Customer",
+        "driver": "Driver",
+        "admin": "Admin"
+      }
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "action": "Action",
+      "admin": "Admin",
+      "booking": "Booking",
+      "timestamp": "Timestamp",
+      "changes": "Changes",
+      "note": "Note",
+      "actions": {
+        "EDIT": "Edit",
+        "REPRICE": "Reprice",
+        "CANCEL": "Cancel"
+      }
+    },
+    "chat": {
+      "title": "Chat",
+      "conversations": "Conversations",
+      "newMessage": "New Message",
+      "sendMessage": "Send Message",
+      "typeMessage": "Type your message...",
+      "noMessages": "No messages",
+      "group": {
+        "driversGroup": "Drivers Group",
+        "openGroup": "Open Group",
+        "createGroup": "Create Drivers Group",
+        "openSuccess": "Group chat opened",
+        "openError": "Failed to open chat",
+        "noActiveDrivers": "No active drivers"
+      }
+    },
+    "visitors": {
+      "title": "Visitor Analytics",
+      "subtitle": "Track and analyze site visitors",
+      "totalVisitors": "Total Visitors",
+      "newVisitors": "New Visitors",
+      "returningVisitors": "Returning Visitors",
+      "pageViews": "Page Views",
+      "todaySessions": "Today's Sessions",
+      "countries": "Countries",
+      "devices": "Devices",
+      "country": "Country",
+      "city": "City",
+      "location": "Location",
+      "browser": "Browser",
+      "device": "Device",
+      "visits": "Visits",
+      "views": "Views",
+      "page": "Page",
+      "visitCount": "Visit Count",
+      "lastVisit": "Last Visit",
+      "ipHash": "IP Hash",
+      "visitorDetails": "Visitor Details",
+      "visitHistory": "Visit History",
+      "recentVisitors": "Recent Visitors",
+      "referrers": "Referrers",
+      "paths": "Paths",
+      "timezone": "Timezone",
+      "isp": "ISP",
+      "os": "OS",
+      "firstSeen": "First Seen",
+      "directTraffic": "Direct Traffic",
+      "dailyTrend": "Daily Trend",
+      "byDevice": "By Device",
+      "topCountries": "Top Countries",
+      "topBrowsers": "Top Browsers",
+      "topPages": "Top Pages",
+      "visitors": "Visitors",
+      "noData": "No data available",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days",
+      "filters": {
+        "dateRange": "Date Range",
+        "country": "Country",
+        "deviceType": "Device Type"
+      },
+      "chart": {
+        "visits30Days": "Visits (Last 30 Days)"
+      }
+    },
+    "aiAgent": {
+      "title": "AI Agent",
+      "subtitle": "Smart admin assistant in Iraqi Arabic",
+      "placeholder": "Type your message here...",
+      "send": "Send",
+      "clear": "Clear Chat",
+      "thinking": "Thinking...",
+      "executing": "Executing",
+      "error": "An error occurred",
+      "welcome": "Hello! How can I help you today?",
+      "retry": "Retry"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "notifications": "Notifications",
+      "sound": "Sound",
+      "soundEnabled": "Sound Enabled",
+      "soundDisabled": "Sound Disabled"
+    },
+    "notifications": {
+      "newOrder": {
+        "title": "New Order!",
+        "viewDetails": "View Details",
+        "enableSound": "Click to enable sound"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "overview": "Overview",
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "customers": "Customers",
+      "trends": "Trends",
+      "comparison": "Comparison",
+      "growth": "Growth"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email address",
+      "invalidPhone": "Invalid phone number",
+      "minLength": "Minimum {min} characters",
+      "maxLength": "Maximum {max} characters",
+      "invalidDate": "Invalid date",
+      "invalidPrice": "Invalid price"
+    },
+    "status": {
+      "success": "Operation successful",
+      "error": "An error occurred",
+      "warning": "Warning",
+      "info": "Info",
+      "networkError": "Network error. Please try again.",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Forbidden",
+      "notFound": "Not Found"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of",
+      "prev": "Previous",
+      "next": "Next",
+      "first": "First",
+      "last": "Last",
+      "showing": "Showing",
+      "to": "to",
+      "entries": "entries"
+    },
+    "table": {
+      "noData": "No data available",
+      "loading": "Loading data...",
+      "error": "Error loading data"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "thisYear": "This Year",
+      "ago": "ago",
+      "minutes": "minutes",
+      "hours": "hours",
+      "days": "days"
+    }
+  }
+}

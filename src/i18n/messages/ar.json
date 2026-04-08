@@ -1,0 +1,435 @@
+{
+  "admin": {
+    "common": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "view": "عرض",
+      "close": "إغلاق",
+      "confirm": "تأكيد",
+      "back": "رجوع",
+      "next": "التالي",
+      "previous": "السابق",
+      "search": "بحث",
+      "filter": "تصفية",
+      "clear": "مسح",
+      "refresh": "تحديث",
+      "loading": "جارٍ التحميل...",
+      "noResults": "لا توجد نتائج",
+      "actions": "إجراءات",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "all": "الكل",
+      "yes": "نعم",
+      "no": "لا",
+      "submit": "إرسال",
+      "reset": "إعادة تعيين",
+      "details": "التفاصيل",
+      "export": "تصدير",
+      "import": "استيراد",
+      "download": "تنزيل",
+      "upload": "رفع",
+      "select": "اختيار",
+      "selectAll": "تحديد الكل",
+      "deselectAll": "إلغاء تحديد الكل",
+      "required": "مطلوب",
+      "optional": "اختياري",
+      "enabled": "مُفعّل",
+      "disabled": "مُعطّل",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "verified": "تم التحقق",
+      "unverified": "لم يتم التحقق",
+      "pending": "قيد الانتظار",
+      "approved": "تم القبول",
+      "rejected": "تم الرفض",
+      "completed": "مكتمل",
+      "cancelled": "ملغى",
+      "inProgress": "قيد التنفيذ"
+    },
+    "navigation": {
+      "dashboard": "لوحة التحكم",
+      "jobs": "الطلبات",
+      "bookings": "الحجوزات",
+      "quotes": "عروض الأسعار",
+      "applications": "طلبات التسجيل",
+      "drivers": "السائقين",
+      "users": "المستخدمين",
+      "auditLog": "سجل المراجعة",
+      "chat": "المحادثات",
+      "visitors": "الزوار",
+      "aiAgent": "المساعد الذكي",
+      "settings": "الإعدادات",
+      "signOut": "تسجيل الخروج"
+    },
+    "dashboard": {
+      "title": "نظرة عامة",
+      "totalJobs": "إجمالي الطلبات",
+      "bookings": "الحجوزات",
+      "drivers": "السائقين",
+      "users": "المستخدمين",
+      "quotes": "عروض الأسعار",
+      "revenuePaid": "الإيرادات (المدفوعة)",
+      "recentJobs": "آخر الطلبات",
+      "todaySessions": "جلسات اليوم",
+      "countries": "الدول",
+      "devices": "الأجهزة"
+    },
+    "jobs": {
+      "title": "الطلبات",
+      "pickup": "موقع الاستلام",
+      "delivery": "موقع التسليم",
+      "moveDate": "تاريخ النقل",
+      "serviceType": "نوع الخدمة",
+      "estimatedPrice": "السعر المقدر",
+      "finalPrice": "السعر النهائي",
+      "referenceNumber": "رقم المرجع",
+      "customer": "العميل",
+      "description": "الوصف",
+      "items": "العناصر",
+      "distance": "المسافة",
+      "duration": "المدة",
+      "floor": "الطابق",
+      "hasLift": "يوجد مصعد",
+      "needsPacking": "يحتاج تعبئة",
+      "flexibleDates": "تواريخ مرنة",
+      "timeWindow": "الفترة الزمنية",
+      "contactName": "اسم جهة الاتصال",
+      "contactPhone": "هاتف جهة الاتصال",
+      "pickupNotes": "ملاحظات الاستلام",
+      "deliveryNotes": "ملاحظات التسليم",
+      "status": {
+        "pending": "قيد الانتظار",
+        "quoted": "تم التسعير",
+        "accepted": "مقبول",
+        "inProgress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغى"
+      },
+      "filters": {
+        "status": "تصفية حسب الحالة",
+        "dateRange": "نطاق التاريخ",
+        "serviceType": "نوع الخدمة"
+      }
+    },
+    "bookings": {
+      "title": "الحجوزات",
+      "orderNumber": "رقم الطلب",
+      "paymentStatus": "حالة الدفع",
+      "trackingToken": "رمز التتبع",
+      "finalPrice": "السعر النهائي",
+      "priceBreakdown": "تفاصيل السعر",
+      "driverAssigned": "السائق المعين",
+      "cancelledAt": "تم الإلغاء في",
+      "cancelledReason": "سبب الإلغاء",
+      "deliveredAt": "تم التسليم في",
+      "actions": {
+        "edit": "تعديل الحجز",
+        "cancel": "إلغاء الحجز",
+        "reprice": "إعادة التسعير",
+        "assignDriver": "تعيين سائق",
+        "viewTracking": "عرض التتبع",
+        "refund": "استرداد المبلغ"
+      },
+      "payment": {
+        "unpaid": "غير مدفوع",
+        "paid": "مدفوع",
+        "refunded": "مُسترد"
+      },
+      "status": {
+        "confirmed": "مؤكد",
+        "inProgress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغى"
+      },
+      "editModal": {
+        "title": "تعديل الحجز",
+        "serviceType": "نوع الخدمة",
+        "moveDateTime": "تاريخ ووقت النقل",
+        "timeWindow": "الفترة الزمنية",
+        "pickup": "الاستلام",
+        "delivery": "التسليم",
+        "address": "العنوان",
+        "floor": "الطابق",
+        "flat": "الشقة",
+        "hasLift": "يوجد مصعد",
+        "notes": "ملاحظات",
+        "items": "العناصر",
+        "itemName": "اسم العنصر",
+        "quantity": "الكمية",
+        "addItem": "إضافة عنصر",
+        "removeItem": "حذف عنصر",
+        "saveChanges": "حفظ التغييرات",
+        "saving": "جارٍ الحفظ..."
+      },
+      "cancelModal": {
+        "title": "إلغاء الحجز",
+        "warning": "سيتم إلغاء الحجز وتحديث حالته. سيتم الاحتفاظ بسجل الحجز. لا يمكن التراجع عن هذا الإجراء.",
+        "reason": "سبب الإلغاء",
+        "reasonPlaceholder": "أدخل سبب الإلغاء...",
+        "confirmCancel": "تأكيد الإلغاء",
+        "cancelling": "جارٍ الإلغاء..."
+      },
+      "repriceModal": {
+        "title": "إعادة حساب السعر",
+        "currentPrice": "السعر الحالي",
+        "newPrice": "السعر الجديد",
+        "description": "سيتم إعادة حساب سعر الحجز باستخدام محرك التسعير الحالي مع بيانات الطلب المخزنة (المسافة، العناصر، التواريخ). سيحل السعر الجديد محل السعر الحالي.",
+        "calculate": "حساب السعر",
+        "calculating": "جارٍ الحساب...",
+        "accept": "قبول السعر الجديد",
+        "priceDiff": "الفرق"
+      }
+    },
+    "quotes": {
+      "title": "عروض الأسعار",
+      "price": "السعر",
+      "message": "الرسالة",
+      "estimatedDuration": "المدة المقدرة",
+      "expiresAt": "ينتهي في",
+      "driver": "السائق",
+      "actions": {
+        "accept": "قبول",
+        "reject": "رفض"
+      },
+      "status": {
+        "pending": "قيد الانتظار",
+        "accepted": "مقبول",
+        "rejected": "مرفوض",
+        "expired": "منتهي الصلاحية"
+      }
+    },
+    "applications": {
+      "title": "طلبات السائقين",
+      "driverApplications": "طلبات تسجيل السائقين",
+      "companyName": "اسم الشركة",
+      "vanSize": "حجم الشاحنة",
+      "maxWeight": "الوزن الأقصى",
+      "coverageRadius": "نطاق التغطية",
+      "bio": "نبذة تعريفية",
+      "documents": "المستندات",
+      "actions": {
+        "approve": "قبول",
+        "reject": "رفض",
+        "viewDetails": "عرض التفاصيل"
+      },
+      "status": {
+        "pending": "قيد المراجعة",
+        "approved": "مقبول",
+        "rejected": "مرفوض"
+      },
+      "rejectModal": {
+        "title": "رفض الطلب",
+        "reason": "سبب الرفض",
+        "reasonPlaceholder": "أدخل سبب الرفض..."
+      }
+    },
+    "drivers": {
+      "title": "السائقين",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "company": "الشركة",
+      "van": "الشاحنة",
+      "rating": "التقييم",
+      "totalJobs": "إجمالي الأعمال",
+      "stripe": "Stripe",
+      "verified": "تم التحقق",
+      "unverified": "لم يتم التحقق",
+      "actions": {
+        "verify": "التحقق",
+        "unverify": "إلغاء التحقق",
+        "suspend": "تعليق",
+        "viewProfile": "عرض الملف"
+      },
+      "filters": {
+        "all": "الكل",
+        "verified": "تم التحقق",
+        "unverified": "لم يتم التحقق",
+        "status": "تصفية حسب الحالة"
+      }
+    },
+    "users": {
+      "title": "المستخدمين",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "role": "الدور",
+      "emailVerified": "البريد مُفعّل",
+      "twoFactorEnabled": "المصادقة الثنائية",
+      "createdAt": "تاريخ التسجيل",
+      "roles": {
+        "customer": "عميل",
+        "driver": "سائق",
+        "admin": "مدير"
+      }
+    },
+    "auditLog": {
+      "title": "سجل المراجعة",
+      "action": "الإجراء",
+      "admin": "المدير",
+      "booking": "الحجز",
+      "timestamp": "الوقت",
+      "changes": "التغييرات",
+      "note": "ملاحظة",
+      "actions": {
+        "EDIT": "تعديل",
+        "REPRICE": "إعادة تسعير",
+        "CANCEL": "إلغاء"
+      }
+    },
+    "chat": {
+      "title": "المحادثات",
+      "conversations": "المحادثات",
+      "newMessage": "رسالة جديدة",
+      "sendMessage": "إرسال الرسالة",
+      "typeMessage": "اكتب رسالتك...",
+      "noMessages": "لا توجد رسائل",
+      "group": {
+        "driversGroup": "مجموعة السائقين",
+        "openGroup": "فتح المجموعة",
+        "createGroup": "إنشاء مجموعة السائقين",
+        "openSuccess": "تم فتح المحادثة الجماعية",
+        "openError": "تعذر فتح المحادثة",
+        "noActiveDrivers": "لا يوجد سائقين نشطين"
+      }
+    },
+    "visitors": {
+      "title": "تحليلات الزوار",
+      "subtitle": "تتبع وتحليل زوار الموقع",
+      "totalVisitors": "إجمالي الزوار",
+      "newVisitors": "زوار جدد",
+      "returningVisitors": "زوار عائدين",
+      "pageViews": "مشاهدات الصفحات",
+      "todaySessions": "جلسات اليوم",
+      "countries": "الدول",
+      "devices": "الأجهزة",
+      "country": "البلد",
+      "city": "المدينة",
+      "location": "الموقع",
+      "browser": "المتصفح",
+      "device": "الجهاز",
+      "visits": "الزيارات",
+      "views": "المشاهدات",
+      "page": "الصفحة",
+      "visitCount": "عدد الزيارات",
+      "lastVisit": "آخر زيارة",
+      "ipHash": "IP مُعمّى",
+      "visitorDetails": "تفاصيل الزائر",
+      "visitHistory": "سجل الزيارات",
+      "recentVisitors": "آخر الزوار",
+      "referrers": "المصادر",
+      "paths": "المسارات",
+      "timezone": "المنطقة الزمنية",
+      "isp": "مزود الخدمة",
+      "os": "نظام التشغيل",
+      "firstSeen": "أول زيارة",
+      "directTraffic": "زيارة مباشرة",
+      "dailyTrend": "الاتجاه اليومي",
+      "byDevice": "حسب الجهاز",
+      "topCountries": "أعلى الدول",
+      "topBrowsers": "أعلى المتصفحات",
+      "topPages": "أعلى الصفحات",
+      "visitors": "الزوار",
+      "noData": "لا توجد بيانات",
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يوم",
+      "last90Days": "آخر 90 يوم",
+      "filters": {
+        "dateRange": "نطاق التاريخ",
+        "country": "البلد",
+        "deviceType": "نوع الجهاز"
+      },
+      "chart": {
+        "visits30Days": "الزيارات خلال 30 يوم"
+      }
+    },
+    "aiAgent": {
+      "title": "المساعد الذكي",
+      "subtitle": "مساعد ذكي للإدارة بالعراقية",
+      "placeholder": "اكتب رسالتك هنا...",
+      "send": "إرسال",
+      "clear": "مسح المحادثة",
+      "thinking": "يفكر...",
+      "executing": "يشتغل على",
+      "error": "حدث خطأ في المعالجة",
+      "welcome": "هلا بيك! شلون أكدر أساعدك اليوم؟",
+      "retry": "إعادة المحاولة"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "language": "اللغة",
+      "theme": "المظهر",
+      "notifications": "الإشعارات",
+      "sound": "الصوت",
+      "soundEnabled": "تفعيل الصوت",
+      "soundDisabled": "إيقاف الصوت"
+    },
+    "notifications": {
+      "newOrder": {
+        "title": "طلب جديد!",
+        "viewDetails": "عرض التفاصيل",
+        "enableSound": "اضغط لتفعيل الصوت"
+      }
+    },
+    "analytics": {
+      "title": "التحليلات",
+      "overview": "نظرة عامة",
+      "revenue": "الإيرادات",
+      "orders": "الطلبات",
+      "customers": "العملاء",
+      "trends": "الاتجاهات",
+      "comparison": "المقارنة",
+      "growth": "النمو"
+    },
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "invalidEmail": "البريد الإلكتروني غير صحيح",
+      "invalidPhone": "رقم الهاتف غير صحيح",
+      "minLength": "الحد الأدنى {min} أحرف",
+      "maxLength": "الحد الأقصى {max} حرف",
+      "invalidDate": "التاريخ غير صحيح",
+      "invalidPrice": "السعر غير صحيح"
+    },
+    "status": {
+      "success": "تمت العملية بنجاح",
+      "error": "حدث خطأ",
+      "warning": "تحذير",
+      "info": "معلومة",
+      "networkError": "خطأ في الاتصال. يرجى المحاولة مرة أخرى.",
+      "unauthorized": "غير مصرح",
+      "forbidden": "ممنوع",
+      "notFound": "غير موجود"
+    },
+    "pagination": {
+      "page": "صفحة",
+      "of": "من",
+      "prev": "السابق",
+      "next": "التالي",
+      "first": "الأولى",
+      "last": "الأخيرة",
+      "showing": "عرض",
+      "to": "إلى",
+      "entries": "سجل"
+    },
+    "table": {
+      "noData": "لا توجد بيانات",
+      "loading": "جارٍ تحميل البيانات...",
+      "error": "خطأ في تحميل البيانات"
+    },
+    "time": {
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "thisWeek": "هذا الأسبوع",
+      "thisMonth": "هذا الشهر",
+      "lastMonth": "الشهر الماضي",
+      "thisYear": "هذه السنة",
+      "ago": "منذ",
+      "minutes": "دقائق",
+      "hours": "ساعات",
+      "days": "أيام"
+    }
+  }
+}

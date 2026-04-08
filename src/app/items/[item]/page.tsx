@@ -119,7 +119,7 @@ export default async function ItemPage({ params }: PageProps) {
         <Container maxW="1200px">
           <VStack gap={6} align="flex-start">
             <Box>
-              <Badge colorScheme="blue" mb={4}>
+              <Badge colorPalette="blue" mb={4}>
                 {itemMeta.category}
               </Badge>
               <h1 style={{ fontSize: "2.5rem", fontWeight: 800, marginBottom: "1rem", lineHeight: 1.2 }}>

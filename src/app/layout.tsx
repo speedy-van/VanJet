@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Cairo } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/Providers";
 import { SITE } from "@/lib/seo/site";
@@ -13,6 +13,12 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -114,7 +120,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.variable} style={{ fontFamily: "var(--font-inter), sans-serif" }}>
+      <body className={`${inter.variable} ${cairo.variable}`} style={{ fontFamily: "var(--font-inter), sans-serif" }}>
         <Providers>{children}</Providers>
 
         {/* Google Analytics (env-driven) */}

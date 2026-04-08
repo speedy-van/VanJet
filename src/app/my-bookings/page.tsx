@@ -140,7 +140,7 @@ export default async function MyBookingsPage() {
                         </Text>
                       </VStack>
                       <Badge
-                        colorScheme={
+                        colorPalette={
                           job.status === "completed"
                             ? "green"
                             : job.status === "cancelled"
@@ -175,7 +175,7 @@ export default async function MyBookingsPage() {
                                 {b.orderNumber ?? "—"}
                               </Text>
                               <Badge
-                                colorScheme={
+                                colorPalette={
                                   b.paymentStatus === "paid"
                                     ? "green"
                                     : "yellow"
