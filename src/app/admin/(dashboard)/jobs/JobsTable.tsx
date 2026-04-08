@@ -1,9 +1,10 @@
 "use client";
 
-// ─── VanJet · Admin Jobs Table with Selection ─────────────────
+// ─── VanJet · Admin Jobs Table with Selection & Delete ────────
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Box, Flex, Text, Button } from "@chakra-ui/react";
-import { X, Check, Minus } from "lucide-react";
+import { Trash2, Check, Minus } from "lucide-react";
 import Link from "next/link";
 import { formatGBP } from "@/lib/money/format";
 
@@ -76,7 +77,9 @@ function SelectBox({
 }
 
 export function JobsTable({ jobs }: JobsTableProps) {
+  const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const toggleSelection = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -99,7 +102,37 @@ export function JobsTable({ jobs }: JobsTableProps) {
     });
   }, [jobs]);
 
-  // Note: We don't use clearSelection callback here - direct inline handler ensures fresh state update
+  const handleDeleteSelected = async () => {
+    const count = selectedIds.size;
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete ${count} job${count !== 1 ? "s" : ""}?\n\nThis action cannot be undone. All related quotes and bookings will also be deleted.`
+    );
+    
+    if (!confirmed) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch("/api/admin/jobs/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobIds: Array.from(selectedIds) }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to delete jobs");
+      }
+      
+      // Clear selection and refresh the page
+      setSelectedIds(new Set());
+      router.refresh();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("Failed to delete jobs. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const selectedCount = selectedIds.size;
   const allSelected = jobs.length > 0 && selectedCount === jobs.length;
   const someSelected = selectedCount > 0;
@@ -112,26 +145,27 @@ export function JobsTable({ jobs }: JobsTableProps) {
         <Flex
           align="center"
           justify="space-between"
-          bg="blue.50"
+          bg="purple.50"
           borderWidth="1px"
-          borderColor="blue.200"
+          borderColor="purple.200"
           borderRadius="lg"
           px={4}
           py={3}
           mb={4}
         >
-          <Text fontSize="sm" fontWeight="600" color="blue.700">
+          <Text fontSize="sm" fontWeight="600" color="purple.700">
             {selectedCount} job{selectedCount !== 1 ? "s" : ""} selected
           </Text>
           <Button
             type="button"
             size="sm"
-            variant="outline"
-            colorPalette="red"
-            onClick={() => setSelectedIds(new Set<string>())}
+            colorPalette="purple"
+            onClick={handleDeleteSelected}
+            loading={isDeleting}
+            disabled={isDeleting}
           >
-            <X size={16} />
-            <Text ml={1}>Clear Selection</Text>
+            <Trash2 size={16} />
+            <Text ml={1}>Delete Selected</Text>
           </Button>
         </Flex>
       )}
