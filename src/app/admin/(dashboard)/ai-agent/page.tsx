@@ -227,8 +227,8 @@ export default function AdminAIAgentPage() {
               <Image
                 src="/images/zyphon-logo.svg"
                 alt="Zyphon"
-                width={64}
-                height={64}
+                width={88}
+                height={88}
               />
               <Text mt={4} textAlign="center" fontWeight="600" color="gray.600">
                 Zyphon

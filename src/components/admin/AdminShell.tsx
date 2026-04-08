@@ -15,14 +15,15 @@ import {
   HStack,
   IconButton,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
   labelKey: string;
   href: string;
-  icon: string;
+  icon: string | ReactNode;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -35,7 +36,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: "users", href: "/admin/users", icon: "👥" },
   { labelKey: "chat", href: "/admin/chat", icon: "💬" },
   { labelKey: "visitors", href: "/admin/visitors", icon: "👁️" },
-  { labelKey: "aiAgent", href: "/admin/ai-agent", icon: "⚡" },
+  { labelKey: "aiAgent", href: "/admin/ai-agent", icon: <Image src="/images/zyphon-logo.svg" alt="Zyphon" width={20} height={20} /> },
   { labelKey: "auditLog", href: "/admin/audit-log", icon: "📜" },
 ];
 
@@ -64,7 +65,7 @@ function SidebarContent({
 
         return (
           <Link key={item.href} href={item.href} onClick={onNavigate}>
-            <Box
+            <HStack
               px={3}
               py={2}
               borderRadius="md"
@@ -74,9 +75,11 @@ function SidebarContent({
               fontSize="sm"
               _hover={{ bg: isActive ? "blue.50" : "gray.100" }}
               transition="all 0.15s"
+              gap={2}
             >
-              {item.icon}  {t(item.labelKey)}
-            </Box>
+              <Box flexShrink={0}>{item.icon}</Box>
+              <Text>{t(item.labelKey)}</Text>
+            </HStack>
           </Link>
         );
       })}
