@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   VStack,
@@ -94,12 +94,21 @@ export function StepReview({ form, onNext, onBack }: StepReviewProps) {
   const pickupAddress = form.watch("pickup.address");
   const dropoffAddress = form.watch("dropoff.address");
   
+  // Track previous addresses to detect actual changes (not initial pricing set)
+  const prevAddressesRef = useRef({ pickup: pickupAddress, dropoff: dropoffAddress });
+  
   useEffect(() => {
-    // If pricing exists and addresses change, clear pricing to force re-calculation
-    if (pricingEngine || jobResult) {
+    const prev = prevAddressesRef.current;
+    const addressesChanged = prev.pickup !== pickupAddress || prev.dropoff !== dropoffAddress;
+    
+    // Only clear pricing if addresses actually changed (not on initial pricing set)
+    if (addressesChanged && (pricingEngine || jobResult)) {
       setPricingEngine(null);
       setJobResult(null);
     }
+    
+    // Update the ref for next comparison
+    prevAddressesRef.current = { pickup: pickupAddress, dropoff: dropoffAddress };
   }, [pickupAddress, dropoffAddress, pricingEngine, jobResult]);
 
   // Calculate add-ons cost
