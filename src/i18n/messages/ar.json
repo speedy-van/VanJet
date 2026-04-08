@@ -400,6 +400,16 @@
         "enableSound": "اضغط لتفعيل الصوت"
       }
     },
+    "notificationCenter": {
+      "title": "الإشعارات",
+      "empty": "لا توجد إشعارات",
+      "markAllRead": "تعيين الكل كمقروء",
+      "viewAll": "عرض جميع الإشعارات",
+      "justNow": "الآن",
+      "minsAgo": " د",
+      "hoursAgo": " س",
+      "daysAgo": " ي"
+    },
     "analytics": {
       "title": "التحليلات",
       "overview": "نظرة عامة",

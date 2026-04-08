@@ -26,6 +26,7 @@ import {
 } from "@/lib/resend";
 import { sendBookingConfirmedSMS, sendPaymentFailedSMS, sendRefundSMS } from "@/lib/sms";
 import { emitNewOrder } from "@/lib/events/newOrderEventBus";
+import { createNotification } from "@/lib/notifications";
 
 const WEBHOOK_SECRET = serverEnv.STRIPE_WEBHOOK_SECRET;
 
@@ -293,6 +294,15 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
     finalPrice: parseFloat(finalPrice),
     createdAt: new Date(),
   });
+
+  // Persist notification
+  createNotification({
+    type: "new_order",
+    severity: "success",
+    title: `طلب جديد #${orderNumber}`,
+    body: `${job.pickupAddress} → ${job.deliveryAddress} — £${parseFloat(finalPrice).toFixed(2)}`,
+    linkHref: "/admin/bookings",
+  }).catch(() => {});
 
   const [customer] = await db
     .select()

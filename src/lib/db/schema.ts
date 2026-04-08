@@ -483,3 +483,23 @@ export const zyphonMessages = pgTable(
     index("zyphon_msg_conv_idx").on(table.conversationId, table.createdAt),
   ]
 );
+
+// ── Admin Notifications ─────────────────────────────────────────
+export const adminNotifications = pgTable(
+  "admin_notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: varchar("type", { length: 30 }).notNull(), // new_order | driver_applied | booking_cancelled | payment_received | driver_verified
+    severity: varchar("severity", { length: 10 }).notNull().default("info"), // info | warning | success | error
+    title: varchar("title", { length: 255 }).notNull(),
+    body: text("body"),
+    linkHref: varchar("link_href", { length: 500 }),
+    read: boolean("read").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("admin_notif_read_idx").on(table.read, table.createdAt),
+    index("admin_notif_type_idx").on(table.type),
+    index("admin_notif_created_idx").on(table.createdAt),
+  ]
+);

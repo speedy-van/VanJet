@@ -400,6 +400,16 @@
         "enableSound": "Click to enable sound"
       }
     },
+    "notificationCenter": {
+      "title": "Notifications",
+      "empty": "No notifications",
+      "markAllRead": "Mark all read",
+      "viewAll": "View all notifications",
+      "justNow": "Just now",
+      "minsAgo": "m ago",
+      "hoursAgo": "h ago",
+      "daysAgo": "d ago"
+    },
     "analytics": {
       "title": "Analytics",
       "overview": "Overview",

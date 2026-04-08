@@ -18,6 +18,7 @@ import {
 import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NotificationBell } from "./NotificationBell";
 import type { Locale } from "@/i18n/config";
 
 interface NavItem {
@@ -243,6 +244,7 @@ export function AdminShell({ user, locale, children }: AdminShellProps) {
           </HStack>
 
           <HStack gap={2}>
+            <NotificationBell />
             <LanguageSwitcher currentLocale={locale} />
             <Text fontSize="sm" color="gray.500" display={{ base: "none", md: "block" }}>
               {user.name}
