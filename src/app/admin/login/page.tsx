@@ -136,7 +136,7 @@ export default function AdminLoginPage() {
 
             <Button
               type="submit"
-              colorPalette="blue"
+              colorPalette="purple"
               size="lg"
               w="full"
               loading={loading}

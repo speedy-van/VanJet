@@ -76,11 +76,11 @@ function SidebarContent({
               px={3}
               py={2}
               borderRadius="md"
-              bg={isActive ? "blue.50" : "transparent"}
-              color={isActive ? "blue.700" : "gray.700"}
+              bg={isActive ? "purple.50" : "transparent"}
+              color={isActive ? "purple.700" : "gray.700"}
               fontWeight={isActive ? "600" : "400"}
               fontSize="sm"
-              _hover={{ bg: isActive ? "blue.50" : "gray.100" }}
+              _hover={{ bg: isActive ? "purple.50" : "gray.100" }}
               transition="all 0.15s"
               gap={2}
               justifyContent={collapsed ? "center" : "flex-start"}

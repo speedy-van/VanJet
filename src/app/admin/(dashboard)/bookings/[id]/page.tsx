@@ -134,7 +134,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
       <Flex align="center" gap={3} mb={5}>
         <Link href="/admin/bookings">
           <Text
-            color="blue.500"
+            color="purple.500"
             fontSize="sm"
             _hover={{ textDecoration: "underline" }}
           >
@@ -155,8 +155,8 @@ export default async function AdminBookingDetailPage({ params }: Props) {
             px={2}
             py={0.5}
             borderRadius="full"
-            bg="blue.50"
-            color="blue.700"
+            bg="purple.50"
+            color="purple.700"
             fontSize="xs"
             fontWeight="600"
           >
@@ -204,7 +204,7 @@ function StatusBadge({
   type: "status" | "payment";
 }) {
   const statusColors: Record<string, { bg: string; color: string }> = {
-    confirmed: { bg: "blue.50", color: "blue.700" },
+    confirmed: { bg: "purple.50", color: "purple.700" },
     in_progress: { bg: "orange.50", color: "orange.700" },
     completed: { bg: "green.50", color: "green.700" },
     cancelled: { bg: "red.50", color: "red.700" },

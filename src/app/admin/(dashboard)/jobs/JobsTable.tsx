@@ -27,7 +27,7 @@ interface JobsTableProps {
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   pending: { bg: "yellow.100", color: "yellow.800" },
-  quoted: { bg: "blue.100", color: "blue.800" },
+  quoted: { bg: "purple.100", color: "purple.800" },
   accepted: { bg: "cyan.100", color: "cyan.800" },
   in_progress: { bg: "purple.100", color: "purple.800" },
   completed: { bg: "green.100", color: "green.800" },
@@ -294,7 +294,7 @@ export function JobsTable({ jobs }: JobsTableProps) {
                     <td style={{ padding: "12px 16px" }}>
                       <Link href={`/admin/jobs/${job.id}`}>
                         <Text
-                          color="blue.500"
+                          color="purple.500"
                           fontWeight="500"
                           fontSize="sm"
                           _hover={{ textDecoration: "underline" }}

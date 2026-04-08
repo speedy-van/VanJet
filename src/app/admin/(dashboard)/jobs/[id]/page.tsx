@@ -43,7 +43,7 @@ export default async function AdminJobDetailPage({ params }: Props) {
     <Box>
       <Flex align="center" gap={3} mb={5}>
         <Link href="/admin/jobs">
-          <Text color="blue.500" fontSize="sm" _hover={{ textDecoration: "underline" }}>
+          <Text color="purple.500" fontSize="sm" _hover={{ textDecoration: "underline" }}>
             ← Back to Jobs
           </Text>
         </Link>

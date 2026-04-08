@@ -59,11 +59,11 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               <Box
                 px={3} py={1} borderRadius="full" fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
-                borderWidth="1px" borderColor={isActive ? "blue.500" : "gray.200"}
+                borderWidth="1px" borderColor={isActive ? "purple.500" : "gray.200"}
                 textTransform="capitalize"
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {label}
@@ -148,7 +148,7 @@ function RoleBadge({ role }: { role: string }) {
   const colors: Record<string, { bg: string; color: string }> = {
     admin: { bg: "red.100", color: "red.800" },
     driver: { bg: "purple.100", color: "purple.800" },
-    customer: { bg: "blue.100", color: "blue.800" },
+    customer: { bg: "purple.100", color: "purple.800" },
   };
   const c = colors[role] ?? { bg: "gray.100", color: "gray.800" };
   return (

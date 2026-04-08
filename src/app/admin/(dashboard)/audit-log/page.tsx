@@ -76,11 +76,11 @@ export default async function AdminAuditLogPage({ searchParams }: Props) {
                 borderRadius="full"
                 fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
                 borderWidth="1px"
-                borderColor={isActive ? "blue.500" : "gray.200"}
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                borderColor={isActive ? "purple.500" : "gray.200"}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {label}
@@ -159,7 +159,7 @@ export default async function AdminAuditLogPage({ searchParams }: Props) {
                     <Link
                       href={`/admin/bookings/${r.bookingId}`}
                       style={{
-                        color: "#1D4ED8",
+                        color: "#7C3AED",
                         fontWeight: 500,
                         fontSize: "12px",
                       }}
@@ -255,7 +255,7 @@ export default async function AdminAuditLogPage({ searchParams }: Props) {
 
 function ActionBadge({ action }: { action: string }) {
   const colors: Record<string, { bg: string; color: string }> = {
-    EDIT: { bg: "blue.100", color: "blue.800" },
+    EDIT: { bg: "purple.100", color: "purple.800" },
     REPRICE: { bg: "amber.100", color: "amber.800" },
     CANCEL: { bg: "red.100", color: "red.800" },
   };

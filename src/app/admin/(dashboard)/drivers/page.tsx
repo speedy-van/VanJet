@@ -73,8 +73,8 @@ export default async function AdminDriversPage({ searchParams }: Props) {
         </Text>
         <Link href="/admin/applications">
           <Box
-            px={3} py={1} borderRadius="md" bg="blue.500" color="white"
-            fontSize="sm" fontWeight="600" _hover={{ bg: "blue.600" }}
+            px={3} py={1} borderRadius="md" bg="purple.500" color="white"
+            fontSize="sm" fontWeight="600" _hover={{ bg: "purple.600" }}
             cursor="pointer"
           >
             📝 {tCommon("applications") || "Driver Applications"}
@@ -94,10 +94,10 @@ export default async function AdminDriversPage({ searchParams }: Props) {
               <Box
                 px={3} py={1} borderRadius="full" fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
-                borderWidth="1px" borderColor={isActive ? "blue.500" : "gray.200"}
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                borderWidth="1px" borderColor={isActive ? "purple.500" : "gray.200"}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {f.label}

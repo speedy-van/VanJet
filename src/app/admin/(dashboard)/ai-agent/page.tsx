@@ -321,7 +321,7 @@ export default function AdminAIAgentPage() {
 
           {currentTool && (
             <Flex justify="center">
-              <Badge colorPalette="blue" px={3} py={1}>
+              <Badge colorPalette="purple" px={3} py={1}>
                 <Loader2 size={14} className="animate-spin" />
                 <Text as="span" ms={2}>
                   {t("executing")}: {currentTool}
@@ -348,7 +348,7 @@ export default function AdminAIAgentPage() {
           bg="white"
         />
         <Button
-          colorPalette="blue"
+          colorPalette="purple"
           onClick={handleSend}
           loading={loading}
           disabled={loading || !input.trim()}
@@ -374,7 +374,7 @@ function MessageBubble({
     <Flex justify={isUser ? "flex-end" : "flex-start"}>
       <HStack
         maxW="80%"
-        bg={isUser ? "blue.500" : "gray.100"}
+        bg={isUser ? "purple.500" : "gray.100"}
         color={isUser ? "white" : "gray.800"}
         px={4}
         py={3}

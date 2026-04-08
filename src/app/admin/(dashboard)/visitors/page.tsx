@@ -149,7 +149,7 @@ export default function AdminVisitorsPage() {
               icon={<Users size={24} />}
               label={t("totalVisitors")}
               value={stats?.total || 0}
-              color="blue"
+              color="purple"
             />
             <StatCard
               icon={<UserPlus size={24} />}
@@ -181,7 +181,7 @@ export default function AdminVisitorsPage() {
               {(() => {
                 const total = stats.byDevice.reduce((acc, d) => acc + d.count, 0) || 1;
                 const deviceColors: Record<string, string> = {
-                  desktop: "blue",
+                  desktop: "purple",
                   mobile: "green",
                   tablet: "orange",
                 };
@@ -201,7 +201,7 @@ export default function AdminVisitorsPage() {
                       <Progress.Root
                         value={pct}
                         size="sm"
-                        colorPalette={typeof color === "string" && !color.startsWith("#") ? color : "blue"}
+                        colorPalette={typeof color === "string" && !color.startsWith("#") ? color : "purple"}
                       >
                         <Progress.Track>
                           <Progress.Range />
@@ -356,7 +356,7 @@ export default function AdminVisitorsPage() {
                       {p.page || "/"}
                     </Table.Cell>
                     <Table.Cell textAlign="end">
-                      <Badge colorPalette="blue">{p.count}</Badge>
+                      <Badge colorPalette="purple">{p.count}</Badge>
                     </Table.Cell>
                   </Table.Row>
                 ))}

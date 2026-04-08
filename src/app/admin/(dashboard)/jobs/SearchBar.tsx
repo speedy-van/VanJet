@@ -44,15 +44,15 @@ export function SearchBar({ currentQuery }: SearchBarProps) {
           onChange={(e) => setQuery(e.target.value)}
           bg="white"
           borderColor="gray.200"
-          _focus={{ borderColor: "blue.400", boxShadow: "0 0 0 1px #1D4ED8" }}
+          _focus={{ borderColor: "purple.400", boxShadow: "0 0 0 1px #7C3AED" }}
           fontSize="sm"
         />
         <Button
           type="submit"
-          bg="#1D4ED8"
+          bg="#7C3AED"
           color="white"
           fontWeight="600"
-          _hover={{ bg: "#1840B8" }}
+          _hover={{ bg: "#6D28D9" }}
           px={6}
         >
           Search

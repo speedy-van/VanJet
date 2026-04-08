@@ -68,12 +68,12 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                 borderRadius="full"
                 fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
                 borderWidth="1px"
-                borderColor={isActive ? "blue.500" : "gray.200"}
+                borderColor={isActive ? "purple.500" : "gray.200"}
                 textTransform="capitalize"
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {label}
@@ -131,13 +131,13 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                     borderColor="gray.100"
                     _hover={{ bg: "gray.50" }}
                   >
-                    <Box as="td" px={4} py={3} fontSize="xs" fontWeight="600" color="blue.600" fontFamily="mono">
+                    <Box as="td" px={4} py={3} fontSize="xs" fontWeight="600" color="purple.600" fontFamily="mono">
                       {b.orderNumber ?? "—"}
                     </Box>
                     <Box as="td" px={4} py={3} fontSize="xs">
                       <Link
                         href={`/admin/bookings/${b.id}`}
-                        style={{ color: '#1D4ED8', fontWeight: 500 }}
+                        style={{ color: '#7C3AED', fontWeight: 500 }}
                       >
                         {b.id.slice(0, 8)}…
                       </Link>
@@ -162,7 +162,7 @@ export default async function AdminBookingsPage({ searchParams }: Props) {
                         href={`/admin/bookings/${b.id}`}
                         style={{
                           fontSize: '12px',
-                          color: '#1D4ED8',
+                          color: '#7C3AED',
                           fontWeight: 500,
                         }}
                       >

@@ -152,7 +152,7 @@ export default function ChatRoomPage() {
   if (loading) {
     return (
       <Flex justify="center" align="center" minH="400px">
-        <Spinner size="lg" colorPalette="blue" />
+        <Spinner size="lg" colorPalette="purple" />
       </Flex>
     );
   }
@@ -224,7 +224,7 @@ export default function ChatRoomPage() {
                 >
                   <Box
                     maxW="75%"
-                    bg={isOwn ? "blue.500" : "white"}
+                    bg={isOwn ? "purple.500" : "white"}
                     color={isOwn ? "white" : "gray.800"}
                     borderRadius="xl"
                     px={4}
@@ -238,7 +238,7 @@ export default function ChatRoomPage() {
                         <Text
                           fontSize="xs"
                           fontWeight="600"
-                          color={isOwn ? "blue.100" : "blue.600"}
+                          color={isOwn ? "purple.100" : "purple.600"}
                         >
                           {msg.senderName}
                         </Text>
@@ -258,7 +258,7 @@ export default function ChatRoomPage() {
                     </Text>
                     <Text
                       fontSize="2xs"
-                      color={isOwn ? "blue.100" : "gray.400"}
+                      color={isOwn ? "purple.100" : "gray.400"}
                       textAlign="end"
                       mt={1}
                     >
@@ -297,7 +297,7 @@ export default function ChatRoomPage() {
           size="md"
         />
         <Button
-          colorPalette="blue"
+          colorPalette="purple"
           onClick={handleSend}
           loading={sending}
           disabled={!newMessage.trim() || sending}

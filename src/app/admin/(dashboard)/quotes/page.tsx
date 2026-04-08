@@ -62,11 +62,11 @@ export default async function AdminQuotesPage({ searchParams }: Props) {
               <Box
                 px={3} py={1} borderRadius="full" fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
-                borderWidth="1px" borderColor={isActive ? "blue.500" : "gray.200"}
+                borderWidth="1px" borderColor={isActive ? "purple.500" : "gray.200"}
                 textTransform="capitalize"
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {label}

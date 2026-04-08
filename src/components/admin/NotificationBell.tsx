@@ -84,7 +84,7 @@ export function NotificationBell() {
   }, []);
 
   const severityColor: Record<string, string> = {
-    info: "blue",
+    info: "purple",
     success: "green",
     warning: "orange",
     error: "red",
@@ -159,7 +159,7 @@ export function NotificationBell() {
             {unread > 0 && (
               <Text
                 fontSize="xs"
-                color="blue.500"
+                color="purple.500"
                 cursor="pointer"
                 onClick={markAllRead}
                 _hover={{ textDecoration: "underline" }}
@@ -184,11 +184,11 @@ export function NotificationBell() {
                 py={3}
                 gap={3}
                 align="flex-start"
-                bg={n.read ? "white" : "blue.50"}
+                bg={n.read ? "white" : "purple.50"}
                 borderBottomWidth="1px"
                 borderColor="gray.100"
                 cursor="pointer"
-                _hover={{ bg: n.read ? "gray.50" : "blue.100" }}
+                _hover={{ bg: n.read ? "gray.50" : "purple.100" }}
                 onClick={() => {
                   if (!n.read) markRead(n.id);
                 }}
@@ -200,7 +200,7 @@ export function NotificationBell() {
                   bg={
                     n.read
                       ? "transparent"
-                      : `${severityColor[n.severity] || "blue"}.400`
+                      : `${severityColor[n.severity] || "purple"}.400`
                   }
                   mt={2}
                   flexShrink={0}
@@ -231,7 +231,7 @@ export function NotificationBell() {
           {notifications.length > 0 && (
             <Flex justify="center" py={2} borderTopWidth="1px">
               <Link href="/admin/notifications">
-                <Text fontSize="xs" color="blue.500" _hover={{ textDecoration: "underline" }}>
+                <Text fontSize="xs" color="purple.500" _hover={{ textDecoration: "underline" }}>
                   {t("viewAll")}
                 </Text>
               </Link>

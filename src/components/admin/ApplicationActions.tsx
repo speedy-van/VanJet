@@ -67,7 +67,7 @@ export function ApplicationActions({ driverProfileId, currentStatus }: Props) {
           placeholder="Explain why this application is being rejected..."
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          onFocus={(e) => (e.target.style.borderColor = "#3b82f6")}
+          onFocus={(e) => (e.target.style.borderColor = "#7C3AED")}
           onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
         />
         {error && (

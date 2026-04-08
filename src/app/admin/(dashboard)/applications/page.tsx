@@ -106,7 +106,7 @@ export default async function AdminApplicationsPage({ searchParams }: Props) {
         <StatCard
           label="Total"
           value={pendingCount.value + approvedCount.value + rejectedCount.value}
-          color="blue"
+          color="purple"
         />
       </SimpleGrid>
 
@@ -123,11 +123,11 @@ export default async function AdminApplicationsPage({ searchParams }: Props) {
                 borderRadius="full"
                 fontSize="sm"
                 fontWeight={isActive ? "600" : "400"}
-                bg={isActive ? "blue.500" : "white"}
+                bg={isActive ? "purple.500" : "white"}
                 color={isActive ? "white" : "gray.600"}
                 borderWidth="1px"
-                borderColor={isActive ? "blue.500" : "gray.200"}
-                _hover={{ bg: isActive ? "blue.600" : "gray.100" }}
+                borderColor={isActive ? "purple.500" : "gray.200"}
+                _hover={{ bg: isActive ? "purple.600" : "gray.100" }}
                 cursor="pointer"
               >
                 {f.label}

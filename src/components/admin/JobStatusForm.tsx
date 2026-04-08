@@ -71,7 +71,7 @@ export function JobStatusForm({
 
       <Button
         size="sm"
-        colorPalette="blue"
+        colorPalette="purple"
         onClick={handleUpdate}
         loading={loading}
         disabled={status === currentStatus}

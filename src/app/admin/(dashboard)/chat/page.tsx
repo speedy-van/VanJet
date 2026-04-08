@@ -95,7 +95,7 @@ export default function AdminChatPage() {
         </Text>
         
         <Button
-          colorPalette="blue"
+          colorPalette="purple"
           onClick={handleOpenDriversGroup}
           loading={loading}
           disabled={loading}

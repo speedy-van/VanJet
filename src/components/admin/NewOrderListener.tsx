@@ -230,7 +230,7 @@ export function NewOrderListener() {
             borderRadius="lg"
             boxShadow="lg"
             borderWidth="1px"
-            borderColor="blue.200"
+            borderColor="purple.200"
             overflow="hidden"
             mb={2}
             animation={`slideIn 0.3s ease ${idx * 0.05}s`}
@@ -245,7 +245,7 @@ export function NewOrderListener() {
             <Flex
               align="center"
               justify="space-between"
-              bg="blue.500"
+              bg="purple.500"
               color="white"
               px={3}
               py={2}
@@ -264,7 +264,7 @@ export function NewOrderListener() {
                 minW="auto"
                 h="auto"
                 onClick={() => dismissNotification(notification.id)}
-                _hover={{ bg: "blue.600" }}
+                _hover={{ bg: "purple.600" }}
               >
                 <X size={16} />
               </Button>
@@ -276,7 +276,7 @@ export function NewOrderListener() {
                 <Text fontWeight="700" fontFamily="mono">
                   #{notification.orderNumber}
                 </Text>
-                <Badge colorPalette="blue" textTransform="capitalize">
+                <Badge colorPalette="purple" textTransform="capitalize">
                   {notification.serviceType}
                 </Badge>
               </Flex>
@@ -292,7 +292,7 @@ export function NewOrderListener() {
                 <Link href={`/admin/jobs/${notification.id}`}>
                   <Button 
                     size="xs" 
-                    colorPalette="blue"
+                    colorPalette="purple"
                     onClick={() => dismissNotification(notification.id)}
                   >
                     {t("viewDetails")}

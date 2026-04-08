@@ -163,7 +163,7 @@ export function BookingManagement({
         </Text>
         <Button
           size="sm"
-          colorPalette="blue"
+          colorPalette="purple"
           onClick={() => setEditOpen(true)}
           disabled={isCancelled}
         >
@@ -172,7 +172,7 @@ export function BookingManagement({
         <Button
           size="sm"
           variant="outline"
-          colorPalette="blue"
+          colorPalette="purple"
           onClick={() => setRepriceOpen(true)}
           disabled={isCancelled}
         >
@@ -223,7 +223,7 @@ export function BookingManagement({
           </Text>
           <Flex justify="space-between" py={1.5} borderBottomWidth="1px" borderColor="gray.50">
             <Text fontSize="sm" color="gray.500">Final Price</Text>
-            <Text fontSize="lg" fontWeight="700" color="#1D4ED8">
+            <Text fontSize="lg" fontWeight="700" color="#7C3AED">
               £{Number(booking.finalPrice).toFixed(2)}
             </Text>
           </Flex>
@@ -908,9 +908,9 @@ function EditModal({
                 style={{
                   padding: "4px 12px",
                   borderRadius: "8px",
-                  border: "1px solid #1D4ED8",
-                  background: "#EBF1FF",
-                  color: "#1D4ED8",
+                  border: "1px solid #7C3AED",
+                  background: "#F3E8FF",
+                  color: "#7C3AED",
                   fontSize: "13px",
                   fontWeight: 600,
                   cursor: "pointer",
@@ -1036,7 +1036,7 @@ function EditModal({
           </Button>
           <Button
             size="sm"
-            colorPalette="blue"
+            colorPalette="purple"
             onClick={handleSave}
             loading={loading}
           >
@@ -1230,7 +1230,7 @@ function RepriceModal({
           <>
             <Text fontSize="sm" color="gray.600" mb={2}>
               Current price:{" "}
-              <strong style={{ color: "#1D4ED8" }}>
+              <strong style={{ color: "#7C3AED" }}>
                 £{currentPrice.toFixed(2)}
               </strong>
             </Text>
@@ -1251,7 +1251,7 @@ function RepriceModal({
               </Button>
               <Button
                 size="sm"
-                colorPalette="blue"
+                colorPalette="purple"
                 onClick={handleReprice}
                 loading={loading}
               >
@@ -1264,7 +1264,7 @@ function RepriceModal({
             <Box
               p={4}
               borderRadius="lg"
-              bg="blue.50"
+              bg="purple.50"
               mb={4}
             >
               <Flex justify="space-between" mb={2}>
@@ -1279,7 +1279,7 @@ function RepriceModal({
                 <Text fontSize="sm" color="gray.600" fontWeight="600">
                   New Price
                 </Text>
-                <Text fontSize="xl" fontWeight="700" color="#1D4ED8">
+                <Text fontSize="xl" fontWeight="700" color="#7C3AED">
                   £{result.newPrice.toFixed(2)}
                 </Text>
               </Flex>
@@ -1410,7 +1410,7 @@ function Th({
 
 function ActionBadge({ action }: { action: string }) {
   const styles: Record<string, { bg: string; color: string }> = {
-    EDIT: { bg: "blue.50", color: "blue.700" },
+    EDIT: { bg: "purple.50", color: "purple.700" },
     REPRICE: { bg: "purple.50", color: "purple.700" },
     CANCEL: { bg: "red.50", color: "red.700" },
   };

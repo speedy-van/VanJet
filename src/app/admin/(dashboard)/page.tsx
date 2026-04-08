@@ -68,7 +68,7 @@ export default async function AdminDashboardPage() {
       </Text>
 
       <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={4}>
-        <StatCard label={t("totalJobs")} value={stats.jobs} color="blue.600" />
+        <StatCard label={t("totalJobs")} value={stats.jobs} color="purple.600" />
         <StatCard label={t("bookings")} value={stats.bookings} color="green.600" />
         <StatCard label={t("drivers")} value={stats.drivers} color="purple.600" />
         <StatCard label={t("users")} value={stats.users} color="cyan.600" />
@@ -173,7 +173,7 @@ async function RecentJobsTable() {
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, { bg: string; color: string }> = {
     pending: { bg: "yellow.100", color: "yellow.800" },
-    quoted: { bg: "blue.100", color: "blue.800" },
+    quoted: { bg: "purple.100", color: "purple.800" },
     accepted: { bg: "cyan.100", color: "cyan.800" },
     in_progress: { bg: "purple.100", color: "purple.800" },
     completed: { bg: "green.100", color: "green.800" },
