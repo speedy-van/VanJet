@@ -60,7 +60,7 @@
       "auditLog": "Audit Log",
       "chat": "Chat",
       "visitors": "Visitors",
-      "aiAgent": "AI Agent",
+      "aiAgent": "Zyphon",
       "settings": "Settings",
       "signOut": "Sign Out"
     },
@@ -346,16 +346,37 @@
         "visits30Days": "Visits (Last 30 Days)"
       }
     },
-    "aiAgent": {
-      "title": "AI Agent",
-      "subtitle": "Smart admin assistant in Iraqi Arabic",
+    "zyphon": {
+      "title": "Zyphon",
+      "subtitle": "Your smart agent inside the admin panel",
       "placeholder": "Type your message here...",
       "send": "Send",
       "clear": "Clear Chat",
       "thinking": "Thinking...",
       "executing": "Executing",
       "error": "An error occurred",
-      "welcome": "Hello! How can I help you today?",
+      "welcome": "Hello! I'm Zyphon, your smart agent. How can I help you today?",
+      "retry": "Retry",
+      "clearBtn": "Clear Conversation",
+      "sendBtn": "Send",
+      "thinkingBadge": "Zyphon is thinking...",
+      "toolBadge": "Running tool",
+      "errorToast": "An error occurred",
+      "emptyState": "Ask Zyphon anything about operations",
+      "identityHint": "Created by Ahmad Alwakai",
+      "tagline": "Your smart agent inside the admin panel",
+      "byCreator": "by Ahmad Alwakai"
+    },
+    "aiAgent": {
+      "title": "Zyphon",
+      "subtitle": "Your smart agent inside the admin panel",
+      "placeholder": "Type your message here...",
+      "send": "Send",
+      "clear": "Clear Chat",
+      "thinking": "Thinking...",
+      "executing": "Executing",
+      "error": "An error occurred",
+      "welcome": "Hello! I'm Zyphon, your smart agent. How can I help you today?",
       "retry": "Retry"
     },
     "settings": {

@@ -1,7 +1,7 @@
 "use client";
 
-// ─── VanJet · Admin AI Agent Page ─────────────────────────────
-// Chat interface for the Iraqi dialect AI assistant
+// ─── VanJet · Zyphon Agent Page ───────────────────────────────
+// Chat interface for Zyphon — the admin AI agent
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -14,8 +14,9 @@ import {
   HStack,
   Textarea,
   Badge,
+  Avatar,
 } from "@chakra-ui/react";
-import { Send, Trash2, Bot, User, Loader2 } from "lucide-react";
+import { Send, Trash2, User, Loader2, Zap } from "lucide-react";
 import { toaster } from "@/components/ui/toaster";
 
 interface Message {
@@ -24,7 +25,7 @@ interface Message {
 }
 
 export default function AdminAIAgentPage() {
-  const t = useTranslations("admin.aiAgent");
+  const t = useTranslations("admin.zyphon");
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -166,14 +167,26 @@ export default function AdminAIAgentPage() {
     <Flex direction="column" h="calc(100vh - 140px)" minH="500px">
       {/* Header */}
       <Flex justify="space-between" align="center" mb={4}>
-        <Box>
-          <Text fontSize="xl" fontWeight="700" color="gray.800">
-            {t("title")}
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            {t("subtitle")}
-          </Text>
-        </Box>
+        <HStack gap={3}>
+          <Box title={t("identityHint")}>
+            <Avatar.Root colorPalette="purple" size="md">
+              <Avatar.Fallback>Z</Avatar.Fallback>
+            </Avatar.Root>
+          </Box>
+          <Box>
+            <HStack gap={2} align="center">
+              <Text fontSize="xl" fontWeight="700" color="gray.800">
+                {t("title")}
+              </Text>
+              <Badge colorPalette="purple" size="sm" variant="subtle">
+                {t("byCreator")}
+              </Badge>
+            </HStack>
+            <Text fontSize="sm" color="gray.500">
+              {t("tagline")}
+            </Text>
+          </Box>
+        </HStack>
         
         <Button
           size="sm"
@@ -208,9 +221,14 @@ export default function AdminAIAgentPage() {
               py={12}
               color="gray.400"
             >
-              <Bot size={48} />
-              <Text mt={4} textAlign="center">
-                {t("welcome")}
+              <Avatar.Root colorPalette="purple" size="xl">
+                <Avatar.Fallback>Z</Avatar.Fallback>
+              </Avatar.Root>
+              <Text mt={4} textAlign="center" fontWeight="600" color="gray.600">
+                Zyphon
+              </Text>
+              <Text mt={1} textAlign="center" fontSize="sm">
+                {t("emptyState")}
               </Text>
             </Flex>
           )}
@@ -291,7 +309,7 @@ function MessageBubble({
         gap={2}
       >
         <Box flexShrink={0} alignSelf="flex-start" mt={0.5}>
-          {isUser ? <User size={16} /> : <Bot size={16} />}
+          {isUser ? <User size={16} /> : <Zap size={16} />}
         </Box>
         <Text
           fontSize="sm"

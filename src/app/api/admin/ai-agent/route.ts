@@ -1,5 +1,5 @@
-// ─── VanJet · Admin AI Agent API ──────────────────────────────
-// POST: Streaming AI agent endpoint with tool calling
+// ─── VanJet · Zyphon AI Agent API ─────────────────────────────
+// POST: Streaming AI agent endpoint with tool calling + identity guard
 
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
@@ -7,6 +7,12 @@ import { authOptions } from "@/auth";
 import { getGroqClient, getGroqModel } from "@/lib/ai/groqClient";
 import { systemPrompt } from "@/lib/ai/systemPrompt";
 import { getGroqTools, executeTool } from "@/lib/ai/tools";
+import {
+  detectIdentityQuestion,
+  getIdentityResponse,
+  containsForbiddenTokens,
+} from "@/lib/ai/identityGuard";
+import { logAIToolAction } from "@/lib/ai/audit";
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -72,6 +78,27 @@ export async function POST(req: NextRequest) {
     const groq = getGroqClient();
     const model = getGroqModel();
     const tools = getGroqTools();
+
+    // ── IDENTITY GUARD: Short-circuit identity questions ──
+    const lastUserMessage = messages[messages.length - 1];
+    if (lastUserMessage?.role === "user" && detectIdentityQuestion(lastUserMessage.content)) {
+      const identityAnswer = getIdentityResponse("ar");
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: identityAnswer })}\n\n`));
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        },
+      });
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
+    }
 
     // Build conversation with system prompt
     // Using ChatCompletionMessageParam type from Groq SDK
@@ -156,7 +183,20 @@ export async function POST(req: NextRequest) {
       }
 
       // No more tool calls - stream the final response
-      const finalContent = message.content || "";
+      let finalContent = message.content || "";
+
+      // ── SAFETY NET: Scan for forbidden identity leakage ──
+      if (containsForbiddenTokens(finalContent)) {
+        finalContent = getIdentityResponse("ar");
+        // Log the blocked leakage
+        logAIToolAction({
+          adminId,
+          toolName: "identity_leak_blocked",
+          input: { originalResponse: message.content?.slice(0, 200) },
+          output: { replacement: finalContent },
+          status: "error",
+        }).catch(() => {});
+      }
 
       // Create streaming response
       const encoder = new TextEncoder();

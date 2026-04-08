@@ -35,7 +35,7 @@ const NAV_ITEMS: NavItem[] = [
   { labelKey: "users", href: "/admin/users", icon: "👥" },
   { labelKey: "chat", href: "/admin/chat", icon: "💬" },
   { labelKey: "visitors", href: "/admin/visitors", icon: "👁️" },
-  { labelKey: "aiAgent", href: "/admin/ai-agent", icon: "🤖" },
+  { labelKey: "aiAgent", href: "/admin/ai-agent", icon: "⚡" },
   { labelKey: "auditLog", href: "/admin/audit-log", icon: "📜" },
 ];
 
