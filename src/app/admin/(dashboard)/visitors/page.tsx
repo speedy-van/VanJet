@@ -3,7 +3,7 @@
 // ─── VanJet · Admin Visitors Analytics Page ───────────────────
 // Real-time visitor statistics with charts
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import {
   Box,
@@ -14,6 +14,7 @@ import {
   Spinner,
   Table,
   NativeSelect,
+  Progress,
 } from "@chakra-ui/react";
 import {
   AreaChart,
@@ -29,7 +30,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { Users, UserPlus, Globe, RefreshCw } from "lucide-react";
+import { Users, UserPlus, Globe, RefreshCw, Monitor } from "lucide-react";
 import { Button } from "@chakra-ui/react";
 
 const COLORS = ["#3182CE", "#38A169", "#DD6B20", "#805AD5", "#D53F8C", "#00B5D8"];
@@ -89,6 +90,9 @@ export default function AdminVisitorsPage() {
 
   useEffect(() => {
     fetchData();
+    // Auto-poll every 30 seconds
+    const interval = setInterval(fetchData, 30_000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   // Format date for display
@@ -166,6 +170,49 @@ export default function AdminVisitorsPage() {
               color="purple"
             />
           </Grid>
+
+          {/* Device Breakdown Progress Bars */}
+          {stats?.byDevice && stats.byDevice.length > 0 && (
+            <Box bg="white" p={4} borderRadius="lg" borderWidth="1px" mb={6}>
+              <Flex align="center" gap={2} mb={4}>
+                <Monitor size={18} />
+                <Text fontWeight="600">{t("byDevice")}</Text>
+              </Flex>
+              {(() => {
+                const total = stats.byDevice.reduce((acc, d) => acc + d.count, 0) || 1;
+                const deviceColors: Record<string, string> = {
+                  desktop: "blue",
+                  mobile: "green",
+                  tablet: "orange",
+                };
+                return stats.byDevice.map((d, idx) => {
+                  const pct = Math.round((d.count / total) * 100);
+                  const color = deviceColors[d.device || "desktop"] || COLORS[idx % COLORS.length];
+                  return (
+                    <Box key={idx} mb={3}>
+                      <Flex justify="space-between" mb={1}>
+                        <Text fontSize="sm" textTransform="capitalize">
+                          {d.device || "desktop"}
+                        </Text>
+                        <Text fontSize="sm" color="gray.500">
+                          {d.count} ({pct}%)
+                        </Text>
+                      </Flex>
+                      <Progress.Root
+                        value={pct}
+                        size="sm"
+                        colorPalette={typeof color === "string" && !color.startsWith("#") ? color : "blue"}
+                      >
+                        <Progress.Track>
+                          <Progress.Range />
+                        </Progress.Track>
+                      </Progress.Root>
+                    </Box>
+                  );
+                });
+              })()}
+            </Box>
+          )}
 
           {/* Charts Row */}
           <Grid templateColumns={{ base: "1fr", lg: "2fr 1fr" }} gap={6} mb={6}>
@@ -406,6 +453,33 @@ function StatCard({
   value: number;
   color: string;
 }) {
+  const [displayed, setDisplayed] = useState(0);
+  const prevValue = useRef(0);
+  const frameRef = useRef(0);
+
+  useEffect(() => {
+    const from = prevValue.current;
+    const diff = value - from;
+    if (diff === 0) return;
+    const start = performance.now();
+    const duration = 800;
+
+    function tick(now: number) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayed(Math.round(from + diff * eased));
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(tick);
+      } else {
+        prevValue.current = value;
+      }
+    }
+
+    frameRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [value]);
+
   return (
     <Box bg="white" p={4} borderRadius="lg" borderWidth="1px">
       <Flex align="center" gap={3}>
@@ -422,7 +496,7 @@ function StatCard({
         </Flex>
         <Box>
           <Text fontSize="2xl" fontWeight="700" lineHeight="1">
-            {value.toLocaleString()}
+            {displayed.toLocaleString()}
           </Text>
           <Text fontSize="sm" color="gray.500">
             {label}
